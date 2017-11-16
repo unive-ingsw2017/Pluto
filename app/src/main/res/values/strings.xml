@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Pluto</string>
+    <string name="seleziona_un_regione">Seleziona una regione</string>
+    <string name="seleziona_una_provincia">Seleziona una provincia</string>
+    <string name="seleziona_un_comune">Seleziona un comune</string>
+    <string name="seleziona_un_ente">Seleziona un ente</string>
+    <string name="cerca">Cerca</string>
+</resources>
