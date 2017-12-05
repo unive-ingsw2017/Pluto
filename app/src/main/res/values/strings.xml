@@ -5,4 +5,8 @@
     <string name="seleziona_un_comune">Seleziona un comune</string>
     <string name="seleziona_un_ente">Seleziona un ente</string>
     <string name="cerca">Cerca</string>
+    <string name="sezioni">Sezioni</string>
+    <string name="about_us">About us</string>
+    <string name="enti">Enti</string>
+    <string name="categorie_di_bilancio">Categorie di bilancio</string>
 </resources>
