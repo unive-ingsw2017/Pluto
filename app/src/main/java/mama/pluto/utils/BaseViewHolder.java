@@ -1,6 +1,6 @@
 package mama.pluto.utils;
 
-import android.support.annotation.NonNull;
+import org.jetbrains.annotations.NotNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -20,7 +20,7 @@ public class BaseViewHolder<V extends View> extends RecyclerView.ViewHolder {
         return (V) itemView;
     }
 
-    public void setFullWidth(@NonNull RecyclerView recyclerView) {
+    public void setFullWidth(@NotNull RecyclerView recyclerView) {
         final RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
         if (itemView.getLayoutParams() == null) {
             itemView.setLayoutParams(layoutManager.generateDefaultLayoutParams());

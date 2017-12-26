@@ -1,39 +1,32 @@
 package mama.pluto.view.selectors;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 
+import org.jetbrains.annotations.NotNull;
+
+import mama.pluto.Ente;
 import mama.pluto.utils.AbstractEnteSelectorAdapter;
+import mama.pluto.utils.HierarchyLevel;
 
 /**
  * Created by MMarco on 16/11/2017.
  */
-
 public class ProvinciaSelectorView extends AbstractEnteSelectorView {
 
-    @NonNull
-    private final String regione;
-
-    public ProvinciaSelectorView(Context context, @NonNull String regione) {
-        super(context);
-        this.regione = regione;
-    }
-
-    @NonNull
-    public String getRegione() {
-        return regione;
+    public ProvinciaSelectorView(@NotNull Context context, @NotNull Ente regione) {
+        super(context, regione);
     }
 
     @Override
     protected AbstractEnteSelectorAdapter createAdapter() {
         return new AbstractEnteSelectorAdapter() {
             @Override
-            protected String getEnte(int position) {
-                return "Provincia " + position + " di " + regione;
+            protected Ente getEnte(int position) {
+                return new Ente(getMainEnte(), HierarchyLevel.PROVINCIA, "Provincia " + position + " di " + getMainEnte().getName());
             }
 
             @Override
-            public int getItemCount() {
+            public int getEntiCount() {
                 return 10;
             }
         };

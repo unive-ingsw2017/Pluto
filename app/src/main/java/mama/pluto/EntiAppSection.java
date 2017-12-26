@@ -11,7 +11,7 @@ import mama.pluto.view.EntiMainView;
  * Created by MMarco on 05/12/2017.
  */
 
-public class EntiAppSection extends AppSection {
+public class EntiAppSection extends AppSection<EntiMainView> {
 
     @Override
     public String getTitle(Context context) {
@@ -24,7 +24,13 @@ public class EntiAppSection extends AppSection {
     }
 
     @Override
-    public View createView(Context context) {
+    public EntiMainView createView(Context context) {
         return new EntiMainView(context);
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        final EntiMainView currentView = getCurrentView();
+        return currentView != null && currentView.onBackPressed();
     }
 }

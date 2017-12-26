@@ -1,7 +1,7 @@
 package mama.pluto.utils;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import org.jetbrains.annotations.NotNull;
 import android.view.View;
 
 /**
@@ -13,19 +13,19 @@ public class MetricsUtils {
         throw new IllegalStateException();
     }
 
-    public static int pixelToDp(@NonNull Context context, int pixel) {
+    public static int pixelToDp(@NotNull Context context, int pixel) {
         return Math.round(pixelToDp(context, (float) pixel));
     }
 
-    public static float pixelToDp(@NonNull Context context, float pixel) {
+    public static float pixelToDp(@NotNull Context context, float pixel) {
         return pixel / context.getResources().getDisplayMetrics().density;
     }
 
-    public static int dpToPixel(@NonNull Context context, int dp) {
+    public static int dpToPixel(@NotNull Context context, int dp) {
         return Math.round(dpToPixel(context, (float) dp));
     }
 
-    public static float dpToPixel(@NonNull Context context, float dp) {
+    public static float dpToPixel(@NotNull Context context, float dp) {
         return dp * context.getResources().getDisplayMetrics().density;
     }
 

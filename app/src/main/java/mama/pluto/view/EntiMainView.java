@@ -3,7 +3,7 @@ package mama.pluto.view;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
-import android.support.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
@@ -56,7 +56,7 @@ public class EntiMainView extends LinearLayout {
     }
 
     private void recomputeToolbarText() {
-        switch (hierarcySelectorView.getHierarcyLevel()) {
+        switch (hierarcySelectorView.getHierarchyLevel()) {
             case REGIONE:
                 toolbar.setTitle(R.string.seleziona_un_regione);
                 break;
@@ -80,6 +80,10 @@ public class EntiMainView extends LinearLayout {
         final int listPadding = Math.max(0, (width - MetricsUtils.dpToPixel(getContext(), 400)) / 2);
         MetricsUtils.applyLateralPadding(hierarcySelectorView, listPadding);
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    }
+
+    public boolean onBackPressed() {
+        return hierarcySelectorView.onBackPressed();
     }
 }
 

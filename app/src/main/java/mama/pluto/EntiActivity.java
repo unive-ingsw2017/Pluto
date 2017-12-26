@@ -1,7 +1,7 @@
 package mama.pluto;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import org.jetbrains.annotations.NotNull;
 import android.support.design.widget.NavigationView;
 import android.view.SubMenu;
 
@@ -21,7 +21,7 @@ public class EntiActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
     }
 
-    @NonNull
+    @NotNull
     @Override
     protected Set<AppSection> getSections() {
         Set<AppSection> ret = new HashSet<>();
@@ -30,7 +30,7 @@ public class EntiActivity extends BaseActivity {
         return ret;
     }
 
-    @NonNull
+    @NotNull
     @Override
     protected AppSection getDefaultAppSection() {
         return entiAppSection;

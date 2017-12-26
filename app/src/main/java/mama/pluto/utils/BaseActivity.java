@@ -3,8 +3,8 @@ package mama.pluto.utils;
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
@@ -47,10 +47,10 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
     }
 
-    @NonNull
+    @NotNull
     protected abstract Set<AppSection> getSections();
 
-    @NonNull
+    @NotNull
     protected abstract AppSection getDefaultAppSection();
 
     protected NavigationView createDrawer(DrawerLayout drawerLayout) {
@@ -86,7 +86,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     private void selectAppSection(AppSection appSection) {
         content.removeAllViews();
-        content.addView(appSection.createView(this), FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+        content.addView(appSection.getView(this), FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
         for (Map.Entry<Integer, AppSection> entry : appSections.entrySet()) {
             navigationMenu.findItem(entry.getKey()).setChecked(entry.getValue() == appSection);
         }
@@ -99,5 +99,12 @@ public abstract class BaseActivity extends AppCompatActivity {
         img.setImageResource(R.drawable.wallpaper);
         img.setScaleType(ImageView.ScaleType.CENTER_CROP);
         return img;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (selectedAppSection == null || !selectedAppSection.onBackPressed()) {
+            super.onBackPressed();
+        }
     }
 }

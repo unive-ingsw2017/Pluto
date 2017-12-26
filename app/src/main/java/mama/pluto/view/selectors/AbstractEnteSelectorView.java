@@ -3,12 +3,15 @@ package mama.pluto.view.selectors;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
-import android.support.annotation.Nullable;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.AttributeSet;
 
+import mama.pluto.Ente;
 import mama.pluto.R;
 import mama.pluto.utils.AbstractEnteSelectorAdapter;
 import mama.pluto.utils.Consumer;
@@ -19,20 +22,11 @@ import mama.pluto.utils.MetricsUtils;
  */
 public abstract class AbstractEnteSelectorView extends RecyclerView {
     private final AbstractEnteSelectorAdapter adapter;
+    private final Ente mainEnte;
 
-    public AbstractEnteSelectorView(Context context) {
+    public AbstractEnteSelectorView(@NotNull Context context, @Nullable Ente mainEnte) {
         super(context);
-    }
-
-    public AbstractEnteSelectorView(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-    }
-
-    public AbstractEnteSelectorView(Context context, @Nullable AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-    }
-
-    {
+        this.mainEnte = mainEnte;
         final int dp8 = MetricsUtils.dpToPixel(getContext(), 8);
         setPadding(0, dp8, 0, dp8);
         setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
@@ -47,9 +41,16 @@ public abstract class AbstractEnteSelectorView extends RecyclerView {
 
         adapter = createAdapter();
         setAdapter(adapter);
+        if (mainEnte != null) {
+            adapter.setMainEnte(mainEnte);
+        }
     }
 
-    public void setOnEnteSelected(Consumer<String> onEnteSelected) {
+    public Ente getMainEnte() {
+        return mainEnte;
+    }
+
+    public void setOnEnteSelected(Consumer<Ente> onEnteSelected) {
         adapter.setOnEnteSelected(onEnteSelected);
     }
 

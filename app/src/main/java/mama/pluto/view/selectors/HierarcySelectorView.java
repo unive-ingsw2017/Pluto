@@ -1,13 +1,18 @@
 package mama.pluto.view.selectors;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
+import java.util.Objects;
+
+import mama.pluto.Ente;
 import mama.pluto.utils.Consumer;
-import mama.pluto.utils.HierarcyLevel;
+import mama.pluto.utils.HierarchyLevel;
 
 /**
  * Created by MMarco on 16/11/2017.
@@ -16,14 +21,14 @@ import mama.pluto.utils.HierarcyLevel;
 public class HierarcySelectorView extends FrameLayout {
 
     @SuppressWarnings("ConstantConditions")
-    @NonNull
-    private HierarcyLevel hierarcyLevel = null;
+    @NotNull
+    private HierarchyLevel hierarchyLevel = null;
     @SuppressWarnings("ConstantConditions")
-    @NonNull
+    @NotNull
     private AbstractEnteSelectorView currentSelector = null;
-    private Consumer<HierarcyLevel> onHierarcyLevelSelector;
-    private String currentSelectedEnte = null;
-    private Consumer<String> onEnteSelector;
+    private Consumer<HierarchyLevel> onHierarcyLevelSelector;
+    private Ente currentSelectedEnte = null;
+    private Consumer<Ente> onEnteSelector;
 
     public HierarcySelectorView(Context context) {
         super(context);
@@ -38,51 +43,50 @@ public class HierarcySelectorView extends FrameLayout {
     }
 
     {
-        setHierarcyLevel(HierarcyLevel.REGIONE);
+        setHierarchyLevel(HierarchyLevel.REGIONE);
     }
 
-    public void setOnHierarcyLevelSelector(Consumer<HierarcyLevel> onHierarcyLevelSelector) {
+    public void setOnHierarcyLevelSelector(Consumer<HierarchyLevel> onHierarcyLevelSelector) {
         this.onHierarcyLevelSelector = onHierarcyLevelSelector;
     }
 
-    @NonNull
-    public HierarcyLevel getHierarcyLevel() {
-        return hierarcyLevel;
+    @NotNull
+    public HierarchyLevel getHierarchyLevel() {
+        return hierarchyLevel;
     }
 
-    public void setOnEnteSelector(Consumer<String> onEnteSelector) {
+    public void setOnEnteSelector(Consumer<Ente> onEnteSelector) {
         this.onEnteSelector = onEnteSelector;
     }
 
-    public void setHierarcyLevel(@NonNull HierarcyLevel hierarcyLevel) {
-        if (hierarcyLevel != this.hierarcyLevel) {
+    public void setHierarchyLevel(@NotNull HierarchyLevel hierarchyLevel) {
+        if (hierarchyLevel != this.hierarchyLevel) {
             AbstractEnteSelectorView selector;
-            switch (hierarcyLevel) {
+            switch (hierarchyLevel) {
                 case REGIONE:
                     selector = new RegioneSelectorView(getContext());
                     selector.setOnEnteSelected(s -> {
                         currentSelectedEnte = s;
-                        setHierarcyLevel(HierarcyLevel.PROVINCIA);
+                        setHierarchyLevel(HierarchyLevel.PROVINCIA);
                     });
                     break;
                 case PROVINCIA:
                     selector = new ProvinciaSelectorView(getContext(), currentSelectedEnte);
                     selector.setOnEnteSelected(s -> {
                         currentSelectedEnte = s;
-                        setHierarcyLevel(HierarcyLevel.COMUNE);
+                        setHierarchyLevel(HierarchyLevel.COMUNE);
                     });
                     break;
                 case COMUNE:
                     selector = new ComuneSelectorView(getContext(), currentSelectedEnte);
                     selector.setOnEnteSelected(s -> {
                         currentSelectedEnte = s;
-                        setHierarcyLevel(HierarcyLevel.ENTE);
+                        setHierarchyLevel(HierarchyLevel.ENTE);
                     });
                     break;
                 case ENTE:
                     selector = new EnteSelectorView(getContext(), currentSelectedEnte);
                     selector.setOnEnteSelected(s -> {
-                        currentSelectedEnte = s;
                         if (onEnteSelector != null) {
                             onEnteSelector.consume(s);
                         }
@@ -93,12 +97,21 @@ public class HierarcySelectorView extends FrameLayout {
             }
 
 
-            this.hierarcyLevel = hierarcyLevel;
+            this.hierarchyLevel = hierarchyLevel;
             addView(selector, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
             if (onHierarcyLevelSelector != null) {
-                onHierarcyLevelSelector.consume(hierarcyLevel);
+                onHierarcyLevelSelector.consume(hierarchyLevel);
             }
         }
     }
 
+    public boolean onBackPressed() {
+        if (currentSelectedEnte == null) {
+            return false;
+        }
+        final Ente parent = currentSelectedEnte.getParent();
+        currentSelectedEnte = parent;
+        setHierarchyLevel(Objects.requireNonNull(parent == null ? HierarchyLevel.REGIONE : parent.getHierarchyLevel().getNext()));
+        return true;
+    }
 }

@@ -1,39 +1,33 @@
 package mama.pluto.view.selectors;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 
+import org.jetbrains.annotations.NotNull;
+
+import mama.pluto.Ente;
 import mama.pluto.utils.AbstractEnteSelectorAdapter;
+import mama.pluto.utils.HierarchyLevel;
 
 /**
  * Created by MMarco on 16/11/2017.
  */
-
 public class EnteSelectorView extends AbstractEnteSelectorView {
 
-    @NonNull
-    private final String comune;
-
-    public EnteSelectorView(Context context, @NonNull String comune) {
-        super(context);
-        this.comune = comune;
+    public EnteSelectorView(@NotNull Context context, @NotNull Ente comune) {
+        super(context, comune);
     }
 
-    @NonNull
-    public String getComune() {
-        return comune;
-    }
 
     @Override
     protected AbstractEnteSelectorAdapter createAdapter() {
         return new AbstractEnteSelectorAdapter() {
             @Override
-            protected String getEnte(int position) {
-                return "Ente " + position + " del comune " + comune;
+            protected Ente getEnte(int position) {
+                return new Ente(getMainEnte(), HierarchyLevel.ENTE, "Ente " + position + " del comune " + getMainEnte().getName());
             }
 
             @Override
-            public int getItemCount() {
+            public int getEntiCount() {
                 return 2000;
             }
         };
