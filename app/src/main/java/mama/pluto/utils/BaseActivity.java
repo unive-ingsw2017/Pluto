@@ -1,12 +1,11 @@
 package mama.pluto.utils;
 
-import android.app.Activity;
-import android.graphics.Color;
 import android.os.Bundle;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
@@ -14,19 +13,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import mama.pluto.R;
-import mama.pluto.utils.MetricsUtils;
 
 /**
- * Created by MMarco on 05/12/2017.
+ * Call setupContentView() to add the navigation drawer and the app sections
  */
 public abstract class BaseActivity extends AppCompatActivity {
 
@@ -35,8 +34,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     private FrameLayout content;
     private SubMenu navigationMenu;
 
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void setupContentView() {
         content = new FrameLayout(this);
         DrawerLayout drawerLayout = new DrawerLayout(this);
         drawerLayout.addView(content, DrawerLayout.LayoutParams.MATCH_PARENT, DrawerLayout.LayoutParams.MATCH_PARENT);
@@ -44,7 +42,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         DrawerLayout.LayoutParams lp = new DrawerLayout.LayoutParams(DrawerLayout.LayoutParams.WRAP_CONTENT, DrawerLayout.LayoutParams.MATCH_PARENT, Gravity.START);
         drawerLayout.addView(createDrawer(drawerLayout), lp);
         setContentView(drawerLayout);
-        super.onCreate(savedInstanceState);
     }
 
     @NotNull
@@ -86,7 +83,11 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     private void selectAppSection(AppSection appSection) {
         content.removeAllViews();
-        content.addView(appSection.getView(this), FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+        final View view = appSection.getView(this);
+        if (view.getParent() instanceof ViewGroup) {
+            ((ViewGroup) view.getParent()).removeView(view);
+        }
+        content.addView(view, FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
         for (Map.Entry<Integer, AppSection> entry : appSections.entrySet()) {
             navigationMenu.findItem(entry.getKey()).setChecked(entry.getValue() == appSection);
         }

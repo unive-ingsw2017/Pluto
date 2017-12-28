@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ImageAssetSettings">
+    <option name="children">
+      <map>
+        <entry key="imageAssetPanel">
+          <value>
+            <PersistentState>
+              <option name="children">
+                <map>
+                  <entry key="launcher">
+                    <value>
+                      <PersistentState>
+                        <option name="children">
+                          <map>
+                            <entry key="foregroundImage">
+                              <value>
+                                <PersistentState>
+                                  <option name="values">
+                                    <map>
+                                      <entry key="scalingPercent" value="58" />
+                                    </map>
+                                  </option>
+                                </PersistentState>
+                              </value>
+                            </entry>
+                          </map>
+                        </option>
+                        <option name="values">
+                          <map>
+                            <entry key="backgroundAssetType" value="COLOR" />
+                            <entry key="backgroundColor" value="388e3c" />
+                            <entry key="foregroundImage" value="C:\Users\Marco\Desktop\euro_sign_PNG4.png" />
+                            <entry key="legacyIconShape" value="HRECT" />
+                            <entry key="webIconShape" value="HRECT" />
+                          </map>
+                        </option>
+                      </PersistentState>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </PersistentState>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
