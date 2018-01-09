@@ -6,11 +6,8 @@ import android.os.Bundle;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import android.support.design.widget.NavigationView;
-import android.view.SubMenu;
-import android.view.View;
-
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import mama.pluto.utils.AppSection;
@@ -21,6 +18,7 @@ public class EntiActivity extends BaseActivity {
 
     public final AppSection entiAppSection = new EntiAppSection();
     public final AppSection categorieDiBilancioAppSection = new CategorieDiBilancioAppSection();
+    public final AppSection heatMapAppSection = new HeatMapAppSection();
 
     private boolean datiLoaded = false;//TODO: replace with an actual struture to hold the data
 
@@ -62,9 +60,10 @@ public class EntiActivity extends BaseActivity {
     @NotNull
     @Override
     protected Set<AppSection> getSections() {
-        Set<AppSection> ret = new HashSet<>();
+        Set<AppSection> ret = new LinkedHashSet<>();
         ret.add(entiAppSection);
         ret.add(categorieDiBilancioAppSection);
+        ret.add(heatMapAppSection);
         return ret;
     }
 
