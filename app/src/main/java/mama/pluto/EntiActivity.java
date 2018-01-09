@@ -3,13 +3,17 @@ package mama.pluto;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import mama.pluto.database.Database;
 import mama.pluto.utils.AppSection;
 import mama.pluto.utils.BaseActivity;
 import mama.pluto.view.FullscreenLoadingView;
@@ -28,22 +32,20 @@ public class EntiActivity extends BaseActivity {
         if (!datiLoaded) {
             FullscreenLoadingView fullscreenLoadingView = new FullscreenLoadingView(this);
             setContentView(fullscreenLoadingView);
-            new AsyncTask<Void, Integer, Void>() {
+            new AsyncTask<Void, Integer, Exception>() {
                 @Override
-                protected Void doInBackground(Void[] objects) {
-                    for (int i = 0; i < 10; i++) {
-                        publishProgress(i * 10);
-                        try {
-                            Thread.sleep(400);
-                        } catch (InterruptedException ignored) {
-                        }
+                protected Exception doInBackground(Void[] objects) {
+                    try {
+                        Database.getInstance(EntiActivity.this).saveAnagrafiche(Anagrafiche.downloadAnagrafiche());
+                        return null;
+                    } catch (IOException e) {
+                        return e;
                     }
-                    return null;
                 }
 
                 @Override
-                protected void onPostExecute(Void o) {
-                    datiLoaded = true;
+                protected void onPostExecute(Exception o) {
+                    datiLoaded = o == null;
                     setupContentView();
                 }
 
