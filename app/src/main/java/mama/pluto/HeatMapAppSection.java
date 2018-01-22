@@ -14,6 +14,8 @@ import org.json.JSONObject;
 import java.util.HashMap;
 
 import mama.pluto.utils.AppSection;
+import mama.pluto.utils.BaseActivity;
+import mama.pluto.view.EntiMainView;
 
 public class HeatMapAppSection extends AppSection {
 
@@ -27,10 +29,11 @@ public class HeatMapAppSection extends AppSection {
         return context.getResources().getDrawable(R.drawable.ic_heatmap_black_24dp);
     }
 
+
     @SuppressLint("SetJavaScriptEnabled")
     @Override
-    protected View createView(@NotNull Context context) {
-        WebView ret = new WebView(context);
+    protected View createView(@NotNull BaseActivity baseActivity) {
+        WebView ret = new WebView(baseActivity);
         ret.getSettings().setJavaScriptEnabled(true);
         ret.setWebChromeClient(new WebChromeClient());
         ret.addJavascriptInterface(new JavaScriptInterface(), "Android");

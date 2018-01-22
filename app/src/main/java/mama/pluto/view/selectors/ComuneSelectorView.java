@@ -2,6 +2,8 @@ package mama.pluto.view.selectors;
 
 import android.content.Context;
 
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
+
 import org.jetbrains.annotations.NotNull;
 
 import mama.pluto.Ente;
@@ -14,8 +16,8 @@ import mama.pluto.utils.HierarchyLevel;
 
 public class ComuneSelectorView extends AbstractEnteSelectorView {
 
-    public ComuneSelectorView(@NotNull Context context, @NotNull Ente provincia) {
-        super(context, provincia);
+    public ComuneSelectorView(@NotNull Context context, @NotNull Anagrafiche anagrafiche, @NotNull Ente provincia) {
+        super(context, anagrafiche, provincia);
     }
 
     @Override

@@ -2,9 +2,14 @@ package mama.pluto;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.view.View;
+import android.support.annotation.NonNull;
+
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
+
+import org.jetbrains.annotations.NotNull;
 
 import mama.pluto.utils.AppSection;
+import mama.pluto.utils.BaseActivity;
 import mama.pluto.view.EntiMainView;
 
 /**
@@ -12,6 +17,12 @@ import mama.pluto.view.EntiMainView;
  */
 
 public class EntiAppSection extends AppSection<EntiMainView> {
+    @NotNull
+    private final Anagrafiche anagrafiche;
+
+    public EntiAppSection(@NonNull Anagrafiche anagrafiche) {
+        this.anagrafiche = anagrafiche;
+    }
 
     @Override
     public String getTitle(Context context) {
@@ -24,8 +35,10 @@ public class EntiAppSection extends AppSection<EntiMainView> {
     }
 
     @Override
-    public EntiMainView createView(Context context) {
-        return new EntiMainView(context);
+    protected EntiMainView createView(@NotNull BaseActivity baseActivity) {
+        EntiMainView ret = new EntiMainView(baseActivity, anagrafiche);
+        baseActivity.setupToolbar(ret.getToolbar());
+        return ret;
     }
 
     @Override

@@ -1,12 +1,11 @@
 package mama.pluto.view.selectors;
 
 import android.content.Context;
+import android.widget.FrameLayout;
+
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import android.util.AttributeSet;
-import android.widget.FrameLayout;
 
 import java.util.Objects;
 
@@ -20,6 +19,8 @@ import mama.pluto.utils.HierarchyLevel;
 
 public class HierarcySelectorView extends FrameLayout {
 
+    @NotNull
+    private final Anagrafiche anagrafiche;
     @SuppressWarnings("ConstantConditions")
     @NotNull
     private HierarchyLevel hierarchyLevel = null;
@@ -30,19 +31,9 @@ public class HierarcySelectorView extends FrameLayout {
     private Ente currentSelectedEnte = null;
     private Consumer<Ente> onEnteSelector;
 
-    public HierarcySelectorView(Context context) {
+    public HierarcySelectorView(Context context, @NotNull Anagrafiche anagrafiche) {
         super(context);
-    }
-
-    public HierarcySelectorView(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-    }
-
-    public HierarcySelectorView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-    }
-
-    {
+        this.anagrafiche = anagrafiche;
         setHierarchyLevel(HierarchyLevel.REGIONE);
     }
 
@@ -64,28 +55,28 @@ public class HierarcySelectorView extends FrameLayout {
             AbstractEnteSelectorView selector;
             switch (hierarchyLevel) {
                 case REGIONE:
-                    selector = new RegioneSelectorView(getContext());
+                    selector = new RegioneSelectorView(getContext(), anagrafiche);
                     selector.setOnEnteSelected(s -> {
                         currentSelectedEnte = s;
                         setHierarchyLevel(HierarchyLevel.PROVINCIA);
                     });
                     break;
                 case PROVINCIA:
-                    selector = new ProvinciaSelectorView(getContext(), currentSelectedEnte);
+                    selector = new ProvinciaSelectorView(getContext(), anagrafiche, currentSelectedEnte);
                     selector.setOnEnteSelected(s -> {
                         currentSelectedEnte = s;
                         setHierarchyLevel(HierarchyLevel.COMUNE);
                     });
                     break;
                 case COMUNE:
-                    selector = new ComuneSelectorView(getContext(), currentSelectedEnte);
+                    selector = new ComuneSelectorView(getContext(), anagrafiche, currentSelectedEnte);
                     selector.setOnEnteSelected(s -> {
                         currentSelectedEnte = s;
                         setHierarchyLevel(HierarchyLevel.ENTE);
                     });
                     break;
                 case ENTE:
-                    selector = new EnteSelectorView(getContext(), currentSelectedEnte);
+                    selector = new EnteSelectorView(getContext(), anagrafiche, currentSelectedEnte);
                     selector.setOnEnteSelected(s -> {
                         if (onEnteSelector != null) {
                             onEnteSelector.consume(s);

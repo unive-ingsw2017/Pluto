@@ -2,6 +2,8 @@ package mama.pluto.view.selectors;
 
 import android.content.Context;
 
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
+
 import org.jetbrains.annotations.NotNull;
 
 import mama.pluto.Ente;
@@ -13,8 +15,8 @@ import mama.pluto.utils.HierarchyLevel;
  */
 public class RegioneSelectorView extends AbstractEnteSelectorView {
 
-    public RegioneSelectorView(@NotNull Context context) {
-        super(context, null);
+    public RegioneSelectorView(@NotNull Context context, @NotNull Anagrafiche anagrafiche) {
+        super(context, anagrafiche, null);
     }
 
 

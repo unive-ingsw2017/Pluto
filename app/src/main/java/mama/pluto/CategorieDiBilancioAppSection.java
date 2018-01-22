@@ -4,7 +4,10 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 
+import org.jetbrains.annotations.NotNull;
+
 import mama.pluto.utils.AppSection;
+import mama.pluto.utils.BaseActivity;
 
 /**
  * Created by MMarco on 05/12/2017.
@@ -23,7 +26,7 @@ public class CategorieDiBilancioAppSection extends AppSection {
     }
 
     @Override
-    public View createView(Context context) {
-        return new View(context);
+    protected View createView(@NotNull BaseActivity baseActivity) {
+        return new View(baseActivity);
     }
 }

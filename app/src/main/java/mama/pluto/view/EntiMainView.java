@@ -3,10 +3,16 @@ package mama.pluto.view;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
-import org.jetbrains.annotations.Nullable;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
-import android.util.AttributeSet;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.Toast;
+
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
+
+import org.jetbrains.annotations.NotNull;
 
 import mama.pluto.R;
 import mama.pluto.utils.MetricsUtils;
@@ -17,35 +23,48 @@ import mama.pluto.view.selectors.HierarcySelectorView;
  */
 
 public class EntiMainView extends LinearLayout {
+
+    @NotNull
+    private final Anagrafiche anagrafiche;
     private final Toolbar toolbar;
+    private final MaterialSearchView searchView;
     private final HierarcySelectorView hierarcySelectorView;
 
-    public EntiMainView(Context context) {
+    public EntiMainView(@NotNull Context context, @NotNull Anagrafiche anagrafiche) {
         super(context);
-    }
-
-    public EntiMainView(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-    }
-
-    public EntiMainView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-    }
-
-
-    {
+        this.anagrafiche = anagrafiche;
         setOrientation(VERTICAL);
         setBackgroundColor(getResources().getColor(R.color.backgroundColor));
+
+
+        FrameLayout toolbarWrapper = new FrameLayout(context);
+        addView(toolbarWrapper, LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
 
         toolbar = new Toolbar(getContext());
         toolbar.setPopupTheme(R.style.Theme_AppCompat_Light);
         toolbar.setBackgroundResource(R.color.colorPrimaryDark);
         toolbar.setTitleTextColor(Color.WHITE);
         toolbar.inflateMenu(R.menu.enti_main_menu);
-        addView(toolbar, LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        toolbarWrapper.addView(toolbar, LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
 
+        searchView = new MaterialSearchView(getContext());
+        searchView.setHint(context.getString(R.string.cerca));
+        toolbarWrapper.addView(searchView, Toolbar.LayoutParams.MATCH_PARENT, Toolbar.LayoutParams.WRAP_CONTENT);
+        searchView.setMenuItem(toolbar.getMenu().findItem(R.id.app_bar_search));
+        searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                Toast.makeText(context, query, Toast.LENGTH_SHORT).show();
+                return false;
+            }
 
-        hierarcySelectorView = new HierarcySelectorView(getContext());
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
+        hierarcySelectorView = new HierarcySelectorView(getContext(), anagrafiche);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             hierarcySelectorView.setElevation(MetricsUtils.dpToPixel(getContext(), 4f));
         }
@@ -53,6 +72,10 @@ public class EntiMainView extends LinearLayout {
         addView(hierarcySelectorView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 
         recomputeToolbarText();
+    }
+
+    public Toolbar getToolbar() {
+        return toolbar;
     }
 
     private void recomputeToolbarText() {
@@ -83,7 +106,13 @@ public class EntiMainView extends LinearLayout {
     }
 
     public boolean onBackPressed() {
-        return hierarcySelectorView.onBackPressed();
+        if (searchView.isSearchOpen()) {
+            searchView.closeSearch();
+            return true;
+        } else {
+            return hierarcySelectorView.onBackPressed();
+        }
     }
 }
+
 

@@ -10,4 +10,7 @@
     <string name="enti">Enti</string>
     <string name="categorie_di_bilancio">Categorie di bilancio</string>
     <string name="heat_map">Heatmap</string>
+    <string name="retry">Riprova</string>
+    <string name="drawer_open">Apri drawer</string>
+    <string name="drawer_close">Chiudi drawer</string>
 </resources>

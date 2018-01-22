@@ -1,22 +1,20 @@
 package mama.pluto.utils;
 
-import android.os.Bundle;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,13 +28,14 @@ import mama.pluto.R;
 public abstract class BaseActivity extends AppCompatActivity {
 
     private final Map<Integer, AppSection> appSections = new HashMap<>();
+    private DrawerLayout drawerLayout;
     private AppSection selectedAppSection;
     private FrameLayout content;
     private SubMenu navigationMenu;
 
     protected void setupContentView() {
         content = new FrameLayout(this);
-        DrawerLayout drawerLayout = new DrawerLayout(this);
+        drawerLayout = new DrawerLayout(this);
         drawerLayout.addView(content, DrawerLayout.LayoutParams.MATCH_PARENT, DrawerLayout.LayoutParams.MATCH_PARENT);
 
         DrawerLayout.LayoutParams lp = new DrawerLayout.LayoutParams(DrawerLayout.LayoutParams.WRAP_CONTENT, DrawerLayout.LayoutParams.MATCH_PARENT, Gravity.START);
@@ -107,5 +106,23 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (selectedAppSection == null || !selectedAppSection.onBackPressed()) {
             super.onBackPressed();
         }
+    }
+
+    public void setupToolbar(@NotNull Toolbar toolbar) {
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close) {
+
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                invalidateOptionsMenu();
+            }
+
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                invalidateOptionsMenu();
+            }
+        };
+        drawerLayout.addDrawerListener(toggle);
+        toggle.setDrawerIndicatorEnabled(true);
+        toggle.syncState();
     }
 }

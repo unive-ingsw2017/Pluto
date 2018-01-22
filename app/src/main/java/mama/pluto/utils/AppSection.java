@@ -2,9 +2,13 @@ package mama.pluto.utils;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import org.jetbrains.annotations.Nullable;
 import android.view.MenuItem;
 import android.view.View;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import mama.pluto.view.EntiMainView;
 
 /**
  * Created by MMarco on 05/12/2017.
@@ -23,9 +27,9 @@ public abstract class AppSection<V extends View> {
 
     public abstract Drawable getIcon(Context context);
 
-    public V getView(Context context) {
+    public V getView(@NotNull BaseActivity baseActivity) {
         if (createdView == null) {
-            createdView = createView(context);
+            createdView = createView(baseActivity);
         }
         return createdView;
     }
@@ -35,7 +39,7 @@ public abstract class AppSection<V extends View> {
         return createdView;
     }
 
-    protected abstract V createView(Context context);
+    protected abstract V createView(@NotNull BaseActivity baseActivity);
 
     public boolean onBackPressed() {
         return false;
