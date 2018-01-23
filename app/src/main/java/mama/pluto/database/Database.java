@@ -1,8 +1,10 @@
 package mama.pluto.database;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.support.annotation.NonNull;
 
+import com.github.mmauro94.siopeDownloader.datastruct.AutoMap;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.CodiceGestionale;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.CodiceGestionaleEntrate;
@@ -25,12 +27,14 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 
 import io.requery.android.database.sqlite.SQLiteDatabase;
 import io.requery.android.database.sqlite.SQLiteOpenHelper;
 import io.requery.android.database.sqlite.SQLiteStatement;
 import mama.pluto.utils.BiConsumer;
 import mama.pluto.utils.Consumer;
+import mama.pluto.utils.Function;
 import mama.pluto.utils.StringUtils;
 
 public class Database extends SQLiteOpenHelper {
@@ -82,7 +86,7 @@ public class Database extends SQLiteOpenHelper {
                 "codiceFiscale TEXT," +
                 "nome TEXT NOT NULL," +
                 "comune_codice INTEGER NOT NULL," +
-                "comune_provincia INTEGER NOT NULL," +
+                "provincia_codice INTEGER NOT NULL," +
                 "numeroAbitanti INTEGER," +
                 "sottocomparto TEXT NOT NULL REFERENCES Sottocomparto(codice)," +
                 "FOREIGN KEY (comune_codice, comune_provincia) REFERENCES Comune(codice, provincia)" +
@@ -91,6 +95,7 @@ public class Database extends SQLiteOpenHelper {
                 "codice TEXT NOT NULL," +
                 "tipo TEXT NOT NULL," +
                 "nome TEXT NOT NULL," +
+                "comparto TEXT NOT NULL REFERENCES Comparto(codice), " +
                 "inizioValidita INTEGER NOT NULL," +
                 "fineValidita INTEGER," +
                 "PRIMARY KEY (codice, tipo)" +
@@ -224,7 +229,7 @@ public class Database extends SQLiteOpenHelper {
     }
 
     public void saveEnti(@NotNull Collection<Ente> enti) {
-        save(enti, insertQuery("Ente", "codice", "dataInclusione", "dataEsclusione", "codiceFiscale", "nome", "comune_codice", "comune_provincia", "numeroAbitanti", "sottocomparto"), (stmt, item) -> {
+        save(enti, insertQuery("Ente", "codice", "dataInclusione", "dataEsclusione", "codiceFiscale", "nome", "comune_codice", "provincia_codice", "numeroAbitanti", "sottocomparto"), (stmt, item) -> {
             stmt.bindString(1, item.getCodice());
             stmt.bindLong(2, item.getDataInclusione().getTime());
             if (item.hasDataEsclusione()) {
@@ -260,15 +265,16 @@ public class Database extends SQLiteOpenHelper {
     }
 
     public void saveCodiciGestionali(@NotNull Collection<? extends CodiceGestionale> codiciGestionali) {
-        save(codiciGestionali, insertQuery("CodiceGestionale", "codice", "tipo", "nome", "inizioValidita", "fineValidita"), (stmt, item) -> {
+        save(codiciGestionali, insertQuery("CodiceGestionale", "codice", "tipo", "nome", "comparto", "inizioValidita", "fineValidita"), (stmt, item) -> {
             stmt.bindString(1, item.getCodice());
             stmt.bindString(2, getTipoCodiceGestionale(item));
             stmt.bindString(3, item.getNome());
-            stmt.bindLong(4, item.getInizioValidita().getTime());
+            stmt.bindString(4, item.getComparto().getCodice());
+            stmt.bindLong(5, item.getInizioValidita().getTime());
             if (item.getFineValidita() != null) {
-                stmt.bindLong(5, item.getFineValidita().getTime());
+                stmt.bindLong(6, item.getFineValidita().getTime());
             } else {
-                stmt.bindNull(5);
+                stmt.bindNull(6);
             }
 
         });
@@ -298,8 +304,152 @@ public class Database extends SQLiteOpenHelper {
     }
 
     @NotNull
-    public RipartizioneGeografica.Map loadRipartizioniGeografiche(){
-        //getReadableDatabase().rawQuery("SELECT nome FROM ")
-        return null;
+    public RipartizioneGeografica.Map loadRipartizioniGeografiche() {
+        final RipartizioneGeografica.Map ret = new RipartizioneGeografica.Map();
+        try (Cursor c = getReadableDatabase().rawQuery("SELECT nome FROM RipartizioneGeografica", null)) {
+            while (c.moveToNext()) {
+                ret.add(new RipartizioneGeografica(c.getString(0)));
+            }
+        }
+        return ret;
+    }
+
+    private <K, V, R extends AutoMap<K, V>> R loadMap(@NotNull String query, @Nullable String[] selectionArgs, @NotNull R map, @NotNull Function<Cursor, V> f) {
+        try (Cursor c = getReadableDatabase().rawQuery(query, selectionArgs)) {
+            while (c.moveToNext()) {
+                map.add(f.apply(c));
+            }
+        }
+        return map;
+    }
+
+    @NotNull
+    public Regione.Map loadRegioni(@NotNull RipartizioneGeografica.Map ripartizioniGeografiche) {
+        return loadMap("SELECT codice, nome, ripartizioneGeografica FROM Regione", null, new Regione.Map(), c ->
+                new Regione(
+                        c.getInt(0),
+                        c.getString(1),
+                        ripartizioniGeografiche.get(c.getString(2))
+                )
+        );
+    }
+
+    @NotNull
+    public Provincia.Map loadProvincie(@NotNull Regione.Map regioni) {
+        return loadMap("SELECT codice, nome, regione FROM Provincia", null, new Provincia.Map(), c ->
+                new Provincia(
+                        c.getInt(0),
+                        c.getString(1),
+                        regioni.get(c.getInt(2))
+                )
+        );
+    }
+
+    @NotNull
+    public Comune.Map loadComuni(@NotNull Provincia.Map provincie) {
+        return loadMap("SELECT codice, provincia, nome FROM Comune", null, new Comune.Map(), c ->
+                new Comune(
+                        new Comune.ComuneId(c.getInt(0), provincie.get(c.getInt(1))),
+                        c.getString(2)
+                )
+        );
+    }
+
+    @NotNull
+    public Comparto.Map loadComparti() {
+        return loadMap("SELECT codice, nome FROM Comparto", null, new Comparto.Map(), c ->
+                new Comparto(
+                        c.getString(0),
+                        c.getString(1)
+                )
+        );
+    }
+
+    @NotNull
+    public Sottocomparto.Map loadSottocomparti(@NotNull Comparto.Map comparti) {
+        return loadMap("SELECT codice, nome, comparto FROM Comparto", null, new Sottocomparto.Map(), c ->
+                new Sottocomparto(
+                        c.getString(0),
+                        c.getString(1),
+                        comparti.get(c.getString(2))
+                )
+        );
+    }
+
+    @NotNull
+    public Ente.Map loadEnti(@NotNull Comune.Map comuni, @NotNull Provincia.Map provincie, @NotNull Sottocomparto.Map sottocomparti) {
+        return loadMap("SELECT codice, dataInclusione, dataEsclusione, codiceFiscale, nome, comune_codice, provincia_codice, numeroAbitanti, sottocomparto FROM Ente", null, new Ente.Map(), c ->
+                new Ente(
+                        c.getString(0),
+                        new Date(c.getLong(1)),
+                        c.isNull(2) ? null : new Date(c.getLong(2)),
+                        c.isNull(3) ? null : c.getString(3),
+                        c.getString(4),
+                        comuni.get(new Comune.ComuneId(c.getInt(5), provincie.get(c.getInt(6)))),
+                        c.isNull(7) ? null : c.getInt(7),
+                        sottocomparti.get(c.getString(8))
+                )
+        );
+    }
+
+    public interface CodiceGestionaleConstructor<T extends CodiceGestionale> {
+        T construct(@NotNull String codice, @NotNull String name, @NotNull Comparto comparto, @NotNull Date inizioValidita, @Nullable Date fineValidita);
+    }
+
+    @NotNull
+    public <T extends CodiceGestionale, R extends CodiceGestionale.Map<T>> R loadCodiciGestionali(@NotNull Comparto.Map comparti, @NotNull String tipo, @NotNull R map, @NotNull CodiceGestionaleConstructor<T> codiceGestionaleConstructor) {
+        return loadMap("SELECT codice, nome, comparto, inizioValidita, fineValidita FROM CodiceGestionale WHERE tipo=?", new String[]{tipo}, map, c ->
+                codiceGestionaleConstructor.construct(
+                        c.getString(0),
+                        c.getString(1),
+                        comparti.get(c.getString(2)),
+                        new Date(c.getLong(3)),
+                        c.isNull(4) ? null : new Date(c.getLong(4))
+                )
+        );
+    }
+
+    @NotNull
+    public CodiceGestionaleEntrate.Map loadCodiciGestionaliEntrate(@NotNull Comparto.Map comparti) {
+        return loadCodiciGestionali(comparti, TIPO_CODICE_GESTIONALE_ENTRATA, new CodiceGestionaleEntrate.Map(), CodiceGestionaleEntrate::new);
+    }
+
+    @NotNull
+    public CodiceGestionaleUscite.Map loadCodiciGestionaliUscite(@NotNull Comparto.Map comparti) {
+        return loadCodiciGestionali(comparti, TIPO_CODICE_GESTIONALE_USCITA, new CodiceGestionaleUscite.Map(), CodiceGestionaleUscite::new);
+    }
+
+    @NotNull
+    public Anagrafiche loadAnagrafiche(@NotNull OnProgressListener progressListener) {
+        progressListener.onProgress(0f);
+
+        final Comparto.Map comparti = loadComparti();
+        progressListener.onProgress(.1f);
+
+        final Sottocomparto.Map sottocomparti = loadSottocomparti(comparti);
+        progressListener.onProgress(.2f);
+
+        final RipartizioneGeografica.Map ripartizioneGeografiche = loadRipartizioniGeografiche();
+        progressListener.onProgress(.3f);
+
+        final Regione.Map regioni = loadRegioni(ripartizioneGeografiche);
+        progressListener.onProgress(.4f);
+
+        final Provincia.Map provincie = loadProvincie(regioni);
+        progressListener.onProgress(.5f);
+
+        final Comune.Map comuni = loadComuni(provincie);
+        progressListener.onProgress(.6f);
+
+        final Ente.Map enti = loadEnti(comuni, provincie, sottocomparti);
+        progressListener.onProgress(.8f);
+
+        final CodiceGestionaleEntrate.Map codiciGestionaliEntrate = loadCodiciGestionaliEntrate(comparti);
+        progressListener.onProgress(.9f);
+
+        final CodiceGestionaleUscite.Map codiciGestionaliUscite = loadCodiciGestionaliUscite(comparti);
+        progressListener.onProgress(1f);
+
+        return new Anagrafiche(comparti, sottocomparti, ripartizioneGeografiche, regioni, provincie, comuni, enti, codiciGestionaliEntrate, codiciGestionaliUscite);
     }
 }
