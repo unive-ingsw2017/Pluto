@@ -37,12 +37,13 @@ public class EntiActivity extends BaseActivity {
         if (anagrafiche == null) {
             FullscreenLoadingView fullscreenLoadingView = new FullscreenLoadingView(this);
             setContentView(fullscreenLoadingView);
-            new AsyncTask<Void, Integer, Exception>() {
+            new AsyncTask<Void, Float, Exception>() {
                 @Override
                 protected Exception doInBackground(Void[] objects) {
                     try {
-                        anagrafiche = Anagrafiche.downloadAnagrafiche();
-                        Database.getInstance(EntiActivity.this).saveAnagrafiche(anagrafiche);
+                        Database.getInstance(EntiActivity.this).saveAnagrafiche(Anagrafiche.downloadAnagrafiche((progress ->
+                            publishProgress(progress)
+                        )));
                         return null;
                     } catch (IOException e) {
                         return e;
@@ -59,8 +60,8 @@ public class EntiActivity extends BaseActivity {
                 }
 
                 @Override
-                protected void onProgressUpdate(Integer[] values) {
-                    fullscreenLoadingView.setProgress(values[0] / 100f);
+                protected void onProgressUpdate(Float[] values) {
+                    fullscreenLoadingView.setProgress(values[0]);
                 }
             }.execute();
         } else {
