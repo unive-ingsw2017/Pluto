@@ -3,7 +3,6 @@ package mama.pluto.view;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -22,30 +21,17 @@ import mama.pluto.view.selectors.HierarcySelectorView;
  * Created by MMarco on 16/11/2017.
  */
 
-public class EntiMainView extends LinearLayout {
+public class EntiMainView extends BaseLayoutView {
 
     @NotNull
     private final Anagrafiche anagrafiche;
-    private final Toolbar toolbar;
     private final MaterialSearchView searchView;
     private final HierarcySelectorView hierarcySelectorView;
 
     public EntiMainView(@NotNull Context context, @NotNull Anagrafiche anagrafiche) {
         super(context);
         this.anagrafiche = anagrafiche;
-        setOrientation(VERTICAL);
-        setBackgroundColor(getResources().getColor(R.color.backgroundColor));
-
-
-        FrameLayout toolbarWrapper = new FrameLayout(context);
-        addView(toolbarWrapper, LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-
-        toolbar = new Toolbar(getContext());
-        toolbar.setPopupTheme(R.style.Theme_AppCompat_Light);
-        toolbar.setBackgroundResource(R.color.colorPrimaryDark);
-        toolbar.setTitleTextColor(Color.WHITE);
         toolbar.inflateMenu(R.menu.enti_main_menu);
-        toolbarWrapper.addView(toolbar, LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
 
         searchView = new MaterialSearchView(getContext());
         searchView.setHint(context.getString(R.string.cerca));
@@ -54,7 +40,7 @@ public class EntiMainView extends LinearLayout {
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Toast.makeText(context, query, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, query + "!!!", Toast.LENGTH_SHORT).show();
                 return false;
             }
 
@@ -72,10 +58,6 @@ public class EntiMainView extends LinearLayout {
         addView(hierarcySelectorView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 
         recomputeToolbarText();
-    }
-
-    public Toolbar getToolbar() {
-        return toolbar;
     }
 
     private void recomputeToolbarText() {

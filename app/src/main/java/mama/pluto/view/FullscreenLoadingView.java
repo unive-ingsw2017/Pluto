@@ -20,6 +20,8 @@ public class FullscreenLoadingView extends FullscreenView {
         setBackgroundColor(ColorUtils.getColor(context, R.color.colorPrimaryDark));
         logo.setImageResource(R.drawable.ic_euro_sign_240dp);
 
+        title.setText(R.string.loading___);
+
         pb = new ProgressBar(context, null, android.R.attr.progressBarStyleHorizontal);
         pb.getIndeterminateDrawable().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
         pb.getProgressDrawable().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
@@ -27,6 +29,7 @@ public class FullscreenLoadingView extends FullscreenView {
         pb.setMax(MAX_PROGRESS);
         content.addView(pb, new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
     }
+
     public void setProgress(float percentage) {
         pb.setIndeterminate(false);
         final int progress = Math.round(percentage * MAX_PROGRESS);

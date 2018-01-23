@@ -19,7 +19,9 @@ import java.util.Set;
 import mama.pluto.database.Database;
 import mama.pluto.utils.AppSection;
 import mama.pluto.utils.BaseActivity;
+import mama.pluto.utils.DataRestrictedState;
 import mama.pluto.view.FullscreenErrorView;
+import mama.pluto.view.FullscreenInternetUsageWarningView;
 import mama.pluto.view.FullscreenLoadingView;
 
 public class EntiActivity extends BaseActivity {
@@ -35,39 +37,48 @@ public class EntiActivity extends BaseActivity {
 
     private void loadAnagrafiche() {
         if (anagrafiche == null) {
-            FullscreenLoadingView fullscreenLoadingView = new FullscreenLoadingView(this);
-            setContentView(fullscreenLoadingView);
-            new AsyncTask<Void, Float, Exception>() {
-                @Override
-                protected Exception doInBackground(Void[] objects) {
-                    try {
-                        anagrafiche = Anagrafiche.downloadAnagrafiche((progress ->
-                                publishProgress(progress, 0f)
-                        ));
-                        Database.getInstance(EntiActivity.this).saveAnagrafiche(anagrafiche, (progress -> publishProgress(1f, progress)));
-                        return null;
-                    } catch (IOException e) {
-                        return e;
-                    }
-                }
-
-                @Override
-                protected void onPostExecute(Exception o) {
-                    if (o == null) {
-                        setupContentView();
-                    } else {
-                        setupErrorView(o);
-                    }
-                }
-
-                @Override
-                protected void onProgressUpdate(Float[] values) {
-                    fullscreenLoadingView.setProgress((values[0] + values[1]) / 2f);
-                }
-            }.execute();
+            DataRestrictedState currentState = DataRestrictedState.getCurrentState(this);
+            if (currentState != DataRestrictedState.DATA_UNRESTRICTED) {
+                setContentView(new FullscreenInternetUsageWarningView(this, currentState, 400, this::startDownload));
+            } else {
+                startDownload();
+            }
         } else {
             setupContentView();
         }
+    }
+
+    private void startDownload() {
+        FullscreenLoadingView fullscreenLoadingView = new FullscreenLoadingView(this);
+        setContentView(fullscreenLoadingView);
+        new AsyncTask<Void, Float, Exception>() {
+            @Override
+            protected Exception doInBackground(Void[] objects) {
+                try {
+                    anagrafiche = Anagrafiche.downloadAnagrafiche((progress ->
+                            publishProgress(progress, 0f)
+                    ));
+                    Database.getInstance(EntiActivity.this).saveAnagrafiche(anagrafiche, (progress -> publishProgress(1f, progress)));
+                    return null;
+                } catch (IOException e) {
+                    return e;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Exception o) {
+                if (o == null) {
+                    setupContentView();
+                } else {
+                    setupErrorView(o);
+                }
+            }
+
+            @Override
+            protected void onProgressUpdate(Float[] values) {
+                fullscreenLoadingView.setProgress((values[0] + values[1]) / 2f);
+            }
+        }.execute();
     }
 
     @Override
