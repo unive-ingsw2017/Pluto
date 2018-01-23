@@ -2,35 +2,37 @@ package mama.pluto.view;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.support.annotation.StringDef;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Provincia;
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Regione;
+
 import org.json.JSONObject;
 
-import java.lang.annotation.Retention;
-import java.util.HashMap;
-
-import static java.lang.annotation.RetentionPolicy.SOURCE;
+import java.util.Map;
 
 public class HeatMapView extends WebView {
 
-    @Retention(SOURCE)
-    @StringDef({
-            REGION_MERCATOR_PROJECTION,
-            REGION_MILLER_PROJECTION,
-            PROVINCE_MERCATOR_PROJECTION,
-            PROVINCE_MILLER_PROJECTION
-    })
-    public @interface MapType {
+    public enum MapProjection {
+        MILLER("mill"),
+        MERCATOR("merc");
+        private final String codeName;
+
+        MapProjection(String codeName) {
+            this.codeName = codeName;
+        }
+
+        public String getCodeName() {
+            return codeName;
+        }
     }
 
-    public static final String REGION_MERCATOR_PROJECTION = "it_regions_merc";
-    public static final String REGION_MILLER_PROJECTION = "it_regions_mill";
-    public static final String PROVINCE_MERCATOR_PROJECTION = "it_merc";
-    public static final String PROVINCE_MILLER_PROJECTION = "it_mill";
-
+    private String label;
+    private Map<?, Float> data;
+    private MapProjection mapProjection;
+    private boolean isRegionLevel;
 
     @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface"})
     public HeatMapView(Context context) {
@@ -42,31 +44,47 @@ public class HeatMapView extends WebView {
         loadUrl("file:///android_asset/map.html");
     }
 
+    public void setupForRegioneLevel(String label, MapProjection mapProjection, Map<Regione, Float> data) {
+        setData(label, mapProjection, data, true);//TODO: make key a String
+    }
+
+    public void setupForProvinciaLevel(String label, MapProjection mapProjection, Map<Provincia, Float> data) {
+        setData(label, mapProjection, data, false);//TODO: make key a String
+    }
+
+    private void setData(String label, MapProjection mapProjection, Map<?, Float> data, boolean isRegionLevel) {
+        this.label = label;
+        this.mapProjection = mapProjection;
+        this.data = data;
+        this.isRegionLevel = isRegionLevel;
+        loadUrl("javascript:refreshMap()");
+    }
+
     private class JavaScriptInterface {
 
-        public JavaScriptInterface() {
+        private JavaScriptInterface() {
         }
 
         @JavascriptInterface
         public String getData() {
-            HashMap<String, Float> data = new HashMap<>();
-            data.put("IT-VE", 12312312f);
-            data.put("IT-MI", 123f);
             return new JSONObject(data).toString();
         }
 
         @JavascriptInterface
         public String getLabel() {
-            return "Spesa";
+            return label;
         }
 
         /**
          * @return one of it_merc, it_mill, it_regions_merc, it_regions_mill
          */
-        @MapType
         @JavascriptInterface
         public String getMap() {
-            return PROVINCE_MERCATOR_PROJECTION;
+            String ret = "it_";
+            if (isRegionLevel) {
+                ret += "regions_";
+            }
+            return ret + mapProjection.getCodeName();
         }
 
     }

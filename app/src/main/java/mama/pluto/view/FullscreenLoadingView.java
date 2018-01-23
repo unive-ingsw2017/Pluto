@@ -7,12 +7,15 @@ import android.os.Build;
 import android.view.Gravity;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import mama.pluto.R;
 import mama.pluto.utils.ColorUtils;
 
 public class FullscreenLoadingView extends FullscreenView {
     private final static int MAX_PROGRESS = 10000;
+    private final TextView messageView;
+    private final TextView percentageView;
     private final ProgressBar pb;
 
     public FullscreenLoadingView(Context context) {
@@ -22,6 +25,16 @@ public class FullscreenLoadingView extends FullscreenView {
 
         title.setText(R.string.loading___);
 
+        messageView = new TextView(context);
+        messageView.setGravity(Gravity.CENTER);
+        messageView.setTextColor(Color.WHITE);
+        content.addView(messageView);
+
+        percentageView = new TextView(context);
+        percentageView.setGravity(Gravity.CENTER);
+        percentageView.setTextColor(Color.WHITE);
+        content.addView(percentageView);
+
         pb = new ProgressBar(context, null, android.R.attr.progressBarStyleHorizontal);
         pb.getIndeterminateDrawable().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
         pb.getProgressDrawable().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
@@ -30,7 +43,12 @@ public class FullscreenLoadingView extends FullscreenView {
         content.addView(pb, new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
     }
 
+    public void setMessage(String message) {
+        this.messageView.setText(message);
+    }
+
     public void setProgress(float percentage) {
+        this.percentageView.setText(percentage * 100 + "%");//TODO
         pb.setIndeterminate(false);
         final int progress = Math.round(percentage * MAX_PROGRESS);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

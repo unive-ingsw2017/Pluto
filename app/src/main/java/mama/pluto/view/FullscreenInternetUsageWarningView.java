@@ -31,29 +31,26 @@ public class FullscreenInternetUsageWarningView extends FullscreenView {
 
         title.setText(R.string.warning);
 
-        LinearLayout ll = new LinearLayout(context);
-        ll.setPadding(dp32, dp32, dp32, dp32);
-        ll.setOrientation(VERTICAL);
-        content.addView(ll);
+        content.setPadding(dp32, dp32, dp32, dp32);
 
         warningMessageView = new TextView(context, null, android.R.attr.textAppearanceMediumInverse);
         warningMessageView.setGravity(Gravity.CENTER_HORIZONTAL);
         warningMessageView.setTextColor(Color.WHITE);
-        ll.addView(warningMessageView);
+        content.addView(warningMessageView);
 
-        ll.addView(new Space(context), new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, 0, 1f));
+        content.addView(new Space(context), new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, 0, 1f));
 
         continueButton = new ImageButton(context, null, android.R.attr.borderlessButtonStyle);
         continueButton.setImageResource(R.drawable.ic_download_black_24dp);
-        ll.addView(continueButton);
+        content.addView(continueButton);
 
         TextView retryButtonCaption = new TextView(context, null, android.R.attr.textAppearanceSmallInverse);
         retryButtonCaption.setGravity(Gravity.CENTER_HORIZONTAL);
         retryButtonCaption.setTextColor(Color.WHITE);
         retryButtonCaption.setText(R.string.start_download);
-        ll.addView(retryButtonCaption);
+        content.addView(retryButtonCaption);
 
-        ll.addView(new Space(context), new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, 0, 1f));
+        content.addView(new Space(context), new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, 0, 1f));
 
 
         warningMessageView.setText(dataRestrictedState.getMessage(getContext(), approximageMBSize));

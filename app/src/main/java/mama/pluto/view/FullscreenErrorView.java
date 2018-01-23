@@ -30,29 +30,26 @@ public class FullscreenErrorView extends FullscreenView {
 
         title.setText(R.string.error);
 
-        LinearLayout ll = new LinearLayout(context);
-        ll.setPadding(dp32, dp32, dp32, dp32);
-        ll.setOrientation(VERTICAL);
-        content.addView(ll);
+        content.setPadding(dp32, dp32, dp32, dp32);
 
         errorMessageView = new TextView(context, null, android.R.attr.textAppearanceMediumInverse);
         errorMessageView.setGravity(Gravity.CENTER_HORIZONTAL);
         errorMessageView.setTextColor(Color.WHITE);
-        ll.addView(errorMessageView);
+        content.addView(errorMessageView);
 
-        ll.addView(new Space(context), new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, 0, 1f));
+        content.addView(new Space(context), new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, 0, 1f));
 
         retryButton = new ImageButton(context, null, android.R.attr.borderlessButtonStyle);
         retryButton.setImageResource(R.drawable.ic_refresh_white_24dp);
-        ll.addView(retryButton);
+        content.addView(retryButton);
 
         TextView retryButtonCaption = new TextView(context, null, android.R.attr.textAppearanceSmallInverse);
         retryButtonCaption.setGravity(Gravity.CENTER_HORIZONTAL);
         retryButtonCaption.setTextColor(Color.WHITE);
         retryButtonCaption.setText(R.string.retry);
-        ll.addView(retryButtonCaption);
+        content.addView(retryButtonCaption);
 
-        ll.addView(new Space(context), new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, 0, 1f));
+        content.addView(new Space(context), new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, 0, 1f));
     }
 
     public void setErrorMessage(String errorMessage) {

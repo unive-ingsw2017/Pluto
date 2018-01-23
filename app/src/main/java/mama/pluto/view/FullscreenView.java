@@ -3,7 +3,6 @@ package mama.pluto.view;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.Gravity;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -13,7 +12,7 @@ import mama.pluto.utils.MetricsUtils;
 public class FullscreenView extends LinearLayout {
     protected final ImageView logo;
     protected final TextView title;
-    protected final FrameLayout content;
+    protected final LinearLayout content;
     private final LayoutParams childParams = new LayoutParams(LayoutParams.MATCH_PARENT, 0, 1f);
 
     public FullscreenView(Context context) {
@@ -35,7 +34,8 @@ public class FullscreenView extends LinearLayout {
         title.setGravity(Gravity.CENTER);
         ll.addView(title);
 
-        content = new FrameLayout(context);
+        content = new LinearLayout(context);
+        content.setOrientation(VERTICAL);
         addView(content, childParams);
     }
 
