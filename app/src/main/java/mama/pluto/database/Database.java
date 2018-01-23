@@ -17,6 +17,7 @@ import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Sottocomparto;
 import com.github.mmauro94.siopeDownloader.datastruct.operazioni.Entrata;
 import com.github.mmauro94.siopeDownloader.datastruct.operazioni.Operazione;
 import com.github.mmauro94.siopeDownloader.datastruct.operazioni.Uscita;
+import com.github.mmauro94.siopeDownloader.utils.OnProgressListener;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -126,19 +127,38 @@ public class Database extends SQLiteOpenHelper {
         return database;
     }
 
-    public void saveAnagrafiche(@NotNull Anagrafiche anagrafiche) {
+    public void saveAnagrafiche(@NotNull Anagrafiche anagrafiche, @NotNull OnProgressListener onProgressListener) {
+        onProgressListener.onProgress(0f);
+
         saveRipartizioneGeografiche(anagrafiche.getRipartizioniGeografiche());
+        onProgressListener.onProgress(.1f);
+
         saveRegioni(anagrafiche.getRegioni());
+        onProgressListener.onProgress(.2f);
+
         saveProvincie(anagrafiche.getProvincie());
+        onProgressListener.onProgress(.3f);
+
         saveComuni(anagrafiche.getComuni());
+        onProgressListener.onProgress(.4f);
+
         saveComparti(anagrafiche.getComparti());
+        onProgressListener.onProgress(.5f);
+
         saveSottocomparti(anagrafiche.getSottocomparti());
+        onProgressListener.onProgress(.6f);
+
         saveEnti(anagrafiche.getEnti());
+        onProgressListener.onProgress(.8f);
+
         saveCodiciGestionali(anagrafiche.getCodiciGestionaliEntrate());
+        onProgressListener.onProgress(.9f);
+
         saveCodiciGestionali(anagrafiche.getCodiciGestionaliUscite());
+        onProgressListener.onProgress(1f);
     }
 
-    private <T> void save(@NotNull Collection<T> collection, @NotNull String query, @NotNull BiConsumer<SQLiteStatement, T> bindValues) {
+    private <T> void save(@NotNull Iterable<T> collection, @NotNull String query, @NotNull BiConsumer<SQLiteStatement, T> bindValues) {
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
         try (SQLiteStatement stmt = db.compileStatement(query)) {
@@ -264,8 +284,8 @@ public class Database extends SQLiteOpenHelper {
         }
     }
 
-    public void saveOperazioni(@NotNull Collection<Operazione> operazioni) {
-        save(operazioni, insertQuery("Operazioni", "tipo", "codiceGestionale_codice", "codiceGestionale_tipo", "ente", "year", "month", "amount"), (stmt, item) -> {
+    public void saveOperazioni(@NotNull Iterable<Operazione> operazioni) {
+        save(operazioni, insertQuery("Operazione", "tipo", "codiceGestionale_codice", "codiceGestionale_tipo", "ente", "year", "month", "amount"), (stmt, item) -> {
             stmt.bindString(1, getTipoOperazione(item));
             stmt.bindString(2, item.getCodiceGestionale().getCodice());
             stmt.bindString(3, getTipoCodiceGestionale(item.getCodiceGestionale()));
@@ -275,5 +295,11 @@ public class Database extends SQLiteOpenHelper {
             stmt.bindString(7, item.getAmount().toPlainString());
 
         });
+    }
+
+    @NotNull
+    public RipartizioneGeografica.Map loadRipartizioniGeografiche(){
+        //getReadableDatabase().rawQuery("SELECT nome FROM ")
+        return null;
     }
 }
