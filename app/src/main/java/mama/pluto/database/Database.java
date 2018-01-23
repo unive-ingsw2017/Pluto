@@ -165,9 +165,16 @@ public class Database extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
         try (SQLiteStatement stmt = db.compileStatement(query)) {
+            int cnt = 0;
             for (T t : collection) {
                 bindValues.consume(stmt, t);
                 stmt.execute();
+                if (++cnt >= 1000) {
+                    db.setTransactionSuccessful();
+                    db.endTransaction();
+                    db.beginTransaction();
+                    cnt = 0;
+                }
             }
             db.setTransactionSuccessful();
         } finally {
@@ -288,7 +295,7 @@ public class Database extends SQLiteOpenHelper {
         }
     }
 
-    public void saveOperazioni(@NotNull Iterable<Operazione> operazioni) {
+    public void saveOperazioni(@NotNull Iterable<? extends Operazione> operazioni) {
         save(operazioni, insertQuery("Operazione", "tipo", "codiceGestionale_codice", "codiceGestionale_tipo", "ente", "year", "month", "amount"), (stmt, item) -> {
             stmt.bindString(1, getTipoOperazione(item));
             stmt.bindString(2, item.getCodiceGestionale().getCodice());
@@ -297,7 +304,6 @@ public class Database extends SQLiteOpenHelper {
             stmt.bindLong(5, item.getYear());
             stmt.bindLong(6, item.getMonth());
             stmt.bindString(7, item.getAmount().toPlainString());
-
         });
     }
 
