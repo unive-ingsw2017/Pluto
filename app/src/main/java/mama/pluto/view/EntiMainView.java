@@ -6,13 +6,17 @@ import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Comune;
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.GeoItem;
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Provincia;
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Regione;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import org.jetbrains.annotations.NotNull;
 
 import mama.pluto.R;
 import mama.pluto.utils.MetricsUtils;
-import mama.pluto.view.selectors.HierarcySelectorView;
+import mama.pluto.view.selectors.HierarchySelectorView;
 
 /**
  * Created by MMarco on 16/11/2017.
@@ -23,7 +27,7 @@ public class EntiMainView extends BaseLayoutView {
     @NotNull
     private final Anagrafiche anagrafiche;
     private final MaterialSearchView searchView;
-    private final HierarcySelectorView hierarcySelectorView;
+    private final HierarchySelectorView hierarchySelectorView;
 
     public EntiMainView(@NotNull Context context, @NotNull Anagrafiche anagrafiche) {
         super(context);
@@ -47,40 +51,37 @@ public class EntiMainView extends BaseLayoutView {
             }
         });
 
-        hierarcySelectorView = new HierarcySelectorView(getContext(), anagrafiche);
+        hierarchySelectorView = new HierarchySelectorView(getContext(), anagrafiche);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            hierarcySelectorView.setElevation(MetricsUtils.dpToPixel(getContext(), 4f));
+            hierarchySelectorView.setElevation(MetricsUtils.dpToPixel(getContext(), 4f));
         }
-        //hierarcySelectorView.setOnHierarcyLevelSelector(hierarcyLevel -> recomputeToolbarText());
-        addView(hierarcySelectorView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        hierarchySelectorView.setOnSelectedGeoItemChanges(geoItem -> recomputeToolbarText());
+        hierarchySelectorView.setOnEnteSelected(ente -> Toast.makeText(getContext(), ente.getNome(), Toast.LENGTH_SHORT).show());
+        addView(hierarchySelectorView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 
         recomputeToolbarText();
     }
 
     private void recomputeToolbarText() {
-        /*switch (hierarcySelectorView.getHierarchyLevel()) {
-            case REGIONE:
-                toolbar.setTitle(R.string.seleziona_un_regione);
-                break;
-            case PROVINCIA:
-                toolbar.setTitle(R.string.seleziona_una_provincia);
-                break;
-            case COMUNE:
-                toolbar.setTitle(R.string.seleziona_un_comune);
-                break;
-            case ENTE:
-                toolbar.setTitle(R.string.seleziona_un_ente);
-                break;
-            default:
-                throw new IllegalStateException();
-        }*/
+        final GeoItem selectedGeoItem = hierarchySelectorView.getSelectedGeoItem();
+        if (selectedGeoItem == null) {
+            toolbar.setTitle(R.string.seleziona_un_regione);
+        } else if (selectedGeoItem instanceof Regione) {
+            toolbar.setTitle(R.string.seleziona_una_provincia);
+        } else if (selectedGeoItem instanceof Provincia) {
+            toolbar.setTitle(R.string.seleziona_un_comune);
+        } else if (selectedGeoItem instanceof Comune) {
+            toolbar.setTitle(R.string.seleziona_un_ente);
+        } else {
+            throw new IllegalStateException();
+        }
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         final int width = MeasureSpec.getSize(widthMeasureSpec);
         final int listPadding = Math.max(0, (width - MetricsUtils.dpToPixel(getContext(), 400)) / 2);
-        MetricsUtils.applyLateralPadding(hierarcySelectorView, listPadding);
+        MetricsUtils.applyLateralPadding(hierarchySelectorView, listPadding);
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
@@ -89,7 +90,7 @@ public class EntiMainView extends BaseLayoutView {
             searchView.closeSearch();
             return true;
         } else {
-            return hierarcySelectorView.onBackPressed();
+            return hierarchySelectorView.onBackPressed();
         }
     }
 }

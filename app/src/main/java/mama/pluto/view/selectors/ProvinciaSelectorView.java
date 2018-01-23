@@ -8,30 +8,47 @@ import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Regione;
 
 import org.jetbrains.annotations.NotNull;
 
-import mama.pluto.utils.AbstractEnteSelectorAdapter;
+import java.util.ArrayList;
+import java.util.Collections;
+
+import mama.pluto.utils.AbstractSelectorAdapter;
+import mama.pluto.utils.StringUtils;
+import mama.pluto.view.SingleLineListItem;
 
 /**
  * Created by MMarco on 16/11/2017.
  */
-public class ProvinciaSelectorView extends AbstractEnteSelectorView<Regione> {
+public class ProvinciaSelectorView extends AbstractGeoItemSelectorView<Regione, Provincia> {
 
     public ProvinciaSelectorView(@NotNull Context context, @NotNull Anagrafiche anagrafiche, @NotNull Regione regione) {
         super(context, anagrafiche, regione);
     }
 
     @Override
-    protected AbstractEnteSelectorAdapter createAdapter() {
-        return new AbstractEnteSelectorAdapter() {
+    protected AbstractSelectorAdapter<?, Provincia> createAdapter() {
+        assert getMainGeoItem() != null;
+        ArrayList<Provincia> province = new ArrayList<>(getMainGeoItem().getProvincie());
+        Collections.sort(province, (p1, p2) -> p1.getNome().compareToIgnoreCase(p2.getNome()));
+
+        return new AbstractSelectorAdapter<SingleLineListItem, Provincia>() {
             @Override
-            protected Provincia getGeoItem(int position) {
-                assert getMainGeoItem() != null;
-                return getMainGeoItem().getProvincie().get(position);
+            protected Provincia getItem(int position) {
+                return province.get(position);
             }
 
             @Override
-            public int getEntiCount() {
-                assert getMainGeoItem() != null;
-                return getMainGeoItem().getProvincie().size();
+            protected SingleLineListItem createView(@NotNull Context context) {
+                return new SingleLineListItem(context);
+            }
+
+            @Override
+            protected void bindView(SingleLineListItem view, Provincia provincia) {
+                view.setText(StringUtils.toNormalCase(provincia.getNome()));
+            }
+
+            @Override
+            public int getItemCount2() {
+                return province.size();
             }
         };
     }

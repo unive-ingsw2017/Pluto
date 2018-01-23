@@ -4,8 +4,6 @@ import android.support.annotation.NonNull;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-
 public final class StringUtils {
 
     private StringUtils() {
@@ -19,6 +17,26 @@ public final class StringUtils {
             sb.append(data[i]).append(separator);
         }
         sb.append(data[data.length - 1].trim());
+        return sb.toString();
+    }
+
+    public static String toNormalCase(String s) {
+        StringBuilder sb = new StringBuilder(s.length());
+        boolean first = true;
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (Character.isLetter(c)) {
+                if (first) {
+                    sb.append(Character.toUpperCase(c));
+                    first = false;
+                } else {
+                    sb.append(Character.toLowerCase(c));
+                }
+            } else {
+                first = true;
+                sb.append(c);
+            }
+        }
         return sb.toString();
     }
 
