@@ -1,21 +1,15 @@
 package mama.pluto;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.view.View;
-import android.webkit.JavascriptInterface;
-import android.webkit.WebChromeClient;
-import android.webkit.WebView;
 
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONObject;
-
-import java.util.HashMap;
 
 import mama.pluto.utils.AppSection;
 import mama.pluto.utils.BaseActivity;
-import mama.pluto.view.EntiMainView;
+import mama.pluto.view.BaseLayoutView;
+import mama.pluto.view.HeatMapView;
 
 public class HeatMapAppSection extends AppSection {
 
@@ -30,42 +24,14 @@ public class HeatMapAppSection extends AppSection {
     }
 
 
-    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected View createView(@NotNull BaseActivity baseActivity) {
-        WebView ret = new WebView(baseActivity);
-        ret.getSettings().setJavaScriptEnabled(true);
-        ret.setWebChromeClient(new WebChromeClient());
-        ret.addJavascriptInterface(new JavaScriptInterface(), "Android");
+        BaseLayoutView baseLayoutView = new BaseLayoutView(baseActivity);
+        baseLayoutView.getToolbar().setTitle(R.string.heat_map);
+        baseActivity.setupToolbar(baseLayoutView.getToolbar());
 
-        ret.loadUrl("file:///android_asset/map.html");
-        return ret;
-    }
-
-    private class JavaScriptInterface {
-        public JavaScriptInterface() {
-        }
-
-        @JavascriptInterface
-        public String getData() {
-            HashMap data = new HashMap();
-            data.put("IT-VE", 12312312);
-            data.put("IT-MI", 123);
-            return new JSONObject(data).toString();
-        }
-
-        @JavascriptInterface
-        public String getLabel() {
-            return "Spesa";
-        }
-
-        /**
-         * @return one of it_merc, it_mill, it_regions_merc, it_regions_mill
-         */
-        @JavascriptInterface
-        public String getMap() {
-            return "it_merc";
-        }
-
+        HeatMapView heatMapView = new HeatMapView(baseActivity);
+        baseLayoutView.addView(heatMapView, BaseLayoutView.LayoutParams.MATCH_PARENT, BaseLayoutView.LayoutParams.MATCH_PARENT);
+        return baseLayoutView;
     }
 }

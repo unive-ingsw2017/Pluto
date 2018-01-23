@@ -13,4 +13,11 @@
     <string name="retry">Riprova</string>
     <string name="drawer_open">Apri drawer</string>
     <string name="drawer_close">Chiudi drawer</string>
+    <string name="data_restricted_warning">È necessario scaricare da internet %d MB. Procedo?</string>
+    <string name="data_restricted_metered_warning">È necessario scaricare da internet %d MB. Ciò potrebbe consumare gran parte del tuo piano. Procedo comunque?</string>
+    <string name="data_restricted_saving_warning">È necessario scaricare da internet %d MB. Procedo nonstante sia attivo il risparmio dati?</string>
+    <string name="start_download">Inizia download</string>
+    <string name="loading___">Carico…</string>
+    <string name="error">Errore!</string>
+    <string name="warning">Atenzione!</string>
 </resources>
