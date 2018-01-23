@@ -22,12 +22,7 @@
 	<body>
 	  <div id="map" style="width: 100%; height: 100%"></div>
 	  <script>
-	    function refreshMap() {
-			var data = JSON.parse(Android.getData());
-			var label = Android.getLabel();
-			var map = Android.getMap();
-
-
+	    function refreshMap(data, label, map) {
 			$('#map').vectorMap({
 				map: map,
 				series: {
@@ -42,9 +37,6 @@
 				}
 			});
 	    }
-		$(function(){
-		    refreshMap();
-		});
 	  </script>
 	</body>
 </html>

@@ -20,4 +20,6 @@
     <string name="loading___">Carico…</string>
     <string name="error">Errore!</string>
     <string name="warning">Attenzione!</string>
+    <string name="detail_level_regione">Livello dettagli regionale</string>
+    <string name="detail_level_provincia">Livello dettagli provinciale</string>
 </resources>

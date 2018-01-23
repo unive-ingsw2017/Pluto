@@ -2,13 +2,13 @@ package mama.pluto.view;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Provincia;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Regione;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import java.util.Map;
@@ -39,16 +39,14 @@ public class HeatMapView extends WebView {
         super(context);
         getSettings().setJavaScriptEnabled(true);
         setWebChromeClient(new WebChromeClient());
-        addJavascriptInterface(new JavaScriptInterface(), "Android");
-
         loadUrl("file:///android_asset/map.html");
     }
 
-    public void setupForRegioneLevel(String label, MapProjection mapProjection, Map<Regione, Float> data) {
+    public void setupForRegioneLevel(@NotNull String label, @NotNull MapProjection mapProjection, @NotNull Map<Regione, Float> data) {
         setData(label, mapProjection, data, true);//TODO: make key a String
     }
 
-    public void setupForProvinciaLevel(String label, MapProjection mapProjection, Map<Provincia, Float> data) {
+    public void setupForProvinciaLevel(@NotNull String label, @NotNull MapProjection mapProjection, @NotNull Map<Provincia, Float> data) {
         setData(label, mapProjection, data, false);//TODO: make key a String
     }
 
@@ -57,35 +55,19 @@ public class HeatMapView extends WebView {
         this.mapProjection = mapProjection;
         this.data = data;
         this.isRegionLevel = isRegionLevel;
-        loadUrl("javascript:refreshMap()");
+        loadUrl("javascript:refreshMap(" +
+                new JSONObject(data) + "," +
+                JSONObject.quote(label) + "," +
+                JSONObject.quote(getMapCode()) +
+                ")");
     }
 
-    private class JavaScriptInterface {
-
-        private JavaScriptInterface() {
+    private String getMapCode() {
+        String ret = "it_";
+        if (isRegionLevel) {
+            ret += "regions_";
         }
-
-        @JavascriptInterface
-        public String getData() {
-            return new JSONObject(data).toString();
-        }
-
-        @JavascriptInterface
-        public String getLabel() {
-            return label;
-        }
-
-        /**
-         * @return one of it_merc, it_mill, it_regions_merc, it_regions_mill
-         */
-        @JavascriptInterface
-        public String getMap() {
-            String ret = "it_";
-            if (isRegionLevel) {
-                ret += "regions_";
-            }
-            return ret + mapProjection.getCodeName();
-        }
-
+        return ret + mapProjection.getCodeName();
     }
+
 }

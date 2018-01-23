@@ -8,8 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import mama.pluto.utils.AppSection;
 import mama.pluto.utils.BaseActivity;
-import mama.pluto.view.BaseLayoutView;
-import mama.pluto.view.HeatMapView;
+import mama.pluto.view.HeatMapMainView;
 
 public class HeatMapAppSection extends AppSection {
 
@@ -26,12 +25,8 @@ public class HeatMapAppSection extends AppSection {
 
     @Override
     protected View createView(@NotNull BaseActivity baseActivity) {
-        BaseLayoutView baseLayoutView = new BaseLayoutView(baseActivity);
-        baseLayoutView.getToolbar().setTitle(R.string.heat_map);
-        baseActivity.setupToolbar(baseLayoutView.getToolbar());
-
-        HeatMapView heatMapView = new HeatMapView(baseActivity);
-        baseLayoutView.addView(heatMapView, BaseLayoutView.LayoutParams.MATCH_PARENT, BaseLayoutView.LayoutParams.MATCH_PARENT);
-        return baseLayoutView;
+        HeatMapMainView heatMapMainView = new HeatMapMainView(baseActivity);
+        baseActivity.setupToolbar(heatMapMainView.getToolbar());
+        return heatMapMainView;
     }
 }
