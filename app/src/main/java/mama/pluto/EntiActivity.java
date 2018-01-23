@@ -41,9 +41,10 @@ public class EntiActivity extends BaseActivity {
                 @Override
                 protected Exception doInBackground(Void[] objects) {
                     try {
-                        Database.getInstance(EntiActivity.this).saveAnagrafiche(Anagrafiche.downloadAnagrafiche((progress ->
-                            publishProgress(progress)
-                        )));
+                        anagrafiche = Anagrafiche.downloadAnagrafiche((progress ->
+                                publishProgress(progress, 0f)
+                        ));
+                        Database.getInstance(EntiActivity.this).saveAnagrafiche(anagrafiche, (progress -> publishProgress(1f, progress)));
                         return null;
                     } catch (IOException e) {
                         return e;
@@ -61,7 +62,7 @@ public class EntiActivity extends BaseActivity {
 
                 @Override
                 protected void onProgressUpdate(Float[] values) {
-                    fullscreenLoadingView.setProgress(values[0]);
+                    fullscreenLoadingView.setProgress((values[0] + values[1]) / 2f);
                 }
             }.execute();
         } else {

@@ -28,6 +28,7 @@ public class FullscreenLoadingView extends FullscreenView {
         content.addView(pb, new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
     }
     public void setProgress(float percentage) {
+        pb.setIndeterminate(false);
         final int progress = Math.round(percentage * MAX_PROGRESS);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             pb.setProgress(progress, true);
