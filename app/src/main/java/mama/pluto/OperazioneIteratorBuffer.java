@@ -65,10 +65,10 @@ public class OperazioneIteratorBuffer<CG extends CodiceGestionale, T extends Ope
             public void run() {
                 while (it.hasNext()) {
                     try {
-                        int suze = buffer.size();
+                        /*int suze = buffer.size();
                         if(suze >= 9500) {
                             System.out.println("Almost full: " + suze);
-                        }
+                        }*/
                         buffer.put(it.next());
                         totalDownloaded++;
                     } catch (InterruptedException e) {

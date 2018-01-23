@@ -7,6 +7,7 @@
           <option name="mode" value="SAMPLED" />
           <option name="name" value="Sample2" />
           <option name="profilerType" value="ART" />
+          <option name="profilingBufferSizeInMb" value="16" />
           <option name="profilingSamplingIntervalUs" value="100" />
         </ProfilingConfiguration>
       </list>
