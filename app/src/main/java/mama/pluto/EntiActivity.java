@@ -1,7 +1,9 @@
 package mama.pluto;
 
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.transition.Fade;
 import android.support.transition.TransitionManager;
 import android.view.View;
@@ -26,6 +28,8 @@ import mama.pluto.view.FullscreenLoadingView;
 
 public class EntiActivity extends BaseActivity {
 
+    private static final String ANAGRAFICHE_DOWNLOADED = "anagraficheDownloaded";
+
     private Anagrafiche anagrafiche = null;
     private FrameLayout mainContainer;
 
@@ -37,15 +41,43 @@ public class EntiActivity extends BaseActivity {
 
     private void loadAnagrafiche() {
         if (anagrafiche == null) {
-            DataRestrictedState currentState = DataRestrictedState.getCurrentState(this);
-            if (currentState != DataRestrictedState.DATA_UNRESTRICTED) {
-                setContentView(new FullscreenInternetUsageWarningView(this, currentState, 400, this::startDownload));
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            if (!preferences.getBoolean(ANAGRAFICHE_DOWNLOADED, false)) {
+                DataRestrictedState currentState = DataRestrictedState.getCurrentState(this);
+                if (currentState != DataRestrictedState.DATA_UNRESTRICTED) {
+                    setContentView(new FullscreenInternetUsageWarningView(this, currentState, 400, this::startDownload));
+                } else {
+                    startDownload();
+                }
             } else {
-                startDownload();
+                startLoading();
             }
         } else {
             setupContentView();
         }
+    }
+
+    private void startLoading() {
+        FullscreenLoadingView fullscreenLoadingView = new FullscreenLoadingView(this);
+        setContentView(fullscreenLoadingView);
+        new AsyncTask<Void, Float, Exception>() {
+            @Override
+            protected Exception doInBackground(Void[] objects) {
+                anagrafiche = Database.getInstance(EntiActivity.this).loadAnagrafiche(progress -> publishProgress(progress));
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Exception o) {
+                setupContentView();
+            }
+
+            @Override
+            protected void onProgressUpdate(Float[] values) {
+                fullscreenLoadingView.setProgress(values[0]);
+            }
+        }.execute();
     }
 
     private void startDownload() {
@@ -59,6 +91,7 @@ public class EntiActivity extends BaseActivity {
                             publishProgress(progress, 0f)
                     ));
                     Database.getInstance(EntiActivity.this).saveAnagrafiche(anagrafiche, (progress -> publishProgress(1f, progress)));
+                    PreferenceManager.getDefaultSharedPreferences(EntiActivity.this).edit().putBoolean(ANAGRAFICHE_DOWNLOADED, true).commit();
                     return null;
                 } catch (IOException e) {
                     return e;

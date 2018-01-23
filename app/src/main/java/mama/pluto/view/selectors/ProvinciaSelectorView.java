@@ -3,19 +3,19 @@ package mama.pluto.view.selectors;
 import android.content.Context;
 
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Provincia;
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Regione;
 
 import org.jetbrains.annotations.NotNull;
 
-import mama.pluto.Ente;
 import mama.pluto.utils.AbstractEnteSelectorAdapter;
-import mama.pluto.utils.HierarchyLevel;
 
 /**
  * Created by MMarco on 16/11/2017.
  */
-public class ProvinciaSelectorView extends AbstractEnteSelectorView {
+public class ProvinciaSelectorView extends AbstractEnteSelectorView<Regione> {
 
-    public ProvinciaSelectorView(@NotNull Context context, @NotNull Anagrafiche anagrafiche, @NotNull Ente regione) {
+    public ProvinciaSelectorView(@NotNull Context context, @NotNull Anagrafiche anagrafiche, @NotNull Regione regione) {
         super(context, anagrafiche, regione);
     }
 
@@ -23,13 +23,15 @@ public class ProvinciaSelectorView extends AbstractEnteSelectorView {
     protected AbstractEnteSelectorAdapter createAdapter() {
         return new AbstractEnteSelectorAdapter() {
             @Override
-            protected Ente getEnte(int position) {
-                return new Ente(getMainEnte(), HierarchyLevel.PROVINCIA, "Provincia " + position + " di " + getMainEnte().getName());
+            protected Provincia getGeoItem(int position) {
+                assert getMainGeoItem() != null;
+                return getMainGeoItem().getProvincie().get(position);
             }
 
             @Override
             public int getEntiCount() {
-                return 10;
+                assert getMainGeoItem() != null;
+                return getMainGeoItem().getProvincie().size();
             }
         };
     }

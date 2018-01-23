@@ -1,11 +1,8 @@
 package mama.pluto.view;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Build;
 import android.support.v7.widget.Toolbar;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
@@ -54,14 +51,14 @@ public class EntiMainView extends BaseLayoutView {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             hierarcySelectorView.setElevation(MetricsUtils.dpToPixel(getContext(), 4f));
         }
-        hierarcySelectorView.setOnHierarcyLevelSelector(hierarcyLevel -> recomputeToolbarText());
+        //hierarcySelectorView.setOnHierarcyLevelSelector(hierarcyLevel -> recomputeToolbarText());
         addView(hierarcySelectorView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 
         recomputeToolbarText();
     }
 
     private void recomputeToolbarText() {
-        switch (hierarcySelectorView.getHierarchyLevel()) {
+        /*switch (hierarcySelectorView.getHierarchyLevel()) {
             case REGIONE:
                 toolbar.setTitle(R.string.seleziona_un_regione);
                 break;
@@ -76,7 +73,7 @@ public class EntiMainView extends BaseLayoutView {
                 break;
             default:
                 throw new IllegalStateException();
-        }
+        }*/
     }
 
     @Override

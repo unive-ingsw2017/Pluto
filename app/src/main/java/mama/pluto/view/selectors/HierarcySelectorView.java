@@ -4,14 +4,16 @@ import android.content.Context;
 import android.widget.FrameLayout;
 
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Comune;
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.GeoItem;
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Provincia;
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Regione;
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.RipartizioneGeografica;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
-
-import mama.pluto.Ente;
 import mama.pluto.utils.Consumer;
-import mama.pluto.utils.HierarchyLevel;
 
 /**
  * Created by MMarco on 16/11/2017.
@@ -23,86 +25,54 @@ public class HierarcySelectorView extends FrameLayout {
     private final Anagrafiche anagrafiche;
     @SuppressWarnings("ConstantConditions")
     @NotNull
-    private HierarchyLevel hierarchyLevel = null;
-    @SuppressWarnings("ConstantConditions")
-    @NotNull
     private AbstractEnteSelectorView currentSelector = null;
-    private Consumer<HierarchyLevel> onHierarcyLevelSelector;
-    private Ente currentSelectedEnte = null;
-    private Consumer<Ente> onEnteSelector;
+    private @Nullable Consumer<@Nullable GeoItem> onCurrentSelectedGeoItemChanges;
+    private GeoItem currentSelectedGeoItem = null;
 
     public HierarcySelectorView(Context context, @NotNull Anagrafiche anagrafiche) {
         super(context);
         this.anagrafiche = anagrafiche;
-        setHierarchyLevel(HierarchyLevel.REGIONE);
+        setCurrentSelectedGeoItem(null);
     }
 
-    public void setOnHierarcyLevelSelector(Consumer<HierarchyLevel> onHierarcyLevelSelector) {
-        this.onHierarcyLevelSelector = onHierarcyLevelSelector;
+    public void setOnCurrentSelectedGeoItemChanges(@NotNull Consumer<@Nullable GeoItem> onCurrentSelectedGeoItemChanges) {
+        this.onCurrentSelectedGeoItemChanges = onCurrentSelectedGeoItemChanges;
     }
 
-    @NotNull
-    public HierarchyLevel getHierarchyLevel() {
-        return hierarchyLevel;
-    }
+    public void setCurrentSelectedGeoItem(@Nullable GeoItem currentSelectedGeoItem) {
+        this.currentSelectedGeoItem = currentSelectedGeoItem;
+        final AbstractEnteSelectorView<?> selector;
+        if (currentSelectedGeoItem == null) {
+            selector = new RegioneSelectorView(getContext(), anagrafiche);
+            selector.setOnGeoItemSelected(this::setCurrentSelectedGeoItem);
+        } else if (currentSelectedGeoItem instanceof Regione) {
+            selector = new ProvinciaSelectorView(getContext(), anagrafiche, (Regione) this.currentSelectedGeoItem);
+            selector.setOnGeoItemSelected(this::setCurrentSelectedGeoItem);
+        } else if (currentSelectedGeoItem instanceof Provincia) {
+            selector = new ComuneSelectorView(getContext(), anagrafiche, (Provincia) this.currentSelectedGeoItem);
+            selector.setOnGeoItemSelected(this::setCurrentSelectedGeoItem);
+        } else if (currentSelectedGeoItem instanceof Comune) {
+            throw new UnsupportedOperationException();
+        } else {
+            throw new IllegalStateException(currentSelectedGeoItem.getClass() + " given");
+        }
 
-    public void setOnEnteSelector(Consumer<Ente> onEnteSelector) {
-        this.onEnteSelector = onEnteSelector;
-    }
-
-    public void setHierarchyLevel(@NotNull HierarchyLevel hierarchyLevel) {
-        if (hierarchyLevel != this.hierarchyLevel) {
-            AbstractEnteSelectorView selector;
-            switch (hierarchyLevel) {
-                case REGIONE:
-                    selector = new RegioneSelectorView(getContext(), anagrafiche);
-                    selector.setOnEnteSelected(s -> {
-                        currentSelectedEnte = s;
-                        setHierarchyLevel(HierarchyLevel.PROVINCIA);
-                    });
-                    break;
-                case PROVINCIA:
-                    selector = new ProvinciaSelectorView(getContext(), anagrafiche, currentSelectedEnte);
-                    selector.setOnEnteSelected(s -> {
-                        currentSelectedEnte = s;
-                        setHierarchyLevel(HierarchyLevel.COMUNE);
-                    });
-                    break;
-                case COMUNE:
-                    selector = new ComuneSelectorView(getContext(), anagrafiche, currentSelectedEnte);
-                    selector.setOnEnteSelected(s -> {
-                        currentSelectedEnte = s;
-                        setHierarchyLevel(HierarchyLevel.ENTE);
-                    });
-                    break;
-                case ENTE:
-                    selector = new EnteSelectorView(getContext(), anagrafiche, currentSelectedEnte);
-                    selector.setOnEnteSelected(s -> {
-                        if (onEnteSelector != null) {
-                            onEnteSelector.consume(s);
-                        }
-                    });
-                    break;
-                default:
-                    throw new IllegalStateException();
-            }
-
-
-            this.hierarchyLevel = hierarchyLevel;
-            addView(selector, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-            if (onHierarcyLevelSelector != null) {
-                onHierarcyLevelSelector.consume(hierarchyLevel);
-            }
+        addView(selector, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        if (onCurrentSelectedGeoItemChanges != null) {
+            onCurrentSelectedGeoItemChanges.consume(currentSelectedGeoItem);
         }
     }
 
     public boolean onBackPressed() {
-        if (currentSelectedEnte == null) {
+        if (currentSelectedGeoItem == null) {
             return false;
+        } else {
+            GeoItem parent = this.currentSelectedGeoItem.getParent();
+            if (parent instanceof RipartizioneGeografica) {
+                parent = null;
+            }
+            setCurrentSelectedGeoItem(parent);
+            return true;
         }
-        final Ente parent = currentSelectedEnte.getParent();
-        currentSelectedEnte = parent;
-        setHierarchyLevel(Objects.requireNonNull(parent == null ? HierarchyLevel.REGIONE : parent.getHierarchyLevel().getNext()));
-        return true;
     }
 }

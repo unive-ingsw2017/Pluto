@@ -30,7 +30,7 @@ public class FullscreenView extends LinearLayout {
         logo.setColorFilter(Color.WHITE);
         ll.addView(logo, new LayoutParams(LayoutParams.MATCH_PARENT, 0, 1f));
 
-        title = new TextView(context, null, android.R.attr.progressBarStyleLargeInverse);
+        title = new TextView(context, null, android.R.attr.textAppearanceLargeInverse);
         title.setTextColor(Color.WHITE);
         title.setGravity(Gravity.CENTER);
         ll.addView(title);

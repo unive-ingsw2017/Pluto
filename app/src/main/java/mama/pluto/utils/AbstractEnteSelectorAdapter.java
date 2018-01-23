@@ -2,17 +2,17 @@ package mama.pluto.utils;
 
 import android.content.Context;
 import android.graphics.Color;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import mama.pluto.Ente;
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.GeoItem;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import mama.pluto.R;
 
 /**
@@ -25,9 +25,9 @@ public abstract class AbstractEnteSelectorAdapter extends RecyclerView.Adapter<B
     @Nullable
     private RecyclerView recyclerView;
     @Nullable
-    private Consumer<Ente> onEnteSelected;
+    private Consumer<GeoItem> onGeoItemSelected;
     @Nullable
-    private Ente mainEnte = null;
+    private GeoItem mainGeoItem = null;
 
     protected TextView createView() {
         ensureRecyclerView();
@@ -44,14 +44,14 @@ public abstract class AbstractEnteSelectorAdapter extends RecyclerView.Adapter<B
         return ret;
     }
 
-    public void setMainEnte(@Nullable Ente mainEnte) {
-        this.mainEnte = mainEnte;
+    public void setMainGeoItem(@Nullable GeoItem mainGeoItem) {
+        this.mainGeoItem = mainGeoItem;
         notifyDataSetChanged();
     }
 
     @Override
     public final int getItemCount() {
-        return getEntiCount() + (mainEnte == null ? 0 : 1);
+        return getEntiCount() + (mainGeoItem == null ? 0 : 1);
     }
 
     protected abstract int getEntiCount();
@@ -64,11 +64,11 @@ public abstract class AbstractEnteSelectorAdapter extends RecyclerView.Adapter<B
 
     @Override
     public int getItemViewType(int position) {
-        return position == 0 && mainEnte != null ? VIEW_TYPE_HEADER : VIEW_TYPE_ENTE;
+        return position == 0 && mainGeoItem != null ? VIEW_TYPE_HEADER : VIEW_TYPE_ENTE;
     }
 
-    public void setOnEnteSelected(@Nullable Consumer<Ente> onEnteSelected) {
-        this.onEnteSelected = onEnteSelected;
+    public void setOnGeoItemSelected(@Nullable Consumer<GeoItem> onGeoItemSelected) {
+        this.onGeoItemSelected = onGeoItemSelected;
     }
 
     @Override
@@ -96,8 +96,8 @@ public abstract class AbstractEnteSelectorAdapter extends RecyclerView.Adapter<B
         return new TextView(recyclerView.getContext());
     }
 
-    protected void bindMainEnteView(@NotNull View mainEnteView, @NotNull Ente mainEnte) {
-        ((TextView) mainEnteView).setText("Hoo wyyy, what do we have here, " + mainEnte.getName() + "?");
+    protected void bindMainEnteView(@NotNull View mainEnteView, @NotNull GeoItem mainGeoItem) {
+        ((TextView) mainEnteView).setText("Hoo wyyy, what do we have here, " + mainGeoItem.getNome() + "?");
     }
 
     @Override
@@ -116,15 +116,15 @@ public abstract class AbstractEnteSelectorAdapter extends RecyclerView.Adapter<B
     public void onBindViewHolder(BaseViewHolder holder, int position) {
         switch (holder.getItemViewType()) {
             case VIEW_TYPE_HEADER:
-                bindMainEnteView(holder.getView(), mainEnte);
+                bindMainEnteView(holder.getView(), mainGeoItem);
                 break;
             case VIEW_TYPE_ENTE:
-                final int entePosition = mainEnte != null ? position - 1 : position;
-                final Ente ente = getEnte(entePosition);
-                ((TextView) holder.getView()).setText(ente.getName());
+                final int entePosition = mainGeoItem != null ? position - 1 : position;
+                final GeoItem geoItem = getGeoItem(entePosition);
+                ((TextView) holder.getView()).setText(geoItem.getNome());
                 holder.getView().setOnClickListener(v -> {
-                    if (onEnteSelected != null) {
-                        onEnteSelected.consume(ente);
+                    if (onGeoItemSelected != null) {
+                        onGeoItemSelected.consume(geoItem);
                     }
                 });
                 break;
@@ -133,6 +133,6 @@ public abstract class AbstractEnteSelectorAdapter extends RecyclerView.Adapter<B
         }
     }
 
-    protected abstract Ente getEnte(int position);
+    protected abstract GeoItem getGeoItem(int position);
 
 }

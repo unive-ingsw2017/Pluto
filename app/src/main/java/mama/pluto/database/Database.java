@@ -24,7 +24,6 @@ import com.github.mmauro94.siopeDownloader.utils.OnProgressListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -33,7 +32,6 @@ import io.requery.android.database.sqlite.SQLiteDatabase;
 import io.requery.android.database.sqlite.SQLiteOpenHelper;
 import io.requery.android.database.sqlite.SQLiteStatement;
 import mama.pluto.utils.BiConsumer;
-import mama.pluto.utils.Consumer;
 import mama.pluto.utils.Function;
 import mama.pluto.utils.StringUtils;
 
@@ -89,7 +87,7 @@ public class Database extends SQLiteOpenHelper {
                 "provincia_codice INTEGER NOT NULL," +
                 "numeroAbitanti INTEGER," +
                 "sottocomparto TEXT NOT NULL REFERENCES Sottocomparto(codice)," +
-                "FOREIGN KEY (comune_codice, comune_provincia) REFERENCES Comune(codice, provincia)" +
+                "FOREIGN KEY (comune_codice, provincia_codice) REFERENCES Comune(codice, provincia)" +
                 ")");
         db.execSQL("CREATE TABLE CodiceGestionale (" +
                 "codice TEXT NOT NULL," +
@@ -303,24 +301,18 @@ public class Database extends SQLiteOpenHelper {
         });
     }
 
-    @NotNull
-    public RipartizioneGeografica.Map loadRipartizioniGeografiche() {
-        final RipartizioneGeografica.Map ret = new RipartizioneGeografica.Map();
-        try (Cursor c = getReadableDatabase().rawQuery("SELECT nome FROM RipartizioneGeografica", null)) {
-            while (c.moveToNext()) {
-                ret.add(new RipartizioneGeografica(c.getString(0)));
-            }
-        }
-        return ret;
-    }
-
     private <K, V, R extends AutoMap<K, V>> R loadMap(@NotNull String query, @Nullable String[] selectionArgs, @NotNull R map, @NotNull Function<Cursor, V> f) {
         try (Cursor c = getReadableDatabase().rawQuery(query, selectionArgs)) {
             while (c.moveToNext()) {
-                map.add(f.apply(c));
+                map.put(f.apply(c));
             }
         }
         return map;
+    }
+
+    @NotNull
+    public RipartizioneGeografica.Map loadRipartizioniGeografiche() {
+        return loadMap("SELECT nome FROM RipartizioneGeografica", null, new RipartizioneGeografica.Map(), c -> new RipartizioneGeografica(c.getString(0)));
     }
 
     @NotNull
@@ -367,7 +359,7 @@ public class Database extends SQLiteOpenHelper {
 
     @NotNull
     public Sottocomparto.Map loadSottocomparti(@NotNull Comparto.Map comparti) {
-        return loadMap("SELECT codice, nome, comparto FROM Comparto", null, new Sottocomparto.Map(), c ->
+        return loadMap("SELECT codice, nome, comparto FROM Sottocomparto", null, new Sottocomparto.Map(), c ->
                 new Sottocomparto(
                         c.getString(0),
                         c.getString(1),
