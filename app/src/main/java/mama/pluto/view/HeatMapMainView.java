@@ -4,14 +4,19 @@ import android.content.Context;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.util.HashMap;
 
 import mama.pluto.R;
 
 public class HeatMapMainView extends BaseLayoutView {
+
     private final HeatMapView heatMapView;
 
-    public HeatMapMainView(Context context) {
+    public HeatMapMainView(Context context, @NotNull Anagrafiche anagrafiche) {
         super(context);
         getToolbar().setTitle(R.string.heat_map);
         getToolbar().inflateMenu(R.menu.heatmap_menu);

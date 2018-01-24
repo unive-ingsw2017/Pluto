@@ -3,6 +3,7 @@ package mama.pluto.dataAbstraction;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Comune;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Ente;
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.GeoItem;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Provincia;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Regione;
 
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import mama.pluto.utils.Function;
+import mama.pluto.utils.Producer;
 
 public class DataUtils {
 
@@ -88,34 +90,44 @@ public class DataUtils {
         return ris;
     }
 
+
+    @NotNull
+    public static Ente getEnteOfGeoItem(@NotNull Anagrafiche anagrafiche, @NotNull GeoItem geoItem) {
+        if (geoItem instanceof Comune) {
+            return getEnteOfComune(anagrafiche, ((Comune) geoItem));
+        } else if (geoItem instanceof Provincia) {
+            return getEnteOfProvincia(anagrafiche, ((Provincia) geoItem));
+        } else if (geoItem instanceof Regione) {
+            return getEnteOfRegione(anagrafiche, ((Regione) geoItem));
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
     @NotNull
     public static Ente getEnteOfRegione(@NotNull Anagrafiche anagrafiche, @NotNull Regione regione) {
-        for (Ente ente : anagrafiche.getEnti()) {
-            if (ente.getSottocomparto().getCodice().equals(SOTTOCOMPARTO_REGIONE) && ente.getComune().getProvincia().getRegione().equals(regione)) {
-                return ente;
-            }
-        }
-        throw new IllegalStateException("Ente for regione " + regione.getNome() + " not found");
+        return getEnteOf(anagrafiche, regione, SOTTOCOMPARTO_REGIONE, e -> e.getComune().getProvincia().getRegione());
     }
 
     @NotNull
     public static Ente getEnteOfProvincia(@NotNull Anagrafiche anagrafiche, @NotNull Provincia provincia) {
-        for (Ente ente : anagrafiche.getEnti()) {
-            if (ente.getSottocomparto().getCodice().equals(SOTTOCOMPARTO_PROVINCIA) && ente.getComune().getProvincia().equals(provincia)) {
-                return ente;
-            }
-        }
-        throw new IllegalStateException("Ente for provincia " + provincia.getNome() + " not found");
+        return getEnteOf(anagrafiche, provincia, SOTTOCOMPARTO_PROVINCIA, e -> e.getComune().getProvincia());
     }
 
     @NotNull
     public static Ente getEnteOfComune(@NotNull Anagrafiche anagrafiche, @NotNull Comune comune) {
+        return getEnteOf(anagrafiche, comune, SOTTOCOMPARTO_PROVINCIA, Ente::getComune);
+    }
+
+    @NotNull
+    private static <T extends GeoItem> Ente getEnteOf(@NotNull Anagrafiche anagrafiche, @NotNull T geoItem, @NotNull String sottocompartoCode, @NotNull Function<Ente, T> producer) {
         for (Ente ente : anagrafiche.getEnti()) {
-            if (ente.getSottocomparto().getCodice().equals(SOTTOCOMPARTO_COMUNE) && ente.getComune().equals(comune)) {
+            if (ente.getSottocomparto().getCodice().equals(sottocompartoCode) && producer.apply(ente).equals(geoItem)) {
                 return ente;
             }
         }
-        throw new IllegalStateException("Ente for comune " + comune.getNome() + " not found");
+        throw new IllegalStateException("Ente for " + sottocompartoCode + " " + geoItem.getNome() + " not found");
+
     }
 
     @NotNull
