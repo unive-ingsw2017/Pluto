@@ -127,7 +127,20 @@ public class DataUtils {
             }
         }
         throw new IllegalStateException("Ente for " + sottocompartoCode + " " + geoItem.getNome() + " not found");
+    }
 
+    @NotNull
+    public static GeoItem getGeoItemOfEnte(@NotNull Ente ente) {
+        switch (ente.getSottocomparto().getCodice()) {
+            case SOTTOCOMPARTO_COMUNE:
+                return ente.getComune();
+            case SOTTOCOMPARTO_PROVINCIA:
+                return ente.getComune().getProvincia();
+            case SOTTOCOMPARTO_REGIONE:
+                return ente.getComune().getProvincia().getRegione();
+            default:
+                throw new IllegalArgumentException("Invalid ente");
+        }
     }
 
     @NotNull
