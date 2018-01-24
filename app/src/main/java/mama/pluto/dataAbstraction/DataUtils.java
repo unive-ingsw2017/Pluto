@@ -8,6 +8,7 @@ import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Provincia;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Regione;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -131,6 +132,15 @@ public class DataUtils {
 
     @NotNull
     public static GeoItem getGeoItemOfEnte(@NotNull Ente ente) {
+        GeoItem geoItem = optGeoItemOfEnte(ente);
+        if(geoItem == null) {
+            throw new IllegalArgumentException("Invalid ente");
+        }
+        return geoItem;
+    }
+
+    @Nullable
+    public static GeoItem optGeoItemOfEnte(@NotNull Ente ente) {
         switch (ente.getSottocomparto().getCodice()) {
             case SOTTOCOMPARTO_COMUNE:
                 return ente.getComune();
@@ -139,7 +149,7 @@ public class DataUtils {
             case SOTTOCOMPARTO_REGIONE:
                 return ente.getComune().getProvincia().getRegione();
             default:
-                throw new IllegalArgumentException("Invalid ente");
+                return null;
         }
     }
 
