@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Pluto.iml" filepath="$PROJECT_DIR$/Pluto.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sqlite-android/sqlite-android.iml" filepath="$PROJECT_DIR$/sqlite-android/sqlite-android.iml" />
     </modules>
   </component>
 </project>

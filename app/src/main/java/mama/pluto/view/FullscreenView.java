@@ -35,6 +35,7 @@ public class FullscreenView extends LinearLayout {
         ll.addView(title);
 
         content = new LinearLayout(context);
+        content.setGravity(Gravity.CENTER);
         content.setOrientation(VERTICAL);
         addView(content, childParams);
     }

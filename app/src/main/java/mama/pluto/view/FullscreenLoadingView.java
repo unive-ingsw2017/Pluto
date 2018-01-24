@@ -9,10 +9,14 @@ import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
+
 import mama.pluto.R;
 import mama.pluto.utils.ColorUtils;
 
 public class FullscreenLoadingView extends FullscreenView {
+
+    private final static DecimalFormat PERCENTAGE_FORMATTER = new DecimalFormat("0.00%");
     private final static int MAX_PROGRESS = 10000;
     private final TextView messageView;
     private final TextView percentageView;
@@ -48,7 +52,7 @@ public class FullscreenLoadingView extends FullscreenView {
     }
 
     public void setProgress(float percentage) {
-        this.percentageView.setText(percentage * 100 + "%");//TODO
+        this.percentageView.setText(PERCENTAGE_FORMATTER.format(percentage));
         pb.setIndeterminate(false);
         final int progress = Math.round(percentage * MAX_PROGRESS);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

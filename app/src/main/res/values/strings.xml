@@ -27,4 +27,6 @@
     <string name="loading_anagrafiche">Caricando anagrafiche…</string>
     <string name="downloading_entrate">Scaricando entrate…</string>
     <string name="downloading_uscite">Scaricando uscite…</string>
+    <string name="which_year_to_download">Per quale anno vuoi scaricare i dati?</string>
+    <string name="year_current_warning">%d (i dati potrebbero essere incompleti)</string>
 </resources>

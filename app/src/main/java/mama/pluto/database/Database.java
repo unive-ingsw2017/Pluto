@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import io.requery.android.database.sqlite.SQLiteBindableLong;
 import io.requery.android.database.sqlite.SQLiteDatabase;
 import io.requery.android.database.sqlite.SQLiteOpenHelper;
 import io.requery.android.database.sqlite.SQLiteStatement;
@@ -45,7 +46,7 @@ public class Database extends SQLiteOpenHelper {
     public static final String TIPO_ENTE_ENTRATA = "ENTRATA";
     public static final String TIPO_ENTE_USCITA = "USCITA";
     public static final int MAX_BINDINGS_PER_QUERY = 999;
-    public static final int OPTIMAL_TRANSACTION_SIZE = 1000;
+    public static final int OPTIMAL_TRANSACTION_SIZE = 20_000;
 
     private Database(@NotNull Context context) {
         super(context, NAME, null, VERSION);
@@ -165,19 +166,21 @@ public class Database extends SQLiteOpenHelper {
     }
 
     private interface Binder<T> {
-        void bind(SQLiteStatement stmt, T obj, int startBind);
+        void bind(T obj, Object[] toFill);
     }
 
     private <T> void save(@NotNull Iterable<T> collection, @NotNull Binder<T> bindValues, @NotNull String tableName, @NotNull String... columns) {
-        int maxBatchSize = getMaxBatchSize(columns.length);
+        long now = System.currentTimeMillis();
+        final int maxBatchSize = getMaxBatchSize(columns.length);
 
-        SparseArray<SQLiteStatement> statements = new SparseArray<>(2);
-        SQLiteDatabase db = getWritableDatabase();
+        final SparseArray<SQLiteStatement> statements = new SparseArray<>(2);
+        final SQLiteDatabase db = getWritableDatabase();
         try {
             db.beginTransaction();
             int transactionBatch = 0;
             List<T> batch = new ArrayList<>(maxBatchSize);
             Iterator<T> iterator = collection.iterator();
+            Object[][] bindings = new Object[maxBatchSize][columns.length];
 
             while (iterator.hasNext()) {
                 batch.clear();
@@ -191,7 +194,10 @@ public class Database extends SQLiteOpenHelper {
                     statements.put(batchSize, stmt);
                 }
                 for (int i = 0; i < batchSize; i++) {
-                    bindValues.bind(stmt, batch.get(i), i * columns.length);
+                    bindValues.bind(batch.get(i), bindings[i]);
+                    for (int j = 0; j < bindings[i].length; j++) {
+                        stmt.bindObject(1 + i * columns.length + j, bindings[i][j]);
+                    }
                 }
                 transactionBatch++;
                 stmt.executeInsert();
@@ -207,8 +213,8 @@ public class Database extends SQLiteOpenHelper {
             for (int i = 0; i < statements.size(); i++) {
                 statements.valueAt(i).close();
             }
+            System.out.println("Saving on table " + tableName + " took " + (System.currentTimeMillis() - now) / 1000f + "s");
         }
-
     }
 
     private static int getMaxBatchSize(int bindingsPerRow) {
@@ -250,72 +256,85 @@ public class Database extends SQLiteOpenHelper {
         return sb.toString();
     }
 
+    private static final class LongWrapper implements SQLiteBindableLong {
+        private long l;
+
+        public LongWrapper(long l) {
+            this.l = l;
+        }
+
+        public void setLong(long l) {
+            this.l = l;
+        }
+
+        @Override
+        public long getLong() {
+            return l;
+        }
+    }
+
+    private static void bindNumber(Object[] toFill, int index, long toBind) {
+        if (toFill[index] instanceof LongWrapper) {
+            ((LongWrapper) toFill[index]).setLong(toBind);
+        } else {
+            toFill[index] = new LongWrapper(toBind);
+        }
+    }
+
     public void saveRipartizioneGeografiche(@NotNull Collection<RipartizioneGeografica> ripartizioniGeografiche) {
-        save(ripartizioniGeografiche, (stmt, item, start) -> stmt.bindString(start + 1, item.getNome()), "RipartizioneGeografica", "nome");
+        save(ripartizioniGeografiche, (item, toFill) -> toFill[0] = item.getNome(), "RipartizioneGeografica", "nome");
     }
 
     public void saveRegioni(@NotNull Collection<Regione> regioni) {
-        save(regioni, (stmt, item, start) -> {
-            stmt.bindLong(start + 1, item.getCodice());
-            stmt.bindString(start + 2, item.getNome());
-            stmt.bindString(start + 3, item.getRipartizioneGeografica().getNome());
+        save(regioni, (item, toFill) -> {
+            toFill[0] = item.getCodice();
+            toFill[1] = item.getNome();
+            toFill[2] = item.getRipartizioneGeografica().getNome();
         }, "Regione", "codice", "nome", "ripartizioneGeografica");
     }
 
     public void saveProvincie(@NotNull Collection<Provincia> provincie) {
-        save(provincie, (stmt, item, start) -> {
-            stmt.bindLong(start + 1, item.getCodice());
-            stmt.bindString(start + 2, item.getNome());
-            stmt.bindLong(start + 3, item.getRegione().getCodice());
+        save(provincie, (item, toFill) -> {
+            toFill[0] = item.getCodice();
+            toFill[1] = item.getNome();
+            toFill[2] = item.getRegione().getCodice();
         }, "Provincia", "codice", "nome", "regione");
     }
 
     public void saveComuni(@NotNull Collection<Comune> comuni) {
-        save(comuni, (stmt, item, start) -> {
-            stmt.bindLong(start + 1, item.getComuneId().getCodice());
-            stmt.bindLong(start + 2, item.getProvincia().getCodice());
-            stmt.bindString(start + 3, item.getNome());
+        save(comuni, (item, toFill) -> {
+            toFill[0] = item.getComuneId().getCodice();
+            toFill[1] = item.getProvincia().getCodice();
+            toFill[2] = item.getNome();
         }, "Comune", "codice", "provincia", "nome");
     }
 
     public void saveComparti(@NotNull Collection<Comparto> comparti) {
-        save(comparti, (stmt, item, start) -> {
-            stmt.bindString(start + 1, item.getCodice());
-            stmt.bindString(start + 2, item.getNome());
+        save(comparti, (item, toFill) -> {
+            toFill[0] = item.getCodice();
+            toFill[1] = item.getNome();
         }, "Comparto", "codice", "nome");
     }
 
     public void saveSottocomparti(@NotNull Collection<Sottocomparto> sottocomparti) {
-        save(sottocomparti, (stmt, item, start) -> {
-            stmt.bindString(start + 1, item.getCodice());
-            stmt.bindString(start + 2, item.getNome());
-            stmt.bindString(start + 3, item.getComparto().getCodice());
+        save(sottocomparti, (item, toFill) -> {
+            toFill[0] = item.getCodice();
+            toFill[1] = item.getNome();
+            toFill[2] = item.getComparto().getCodice();
         }, "Sottocomparto", "codice", "nome", "comparto");
     }
 
     public void saveEnti(@NotNull Collection<Ente> enti) {
-        save(enti, (stmt, item, start) -> {
-            stmt.bindString(start + 1, item.getCodice());
-            stmt.bindLong(start + 2, item.getDataInclusione().getTime());
-            if (item.hasDataEsclusione()) {
-                stmt.bindLong(start + 3, item.getDataEsclusione().getTime());
-            } else {
-                stmt.bindNull(start + 3);
-            }
-            if (item.getCodiceFiscale() != null) {
-                stmt.bindString(start + 4, item.getCodiceFiscale());
-            } else {
-                stmt.bindNull(start + 4);
-            }
-            stmt.bindString(start + 5, item.getNome());
-            stmt.bindLong(start + 6, item.getComune().getComuneId().getCodice());
-            stmt.bindLong(start + 7, item.getComune().getComuneId().getProvincia().getCodice());
-            if (item.hasNumeroAbitanti()) {
-                stmt.bindLong(start + 8, item.getNumeroAbitanti());
-            } else {
-                stmt.bindNull(start + 8);
-            }
-            stmt.bindString(start + 9, item.getSottocomparto().getCodice());
+        save(enti, (item, toFill) -> {
+            toFill[0] = item.getCodice();
+            toFill[1] = item.getDataInclusione().getTime();
+            toFill[2] = item.hasDataEsclusione() ? item.getDataEsclusione().getTime() : null;
+            toFill[3] = item.getCodiceFiscale();
+            toFill[4] = item.getNome();
+            toFill[5] = item.getComune().getComuneId().getCodice();
+            toFill[6] = item.getComune().getComuneId().getProvincia().getCodice();
+            toFill[7] = item.hasNumeroAbitanti() ? item.getNumeroAbitanti() : null;
+            toFill[8] = item.getSottocomparto().getCodice();
         }, "Ente", "codice", "dataInclusione", "dataEsclusione", "codiceFiscale", "nome", "comune_codice", "provincia_codice", "numeroAbitanti", "sottocomparto");
     }
 
@@ -330,18 +349,13 @@ public class Database extends SQLiteOpenHelper {
     }
 
     public void saveCodiciGestionali(@NotNull Collection<? extends CodiceGestionale> codiciGestionali) {
-        save(codiciGestionali, (stmt, item, start) -> {
-            stmt.bindString(start + 1, item.getCodice());
-            stmt.bindString(start + 2, getTipoCodiceGestionale(item));
-            stmt.bindString(start + 3, item.getNome());
-            stmt.bindString(start + 4, item.getComparto().getCodice());
-            stmt.bindLong(start + 5, item.getInizioValidita().getTime());
-            if (item.getFineValidita() != null) {
-                stmt.bindLong(start + 6, item.getFineValidita().getTime());
-            } else {
-                stmt.bindNull(start + 6);
-            }
-
+        save(codiciGestionali, (item, toFill) -> {
+            toFill[0] = item.getCodice();
+            toFill[1] = getTipoCodiceGestionale(item);
+            toFill[2] = item.getNome();
+            toFill[3] = item.getComparto().getCodice();
+            toFill[4] = item.getInizioValidita().getTime();
+            toFill[5] = item.getFineValidita() != null ? item.getFineValidita().getTime() : null;
         }, "CodiceGestionale", "codice", "tipo", "nome", "comparto", "inizioValidita", "fineValidita");
     }
 
@@ -355,15 +369,19 @@ public class Database extends SQLiteOpenHelper {
         }
     }
 
+    public void truncateOperazioni() {
+        getWritableDatabase().execSQL("DELETE FROM Operazione");
+    }
+
     public void saveOperazioni(@NotNull Iterable<? extends Operazione> operazioni) {
-        save(operazioni, (stmt, item, start) -> {
-            stmt.bindString(start + 1, getTipoOperazione(item));
-            stmt.bindString(start + 2, item.getCodiceGestionale().getCodice());
-            stmt.bindString(start + 3, getTipoCodiceGestionale(item.getCodiceGestionale()));
-            stmt.bindString(start + 4, item.getEnte().getCodice());
-            stmt.bindLong(start + 5, item.getYear());
-            stmt.bindLong(start + 6, item.getMonth());
-            stmt.bindLong(start + 7, item.getAmount());
+        save(operazioni, (item, toFill) -> {
+            toFill[0] = getTipoOperazione(item);
+            toFill[1] = item.getCodiceGestionale().getCodice();
+            toFill[2] = getTipoCodiceGestionale(item.getCodiceGestionale());
+            toFill[3] = item.getEnte().getCodice();
+            bindNumber(toFill, 4, item.getYear());
+            bindNumber(toFill, 5, item.getMonth());
+            bindNumber(toFill, 6, item.getAmount());
         }, "Operazione", "tipo", "codiceGestionale_codice", "codiceGestionale_tipo", "ente", "year", "month", "amount");
     }
 
