@@ -7,17 +7,14 @@ import android.preference.PreferenceManager;
 import android.support.annotation.StringRes;
 
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
-import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.CodiceGestionale;
-import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.CodiceGestionaleEntrate;
 import com.github.mmauro94.siopeDownloader.datastruct.operazioni.Entrata;
 import com.github.mmauro94.siopeDownloader.datastruct.operazioni.Operazione;
 import com.github.mmauro94.siopeDownloader.datastruct.operazioni.Uscita;
-import com.github.mmauro94.siopeDownloader.utils.OnProgressListener;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
+import java.io.File;
 import java.util.Arrays;
 
 import mama.pluto.database.Database;
@@ -27,6 +24,7 @@ public class InitialDataLoader extends AsyncTask<Void, Progress, Exception> {
     @NotNull
     private final Context context;
     private final boolean anagraficheToDownload, operazioniToDownload;
+    private final int yearToDownload;
 
     @Nullable
     private Anagrafiche anagrafiche;
@@ -34,11 +32,13 @@ public class InitialDataLoader extends AsyncTask<Void, Progress, Exception> {
 
     private static final int[] progressesWeights = new int[4];
 
-    public InitialDataLoader(@NotNull Context context) {
+    public InitialDataLoader(@NotNull Context context, int yearToDownload) {
         this.context = context.getApplicationContext();
+        this.yearToDownload = yearToDownload;
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         anagraficheToDownload = !preferences.getBoolean(SharedPreferencesConsts.ANAGRAFICHE_DOWNLOADED, false);
-        operazioniToDownload = !preferences.getBoolean(SharedPreferencesConsts.OPERAZIONI_DOWNLOADED, false);
+        final Integer downloadedYear = getDownloadedYear(context);
+        operazioniToDownload = downloadedYear == null || downloadedYear != yearToDownload;
 
         Arrays.fill(progresses, 0);
         Arrays.fill(progressesWeights, 0);
@@ -49,7 +49,7 @@ public class InitialDataLoader extends AsyncTask<Void, Progress, Exception> {
         }
         if (operazioniToDownload) {
             progressesWeights[2] = 100;
-            //progressesWeights[3] = 100;
+            progressesWeights[3] = 100;
         }
     }
 
@@ -68,7 +68,7 @@ public class InitialDataLoader extends AsyncTask<Void, Progress, Exception> {
         try {
 
             if (anagraficheToDownload) {
-                anagrafiche = Anagrafiche.downloadAnagrafiche(p -> progress(0, p, R.string.downloading_anagrafiche));
+                anagrafiche = new Anagrafiche.Downloader().setOnProgressListener(p -> progress(0, p, R.string.downloading_anagrafiche)).download();
                 db.saveAnagrafiche(anagrafiche, p -> progress(1, p, R.string.saving_anagrafiche));
 
                 preferences.edit().putBoolean(SharedPreferencesConsts.ANAGRAFICHE_DOWNLOADED, true).apply();
@@ -76,23 +76,27 @@ public class InitialDataLoader extends AsyncTask<Void, Progress, Exception> {
                 anagrafiche = db.loadAnagrafiche(p -> progress(0, p, R.string.loading_anagrafiche));
             }
             if (operazioniToDownload) {
-                db.saveOperazioni(
-                        new OperazioneIteratorBuffer<>(
-                                progressListener -> Entrata.downloadEntrate(2017, anagrafiche, progressListener),
-                                p -> progress(2, p,R.string.downloading_entrate)
-                        ).start()
-                );
-                //db.saveOperazioni(Entrata.downloadEntrate(2017, anagrafiche, p -> progress(2, p)));
-
-                /*db.saveOperazioni(
-                        Uscita.downloadUscite(2017, anagrafiche, p -> progress(3, p))
-                );*/
+                db.truncateOperazioni();
+                final File tempFile = new File(context.getCacheDir(), "temp.zip");
+                tempFile.deleteOnExit();
+                downloadOperazioni(db, new Entrata.Downloader(yearToDownload, anagrafiche), tempFile, 2, R.string.downloading_entrate);
+                downloadOperazioni(db, new Uscita.Downloader(yearToDownload, anagrafiche), tempFile, 3, R.string.downloading_uscite);
+                preferences.edit().putInt(SharedPreferencesConsts.OPERAZIONI_DOWNLOADED, yearToDownload).apply();
             }
         } catch (Exception e) {
             return e;
         }
-
         return null;
+    }
+
+    private void downloadOperazioni(Database db, Operazione.Downloader<?, ?, ?> downloader, File tempFile, int progressIndex, @StringRes int stringMessage) throws Exception {
+        OperazioneIteratorBuffer<?, ?> iteratorBuffer = new OperazioneIteratorBuffer<>(downloader, p -> progress(progressIndex, p, stringMessage))
+                .setTmpFile(tempFile)
+                .start();
+        iteratorBuffer.throwIfTerminatedUnsuccessfully();
+        db.saveOperazioni(
+                iteratorBuffer
+        );
     }
 
     private void progress(int index, float progress, @StringRes int res) {
@@ -103,6 +107,14 @@ public class InitialDataLoader extends AsyncTask<Void, Progress, Exception> {
             sum += progresses[i] * progressesWeights[i];
             weights += progressesWeights[i];
         }
-        publishProgress(new Progress(sum / weights, context.getString(res)));
+        publishProgress(new Progress(sum / weights, context, res));
+    }
+
+    @Nullable
+    public static Integer getDownloadedYear(Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        int ret = preferences.getInt(SharedPreferencesConsts.OPERAZIONI_DOWNLOADED, -1);
+        return ret > 0 ? ret : null;
+
     }
 }

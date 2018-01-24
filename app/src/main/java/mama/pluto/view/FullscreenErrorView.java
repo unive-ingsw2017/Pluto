@@ -3,7 +3,7 @@ package mama.pluto.view;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.Gravity;
-import android.widget.ImageButton;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Space;
 import android.widget.TextView;
@@ -19,7 +19,7 @@ public class FullscreenErrorView extends FullscreenView {
     @NotNull
     private final TextView errorMessageView;
     @NotNull
-    private final ImageButton retryButton;
+    private final Button retryButtonCaption;
 
     public FullscreenErrorView(Context context) {
         super(context);
@@ -27,10 +27,14 @@ public class FullscreenErrorView extends FullscreenView {
         logo.setImageResource(R.drawable.ic_error_outline_white_240dp);
 
         int dp32 = MetricsUtils.dpToPixel(context, 32);
+        int dp8 = MetricsUtils.dpToPixel(context, 8);
+        int dp4 = MetricsUtils.dpToPixel(context, 4);
 
         title.setText(R.string.error);
 
         content.setPadding(dp32, dp32, dp32, dp32);
+
+        content.addView(new Space(context), new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, 0, 1f));
 
         errorMessageView = new TextView(context, null, android.R.attr.textAppearanceMediumInverse);
         errorMessageView.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -39,15 +43,15 @@ public class FullscreenErrorView extends FullscreenView {
 
         content.addView(new Space(context), new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, 0, 1f));
 
-        retryButton = new ImageButton(context, null, android.R.attr.borderlessButtonStyle);
-        retryButton.setImageResource(R.drawable.ic_refresh_white_24dp);
-        content.addView(retryButton);
-
-        TextView retryButtonCaption = new TextView(context, null, android.R.attr.textAppearanceSmallInverse);
+        retryButtonCaption = new Button(context, null, android.R.attr.borderlessButtonStyle);
+        retryButtonCaption.setCompoundDrawablePadding(dp4);
+        retryButtonCaption.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_refresh_white_24dp, 0, 0);
         retryButtonCaption.setGravity(Gravity.CENTER_HORIZONTAL);
         retryButtonCaption.setTextColor(Color.WHITE);
         retryButtonCaption.setText(R.string.retry);
+        retryButtonCaption.setPadding(dp8, dp8, dp8, dp8);
         content.addView(retryButtonCaption);
+
 
         content.addView(new Space(context), new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, 0, 1f));
     }
@@ -57,6 +61,6 @@ public class FullscreenErrorView extends FullscreenView {
     }
 
     public void setOnRetryListener(Runnable onRetryListener) {
-        this.retryButton.setOnClickListener(v -> onRetryListener.run());
+        this.retryButtonCaption.setOnClickListener(v -> onRetryListener.run());
     }
 }

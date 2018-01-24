@@ -3,7 +3,7 @@ package mama.pluto.view;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.Gravity;
-import android.widget.ImageButton;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Space;
 import android.widget.TextView;
@@ -20,7 +20,7 @@ public class FullscreenInternetUsageWarningView extends FullscreenView {
     @NotNull
     private final TextView warningMessageView;
     @NotNull
-    private final ImageButton continueButton;
+    private final Button retryButtonCaption;
 
     public FullscreenInternetUsageWarningView(Context context, DataRestrictedState dataRestrictedState, int approximageMBSize, Runnable onUserAgreed) {
         super(context);
@@ -28,10 +28,14 @@ public class FullscreenInternetUsageWarningView extends FullscreenView {
         logo.setImageResource(R.drawable.ic_data_metered_warning_white_240dp);
 
         int dp32 = MetricsUtils.dpToPixel(context, 32);
+        int dp8 = MetricsUtils.dpToPixel(context, 8);
+        int dp4 = MetricsUtils.dpToPixel(context, 4);
 
         title.setText(R.string.warning);
 
         content.setPadding(dp32, dp32, dp32, dp32);
+
+        content.addView(new Space(context), new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, 0, 1f));
 
         warningMessageView = new TextView(context, null, android.R.attr.textAppearanceMediumInverse);
         warningMessageView.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -40,21 +44,20 @@ public class FullscreenInternetUsageWarningView extends FullscreenView {
 
         content.addView(new Space(context), new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, 0, 1f));
 
-        continueButton = new ImageButton(context, null, android.R.attr.borderlessButtonStyle);
-        continueButton.setImageResource(R.drawable.ic_download_black_24dp);
-        content.addView(continueButton);
-
-        TextView retryButtonCaption = new TextView(context, null, android.R.attr.textAppearanceSmallInverse);
+        retryButtonCaption = new Button(context, null, android.R.attr.borderlessButtonStyle);
+        retryButtonCaption.setCompoundDrawablePadding(dp4);
+        retryButtonCaption.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_download_black_24dp, 0, 0);
         retryButtonCaption.setGravity(Gravity.CENTER_HORIZONTAL);
         retryButtonCaption.setTextColor(Color.WHITE);
         retryButtonCaption.setText(R.string.start_download);
+        retryButtonCaption.setPadding(dp8, dp8, dp8, dp8);
         content.addView(retryButtonCaption);
 
         content.addView(new Space(context), new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, 0, 1f));
 
 
         warningMessageView.setText(dataRestrictedState.getMessage(getContext(), approximageMBSize));
-        continueButton.setOnClickListener(v -> {
+        retryButtonCaption.setOnClickListener(v -> {
             onUserAgreed.run();
         });
     }

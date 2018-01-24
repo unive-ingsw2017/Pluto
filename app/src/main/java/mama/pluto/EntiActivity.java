@@ -1,9 +1,6 @@
 package mama.pluto;
 
-import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.transition.Fade;
 import android.support.transition.TransitionManager;
 import android.view.View;
@@ -14,17 +11,16 @@ import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import mama.pluto.database.Database;
 import mama.pluto.utils.AppSection;
 import mama.pluto.utils.BaseActivity;
 import mama.pluto.utils.DataRestrictedState;
 import mama.pluto.view.FullscreenErrorView;
 import mama.pluto.view.FullscreenInternetUsageWarningView;
 import mama.pluto.view.FullscreenLoadingView;
+import mama.pluto.view.FullscreenYearSelector;
 
 public class EntiActivity extends BaseActivity {
 
@@ -40,26 +36,29 @@ public class EntiActivity extends BaseActivity {
 
     private void loadAnagrafiche() {
         if (anagrafiche == null) {
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-            if (!preferences.getBoolean(SharedPreferencesConsts.OPERAZIONI_DOWNLOADED, false)) {
-                DataRestrictedState currentState = DataRestrictedState.getCurrentState(this);
-                if (currentState != DataRestrictedState.DATA_UNRESTRICTED) {
-                    setContentView(new FullscreenInternetUsageWarningView(this, currentState, 80, this::startLoading));
-                } else {
-                    startLoading();
-                }
+            Integer downloadedYear = InitialDataLoader.getDownloadedYear(this);
+            if (downloadedYear == null) {
+                setContentView(new FullscreenYearSelector(this, year -> {
+                    DataRestrictedState currentState = DataRestrictedState.getCurrentState(this);
+                    if (currentState != DataRestrictedState.DATA_UNRESTRICTED) {
+                        setContentView(new FullscreenInternetUsageWarningView(this, currentState, 100, () -> startLoading(year)));
+                    } else {
+                        startLoading(year);
+                    }
+
+                }));
             } else {
-                startLoading();
+                startLoading(downloadedYear);
             }
         } else {
             setupContentView();
         }
     }
 
-    private void startLoading() {
+    private void startLoading(int year) {
         FullscreenLoadingView fullscreenLoadingView = new FullscreenLoadingView(this);
         setContentView(fullscreenLoadingView);
-        new InitialDataLoader(this) {
+        new InitialDataLoader(this, year) {
 
             @Override
             protected void onPostExecute(Exception e) {
