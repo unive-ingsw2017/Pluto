@@ -116,7 +116,7 @@ public class DataUtils {
 
     @NotNull
     public static Ente getEnteOfComune(@NotNull Anagrafiche anagrafiche, @NotNull Comune comune) {
-        return getEnteOf(anagrafiche, comune, SOTTOCOMPARTO_PROVINCIA, Ente::getComune);
+        return getEnteOf(anagrafiche, comune, SOTTOCOMPARTO_COMUNE, Ente::getComune);
     }
 
     @NotNull
