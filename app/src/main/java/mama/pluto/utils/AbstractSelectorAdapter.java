@@ -153,10 +153,16 @@ public abstract class AbstractSelectorAdapter<V extends View, T> extends Recycle
 
         EnteSummaryView ret = new EnteSummaryView(recyclerView.getContext());
         if (onEnteSelected != null) {
-            ret.addExpandButton(e -> onEnteSelected.consume(e));
+            ret.addExpandButton(this::onEnteSelected);
         }
         ret.setBackgroundColor(0x10000000);
         return ret;
+    }
+
+    protected void onEnteSelected(@NotNull Ente e) {
+        if (onEnteSelected != null) {
+            onEnteSelected.consume(e);
+        }
     }
 
     protected void bindHeaderView(@NotNull View mainEnteView, @Nullable GeoItem mainGeoItem) {
@@ -200,15 +206,19 @@ public abstract class AbstractSelectorAdapter<V extends View, T> extends Recycle
                 //noinspection unchecked
                 bindView(((V) holder.getView()), item);
                 holder.getView().setOnClickListener(v -> {
-                    if (onItemSelected != null) {
-                        onItemSelected.consume(item);
-                    }
+                    onItemSelected(item);
                 });
                 break;
             case VIEW_TYPE_DIVIDER:
                 assert previousDivider != null;
                 ((TextView) holder.getView()).setText(StringUtils.toNormalCase(previousDivider));
                 break;
+        }
+    }
+
+    protected void onItemSelected(T item) {
+        if (onItemSelected != null) {
+            onItemSelected.consume(item);
         }
     }
 

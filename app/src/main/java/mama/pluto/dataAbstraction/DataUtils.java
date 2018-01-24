@@ -25,10 +25,10 @@ public class DataUtils {
     public static final String SOTTOCOMPARTO_REGIONE = "REGIONE";
 
     @NotNull
-    public static List<Ente> getEntiFromComune(@NotNull Anagrafiche anagrafiche, @NotNull Comune comune) {
+    public static List<Ente> getEntiFromComune(@NotNull Anagrafiche anagrafiche, @NotNull Comune comune, boolean includeEnteOfComune) {
         List<Ente> ris = new ArrayList<>();
         for (Ente ente : anagrafiche.getEnti()) {
-            if (ente.getComune().equals(comune)) {
+            if (ente.getComune().equals(comune) && (includeEnteOfComune || !ente.getSottocomparto().getCodice().equals(SOTTOCOMPARTO_COMUNE))) {
                 ris.add(ente);
             }
         }

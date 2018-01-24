@@ -4,13 +4,16 @@ import android.content.Context;
 
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Comune;
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Ente;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Provincia;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
+import mama.pluto.dataAbstraction.DataUtils;
 import mama.pluto.utils.AbstractSelectorAdapter;
 import mama.pluto.utils.StringUtils;
 import mama.pluto.view.SingleLineListItem;
@@ -49,6 +52,16 @@ public class ComuneSelectorView extends AbstractGeoItemSelectorView<Provincia, C
             @Override
             protected int getItemCount2() {
                 return comuni.size();
+            }
+
+            @Override
+            protected void onItemSelected(Comune comune) {
+                final List<Ente> enti = DataUtils.getEntiFromComune(getAnagrafiche(), comune, false);
+                if (enti.isEmpty()) {
+                    super.onEnteSelected(DataUtils.getEnteOfComune(getAnagrafiche(), comune));
+                } else {
+                    super.onItemSelected(comune);
+                }
             }
         };
     }

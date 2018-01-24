@@ -38,7 +38,7 @@ public abstract class AbstractGeoItemSelectorView<P extends GeoItem, G extends G
         return mainGeoItem;
     }
 
-    public void setOnGeoItemSelected(@Nullable Consumer<G> onGeoItemSelected) {
+    public void setOnGeoItemSelected(@Nullable Consumer<? super G> onGeoItemSelected) {
         adapter.setOnItemSelected(onGeoItemSelected);
     }
 
