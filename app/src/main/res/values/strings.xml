@@ -30,8 +30,11 @@
     <string name="which_year_to_download">Per quale anno vuoi scaricare i dati?</string>
     <string name="year_current_warning">%d (i dati potrebbero essere incompleti)</string>
     <string name="no_enti_match_search_query">Nessun ente trovato per \'%s\'</string>
-    <string name="ente_codice_x">Codice ente: %s</string>
-    <string name="ente_codice_fiscale_x">Codice fiscale ente: %s</string>
-    <string name="ente_sottocomparto_x">Sottocomparto: %s</string>
-    <string name="ente_comparto_x">Comparto: %s</string>
+    <string name="ente_codice_x">&lt;b>Codice ente:&lt;/b> %s</string>
+    <string name="ente_codice_fiscale_x">&lt;b>Codice fiscale ente:&lt;/b> %s</string>
+    <string name="ente_sottocomparto_x">&lt;b>Sottocomparto:&lt;/b> %s</string>
+    <string name="ente_comparto_x">&lt;b>Comparto:&lt;/b> %s</string>
+    <string name="italia">Italia</string>
+    <string name="view_all_ente_details">Più dettagli</string>
+    <string name="main_tutorial">Per iniziare, seleziona un ente di tuo interesse.\nSe preferisci, puoi cercarloTODODOODOD</string>
 </resources>

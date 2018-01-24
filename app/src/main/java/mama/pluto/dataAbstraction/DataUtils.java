@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import mama.pluto.utils.Function;
-import mama.pluto.utils.Producer;
 
 public class DataUtils {
 
@@ -112,7 +111,11 @@ public class DataUtils {
 
     @NotNull
     public static Ente getEnteOfProvincia(@NotNull Anagrafiche anagrafiche, @NotNull Provincia provincia) {
-        return getEnteOf(anagrafiche, provincia, SOTTOCOMPARTO_PROVINCIA, e -> e.getComune().getProvincia());
+        Ente ret = optEnteOf(anagrafiche, provincia, SOTTOCOMPARTO_PROVINCIA, e -> e.getComune().getProvincia());
+        if (ret == null) {
+            ret = getEnteOf(anagrafiche, provincia, SOTTOCOMPARTO_REGIONE, e -> e.getComune().getProvincia());
+        }
+        return ret;
     }
 
     @NotNull
@@ -122,18 +125,27 @@ public class DataUtils {
 
     @NotNull
     private static <T extends GeoItem> Ente getEnteOf(@NotNull Anagrafiche anagrafiche, @NotNull T geoItem, @NotNull String sottocompartoCode, @NotNull Function<Ente, T> producer) {
+        Ente ente = optEnteOf(anagrafiche, geoItem, sottocompartoCode, producer);
+        if (ente == null) {
+            throw new IllegalStateException("Ente for " + sottocompartoCode + " " + geoItem.getNome() + " not found");
+        }
+        return ente;
+    }
+
+    @Nullable
+    private static <T extends GeoItem> Ente optEnteOf(@NotNull Anagrafiche anagrafiche, @NotNull T geoItem, @NotNull String sottocompartoCode, @NotNull Function<Ente, T> producer) {
         for (Ente ente : anagrafiche.getEnti()) {
             if (ente.getSottocomparto().getCodice().equals(sottocompartoCode) && producer.apply(ente).equals(geoItem)) {
                 return ente;
             }
         }
-        throw new IllegalStateException("Ente for " + sottocompartoCode + " " + geoItem.getNome() + " not found");
+        return null;
     }
 
     @NotNull
     public static GeoItem getGeoItemOfEnte(@NotNull Ente ente) {
         GeoItem geoItem = optGeoItemOfEnte(ente);
-        if(geoItem == null) {
+        if (geoItem == null) {
             throw new IllegalArgumentException("Invalid ente");
         }
         return geoItem;

@@ -61,16 +61,15 @@ public class HierarchySelectorView extends FrameLayout {
             AbstractGeoItemSelectorView<?, ?> geoItemSelector;
             if (selectedGeoItem == null) {
                 geoItemSelector = new RegioneSelectorView(getContext(), anagrafiche);
-                geoItemSelector.setOnGeoItemSelected(this::setSelectedGeoItem);
             } else if (selectedGeoItem instanceof Regione) {
                 geoItemSelector = new ProvinciaSelectorView(getContext(), anagrafiche, (Regione) selectedGeoItem);
-                geoItemSelector.setOnGeoItemSelected(this::setSelectedGeoItem);
             } else if (selectedGeoItem instanceof Provincia) {
                 geoItemSelector = new ComuneSelectorView(getContext(), anagrafiche, (Provincia) selectedGeoItem);
-                geoItemSelector.setOnGeoItemSelected(this::setSelectedGeoItem);
             } else {
                 throw new IllegalStateException();
             }
+            geoItemSelector.setOnGeoItemSelected(this::setSelectedGeoItem);
+            geoItemSelector.setOnEnteSelected(onEnteSelected);
             selector = geoItemSelector;
         }
         addView(selector, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);

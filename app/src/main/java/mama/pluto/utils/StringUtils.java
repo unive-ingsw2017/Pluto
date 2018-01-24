@@ -11,12 +11,27 @@ public final class StringUtils {
     }
 
     @NonNull
+    public static String join(@NotNull String separator, @NotNull Iterable<String> data) {
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for (String s : data) {
+            if (first) {
+                first = false;
+            } else {
+                sb.append(separator);
+            }
+            sb.append(s);
+        }
+        return sb.toString();
+    }
+
+    @NonNull
     public static String join(@NotNull String separator, @NotNull String... data) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < data.length - 1; i++) {
             sb.append(data[i]).append(separator);
         }
-        sb.append(data[data.length - 1].trim());
+        sb.append(data[data.length - 1]);
         return sb.toString();
     }
 

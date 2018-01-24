@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Ente;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.GeoItem;
 
 import org.jetbrains.annotations.NotNull;
@@ -39,6 +40,10 @@ public abstract class AbstractGeoItemSelectorView<P extends GeoItem, G extends G
 
     public void setOnGeoItemSelected(@Nullable Consumer<G> onGeoItemSelected) {
         adapter.setOnItemSelected(onGeoItemSelected);
+    }
+
+    public void setOnEnteSelected(@Nullable Consumer<Ente> onEnteSelected) {
+        adapter.setOnEnteSelected(onEnteSelected);
     }
 
     protected abstract AbstractSelectorAdapter<?, ? extends G> createAdapter();
