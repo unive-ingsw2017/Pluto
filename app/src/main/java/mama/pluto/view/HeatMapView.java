@@ -13,6 +13,9 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
+import mama.pluto.dataAbstraction.DataUtils;
+import mama.pluto.dataAbstraction.JVectorRegioneCodes;
+
 public class HeatMapView extends WebView {
 
     public enum MapProjection {
@@ -43,14 +46,14 @@ public class HeatMapView extends WebView {
     }
 
     public void setupForRegioneLevel(@NotNull String label, @NotNull MapProjection mapProjection, @NotNull Map<Regione, Float> data) {
-        setData(label, mapProjection, data, true);//TODO: make key a String
+        setData(label, mapProjection, DataUtils.mapConvertKeys(data, JVectorRegioneCodes::getJVectorCode), true);
     }
 
     public void setupForProvinciaLevel(@NotNull String label, @NotNull MapProjection mapProjection, @NotNull Map<Provincia, Float> data) {
-        setData(label, mapProjection, data, false);//TODO: make key a String
+        //setData(label, mapProjection, data, false);//TODO: make key a String
     }
 
-    private void setData(String label, MapProjection mapProjection, Map<?, Float> data, boolean isRegionLevel) {
+    private void setData(String label, MapProjection mapProjection, Map<String, Float> data, boolean isRegionLevel) {
         this.label = label;
         this.mapProjection = mapProjection;
         this.data = data;
