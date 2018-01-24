@@ -8,6 +8,9 @@ import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Ente;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
+import mama.pluto.dataAbstraction.DataUtils;
 import mama.pluto.utils.AbstractEnteSelectorAdapter;
 
 /**
@@ -21,15 +24,17 @@ public class EnteSelectorView extends AbstractEnteSelectorView<Comune> {
 
     @Override
     protected AbstractEnteSelectorAdapter createAdapter() {
+        assert getMainGeoItem() != null;
+        final List<Ente> enti = DataUtils.getEntiFromComune(getAnagrafiche(), getMainGeoItem());
         return new AbstractEnteSelectorAdapter() {
             @Override
             protected Ente getItem(int position) {
-                throw new UnsupportedOperationException();
+                return enti.get(position);
             }
 
             @Override
             protected int getItemCount2() {
-                return 0;
+                return enti.size();
             }
         };
     }

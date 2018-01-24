@@ -52,6 +52,7 @@ public class FullscreenLoadingView extends FullscreenView {
     }
 
     public void setProgress(float percentage) {
+        //TODO: mettere ETA
         this.percentageView.setText(PERCENTAGE_FORMATTER.format(percentage));
         pb.setIndeterminate(false);
         final int progress = Math.round(percentage * MAX_PROGRESS);

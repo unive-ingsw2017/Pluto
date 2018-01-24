@@ -3,6 +3,7 @@ package mama.pluto.database;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.util.SparseArray;
 
 import com.github.mmauro94.siopeDownloader.datastruct.AutoMap;
@@ -386,11 +387,13 @@ public class Database extends SQLiteOpenHelper {
     }
 
     private <K, V, R extends AutoMap<K, V>> R loadMap(@NotNull String query, @Nullable String[] selectionArgs, @NotNull R map, @NotNull Function<Cursor, V> f) {
+        long now = System.currentTimeMillis();
         try (Cursor c = getReadableDatabase().rawQuery(query, selectionArgs)) {
             while (c.moveToNext()) {
                 map.put(f.apply(c));
             }
         }
+        Log.d("SIOPE loading", "Loading " + map.getClass().getName() + " took " + (System.currentTimeMillis() - now) / 1000f + " seconds");
         return map;
     }
 

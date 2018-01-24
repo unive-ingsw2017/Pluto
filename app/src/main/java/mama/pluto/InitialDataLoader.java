@@ -67,6 +67,9 @@ public class InitialDataLoader extends AsyncTask<Void, Progress, Exception> {
         final Database db = Database.getInstance(context);
         try {
 
+            if (operazioniToDownload) {
+                db.truncateOperazioni();
+            }
             if (anagraficheToDownload) {
                 anagrafiche = new Anagrafiche.Downloader().setOnProgressListener(p -> progress(0, p, R.string.downloading_anagrafiche)).download();
                 db.saveAnagrafiche(anagrafiche, p -> progress(1, p, R.string.saving_anagrafiche));
@@ -76,7 +79,6 @@ public class InitialDataLoader extends AsyncTask<Void, Progress, Exception> {
                 anagrafiche = db.loadAnagrafiche(p -> progress(0, p, R.string.loading_anagrafiche));
             }
             if (operazioniToDownload) {
-                db.truncateOperazioni();
                 final File tempFile = new File(context.getCacheDir(), "temp.zip");
                 tempFile.deleteOnExit();
                 downloadOperazioni(db, new Entrata.Downloader(yearToDownload, anagrafiche), tempFile, 2, R.string.downloading_entrate);
@@ -84,6 +86,7 @@ public class InitialDataLoader extends AsyncTask<Void, Progress, Exception> {
                 preferences.edit().putInt(SharedPreferencesConsts.OPERAZIONI_DOWNLOADED, yearToDownload).apply();
             }
         } catch (Exception e) {
+            e.printStackTrace();
             return e;
         }
         return null;
@@ -93,10 +96,8 @@ public class InitialDataLoader extends AsyncTask<Void, Progress, Exception> {
         OperazioneIteratorBuffer<?, ?> iteratorBuffer = new OperazioneIteratorBuffer<>(downloader, p -> progress(progressIndex, p, stringMessage))
                 .setTmpFile(tempFile)
                 .start();
+        db.saveOperazioni(iteratorBuffer);
         iteratorBuffer.throwIfTerminatedUnsuccessfully();
-        db.saveOperazioni(
-                iteratorBuffer
-        );
     }
 
     private void progress(int index, float progress, @StringRes int res) {
