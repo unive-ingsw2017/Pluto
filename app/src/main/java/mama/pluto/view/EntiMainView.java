@@ -2,7 +2,13 @@ package mama.pluto.view;
 
 import android.content.Context;
 import android.os.Build;
+import android.support.transition.Fade;
+import android.support.transition.TransitionManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
@@ -15,6 +21,7 @@ import com.miguelcatalan.materialsearchview.MaterialSearchView;
 import org.jetbrains.annotations.NotNull;
 
 import mama.pluto.R;
+import mama.pluto.utils.EntiSearchAdapter;
 import mama.pluto.utils.MetricsUtils;
 import mama.pluto.view.selectors.HierarchySelectorView;
 
@@ -27,7 +34,10 @@ public class EntiMainView extends BaseLayoutView {
     @NotNull
     private final Anagrafiche anagrafiche;
     private final MaterialSearchView searchView;
+    private final FrameLayout content;
     private final HierarchySelectorView hierarchySelectorView;
+    private final RecyclerView searchResults;
+    private final EntiSearchAdapter searchAdapter;
 
     public EntiMainView(@NotNull Context context, @NotNull Anagrafiche anagrafiche) {
         super(context);
@@ -41,15 +51,31 @@ public class EntiMainView extends BaseLayoutView {
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Toast.makeText(context, query + "!!!", Toast.LENGTH_SHORT).show();
+                searchAdapter.setSearchQuery(query.trim());
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                searchAdapter.setSearchQuery(newText.trim());
                 return false;
             }
         });
+        searchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
+            @Override
+            public void onSearchViewShown() {
+                setContent(searchResults);
+            }
+
+            @Override
+            public void onSearchViewClosed() {
+                setContent(hierarchySelectorView);
+                searchAdapter.setSearchQuery(null);
+            }
+        });
+        content = new FrameLayout(context);
+        addView(content, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+
 
         hierarchySelectorView = new HierarchySelectorView(getContext(), anagrafiche);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -57,9 +83,26 @@ public class EntiMainView extends BaseLayoutView {
         }
         hierarchySelectorView.setOnSelectedGeoItemChanges(geoItem -> recomputeToolbarText());
         hierarchySelectorView.setOnEnteSelected(ente -> Toast.makeText(getContext(), ente.getNome(), Toast.LENGTH_SHORT).show());
-        addView(hierarchySelectorView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        content.addView(hierarchySelectorView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+
+
+        searchResults = new RecyclerView(context);
+        searchResults.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
+        content.addView(searchResults, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        searchAdapter = new EntiSearchAdapter(anagrafiche);
+        searchResults.setAdapter(searchAdapter);
+
 
         recomputeToolbarText();
+        setContent(hierarchySelectorView);
+    }
+
+    private void setContent(@NotNull View v) {
+        TransitionManager.beginDelayedTransition(content, new Fade());
+        for (int i = 0; i < content.getChildCount(); i++) {
+            View view = content.getChildAt(i);
+            view.setVisibility(view == v ? View.VISIBLE : View.GONE);
+        }
     }
 
     private void recomputeToolbarText() {

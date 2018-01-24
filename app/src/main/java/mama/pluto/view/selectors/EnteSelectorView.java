@@ -26,7 +26,7 @@ public class EnteSelectorView extends AbstractEnteSelectorView<Comune> {
     protected AbstractEnteSelectorAdapter createAdapter() {
         assert getMainGeoItem() != null;
         final List<Ente> enti = DataUtils.getEntiFromComune(getAnagrafiche(), getMainGeoItem());
-        return new AbstractEnteSelectorAdapter() {
+        return new AbstractEnteSelectorAdapter(anagrafiche) {
             @Override
             protected Ente getItem(int position) {
                 return enti.get(position);

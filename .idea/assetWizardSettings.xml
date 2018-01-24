@@ -18,7 +18,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/file/ic_file_download_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/social/ic_sentiment_dissatisfied_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -28,10 +28,12 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="color" value="ffffff" />
-                            <entry key="outputName" value="ic_download_black_24dp" />
+                            <entry key="color" value="999999" />
+                            <entry key="height" value="240" />
+                            <entry key="outputName" value="ic_sentiment_dissatisfied_grey_240dp" />
                             <entry key="overrideSize" value="true" />
                             <entry key="sourceFile" value="C:\Users\MMarco" />
+                            <entry key="width" value="240" />
                           </map>
                         </option>
                       </PersistentState>

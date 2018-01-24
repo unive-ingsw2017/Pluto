@@ -30,7 +30,7 @@ public class ProvinciaSelectorView extends AbstractGeoItemSelectorView<Regione, 
         ArrayList<Provincia> province = new ArrayList<>(getMainGeoItem().getProvincie());
         Collections.sort(province, (p1, p2) -> p1.getNome().compareToIgnoreCase(p2.getNome()));
 
-        return new AbstractSelectorAdapter<SingleLineListItem, Provincia>() {
+        return new AbstractSelectorAdapter<SingleLineListItem, Provincia>(anagrafiche) {
             @Override
             protected Provincia getItem(int position) {
                 return province.get(position);

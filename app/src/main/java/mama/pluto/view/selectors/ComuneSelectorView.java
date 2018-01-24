@@ -30,7 +30,7 @@ public class ComuneSelectorView extends AbstractGeoItemSelectorView<Provincia, C
         ArrayList<Comune> comuni = new ArrayList<>(getMainGeoItem().getComuni());
         Collections.sort(comuni, (p1, p2) -> p1.getNome().compareToIgnoreCase(p2.getNome()));
 
-        return new AbstractSelectorAdapter<SingleLineListItem, Comune>() {
+        return new AbstractSelectorAdapter<SingleLineListItem, Comune>(anagrafiche) {
             @Override
             protected Comune getItem(int position) {
                 return comuni.get(position);

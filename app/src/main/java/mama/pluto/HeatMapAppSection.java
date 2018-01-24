@@ -2,7 +2,10 @@ package mama.pluto;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 import android.view.View;
+
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -11,6 +14,12 @@ import mama.pluto.utils.BaseActivity;
 import mama.pluto.view.HeatMapMainView;
 
 public class HeatMapAppSection extends AppSection {
+    @NotNull
+    private final Anagrafiche anagrafiche;
+
+    public HeatMapAppSection(@NonNull Anagrafiche anagrafiche) {
+        this.anagrafiche = anagrafiche;
+    }
 
     @Override
     public String getTitle(@NotNull Context context) {
@@ -25,7 +34,7 @@ public class HeatMapAppSection extends AppSection {
 
     @Override
     protected View createView(@NotNull BaseActivity baseActivity) {
-        HeatMapMainView heatMapMainView = new HeatMapMainView(baseActivity);
+        HeatMapMainView heatMapMainView = new HeatMapMainView(baseActivity, anagrafiche);
         baseActivity.setupToolbar(heatMapMainView.getToolbar());
         return heatMapMainView;
     }

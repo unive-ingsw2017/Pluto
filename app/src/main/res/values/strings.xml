@@ -29,4 +29,9 @@
     <string name="downloading_uscite">Scaricando uscite…</string>
     <string name="which_year_to_download">Per quale anno vuoi scaricare i dati?</string>
     <string name="year_current_warning">%d (i dati potrebbero essere incompleti)</string>
+    <string name="no_enti_match_search_query">Nessun ente trovato per \'%s\'</string>
+    <string name="ente_codice_x">Codice ente: %s</string>
+    <string name="ente_codice_fiscale_x">Codice fiscale ente: %s</string>
+    <string name="ente_sottocomparto_x">Sottocomparto: %s</string>
+    <string name="ente_comparto_x">Comparto: %s</string>
 </resources>

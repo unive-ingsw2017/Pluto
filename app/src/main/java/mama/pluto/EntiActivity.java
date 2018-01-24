@@ -103,7 +103,7 @@ public class EntiActivity extends BaseActivity {
         if (entiAppSection == null) {
             entiAppSection = new EntiAppSection(anagrafiche);
             categorieDiBilancioAppSection = new CategorieDiBilancioAppSection();
-            heatMapAppSection = new HeatMapAppSection();
+            heatMapAppSection = new HeatMapAppSection(anagrafiche);
         }
     }
 

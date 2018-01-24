@@ -1,16 +1,20 @@
 package mama.pluto.utils;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.GeoItem;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import mama.pluto.dataAbstraction.DataUtils;
+import mama.pluto.view.EnteSummaryView;
 import mama.pluto.view.SubHeaderView;
 
 /**
@@ -22,12 +26,24 @@ public abstract class AbstractSelectorAdapter<V extends View, T> extends Recycle
     private final static int VIEW_TYPE_HEADER = 0;
     private final static int VIEW_TYPE_DIVIDER = 1;
     private final static int VIEW_TYPE_ITEM = 2;
+    @NotNull
+    private final Anagrafiche anagrafiche;
+
     @Nullable
     private RecyclerView recyclerView;
     @Nullable
     private Consumer<? super T> onItemSelected;
     @Nullable
     private GeoItem mainGeoItem = null;
+
+    protected AbstractSelectorAdapter(@NonNull Anagrafiche anagrafiche) {
+        this.anagrafiche = anagrafiche;
+    }
+
+    @NonNull
+    public Anagrafiche getAnagrafiche() {
+        return anagrafiche;
+    }
 
     public void setMainGeoItem(@Nullable GeoItem mainGeoItem) {
         this.mainGeoItem = mainGeoItem;
@@ -121,11 +137,14 @@ public abstract class AbstractSelectorAdapter<V extends View, T> extends Recycle
     protected View createMainGeoItemView() {
         ensureRecyclerView();
         assert recyclerView != null;
-        return new TextView(recyclerView.getContext());
+
+        EnteSummaryView ret = new EnteSummaryView(recyclerView.getContext());
+        ret.setBackgroundColor(0x10000000);
+        return ret;
     }
 
     protected void bindMainGeoItemView(@NotNull View mainEnteView, @NotNull GeoItem mainGeoItem) {
-        ((TextView) mainEnteView).setText("Hoo wyyy, what do we have here, " + mainGeoItem.getNome() + "?");
+        ((EnteSummaryView) mainEnteView).setEnte(DataUtils.getEnteOfGeoItem(anagrafiche, mainGeoItem));
     }
 
     @Override

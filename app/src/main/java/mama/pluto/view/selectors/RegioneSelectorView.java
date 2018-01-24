@@ -39,7 +39,7 @@ public class RegioneSelectorView extends AbstractGeoItemSelectorView<GeoItem, Re
                     return ret;
                 }
         );
-        return new AbstractSelectorAdapter<SingleLineListItem, Regione>() {
+        return new AbstractSelectorAdapter<SingleLineListItem, Regione>(anagrafiche) {
             @Override
             protected Regione getItem(int position) {
                 return regioni.get(position);
