@@ -3,6 +3,7 @@ package mama.pluto.database;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
+import android.util.SparseArray;
 
 import com.github.mmauro94.siopeDownloader.datastruct.AutoMap;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
@@ -24,16 +25,16 @@ import com.github.mmauro94.siopeDownloader.utils.OnProgressListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 import io.requery.android.database.sqlite.SQLiteDatabase;
 import io.requery.android.database.sqlite.SQLiteOpenHelper;
 import io.requery.android.database.sqlite.SQLiteStatement;
-import mama.pluto.utils.BiConsumer;
 import mama.pluto.utils.Function;
-import mama.pluto.utils.StringUtils;
 
 public class Database extends SQLiteOpenHelper {
 
@@ -43,6 +44,8 @@ public class Database extends SQLiteOpenHelper {
     public static final String TIPO_CODICE_GESTIONALE_USCITA = "USCITA";
     public static final String TIPO_ENTE_ENTRATA = "ENTRATA";
     public static final String TIPO_ENTE_USCITA = "USCITA";
+    public static final int MAX_BINDINGS_PER_QUERY = 999;
+    public static final int OPTIMAL_TRANSACTION_SIZE = 1000;
 
     private Database(@NotNull Context context) {
         super(context, NAME, null, VERSION);
@@ -107,7 +110,7 @@ public class Database extends SQLiteOpenHelper {
                 "ente TEXT NOT NULL REFERENCES Ente(codice)," +
                 "year INTEGER NOT NULL," +
                 "month INTEGER NOT NULL," +
-                "amount TEXT NOT NULL," +
+                "amount INTEGER NOT NULL," +
                 "PRIMARY KEY (tipo, codiceGestionale_codice, codiceGestionale_tipo, ente, year, month)," +
                 "FOREIGN KEY (codiceGestionale_codice, codiceGestionale_tipo) REFERENCES CodiceGestionale(codice, tipo)" +
                 ")");
@@ -161,95 +164,159 @@ public class Database extends SQLiteOpenHelper {
         onProgressListener.onProgress(1f);
     }
 
-    private <T> void save(@NotNull Iterable<T> collection, @NotNull String query, @NotNull BiConsumer<SQLiteStatement, T> bindValues) {
+    private interface Binder<T> {
+        void bind(SQLiteStatement stmt, T obj, int startBind);
+    }
+
+    private <T> void save(@NotNull Iterable<T> collection, @NotNull Binder<T> bindValues, @NotNull String tableName, @NotNull String... columns) {
+        int maxBatchSize = getMaxBatchSize(columns.length);
+
+        SparseArray<SQLiteStatement> statements = new SparseArray<>(2);
         SQLiteDatabase db = getWritableDatabase();
-        db.beginTransaction();
-        try (SQLiteStatement stmt = db.compileStatement(query)) {
-            for (T t : collection) {
-                bindValues.consume(stmt, t);
-                stmt.execute();
+        try {
+            db.beginTransaction();
+            int transactionBatch = 0;
+            List<T> batch = new ArrayList<>(maxBatchSize);
+            Iterator<T> iterator = collection.iterator();
+
+            while (iterator.hasNext()) {
+                batch.clear();
+                while (batch.size() < maxBatchSize && iterator.hasNext()) {
+                    batch.add(iterator.next());
+                }
+                final int batchSize = batch.size();
+                SQLiteStatement stmt = statements.get(batchSize);
+                if (stmt == null) {
+                    stmt = db.compileStatement(insertQuery(tableName, batchSize, columns));
+                    statements.put(batchSize, stmt);
+                }
+                for (int i = 0; i < batchSize; i++) {
+                    bindValues.bind(stmt, batch.get(i), i * columns.length);
+                }
+                transactionBatch++;
+                stmt.executeInsert();
+                if (transactionBatch % OPTIMAL_TRANSACTION_SIZE == 0) {
+                    db.setTransactionSuccessful();
+                    db.endTransaction();
+                    db.beginTransaction();
+                }
             }
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
+            for (int i = 0; i < statements.size(); i++) {
+                statements.valueAt(i).close();
+            }
         }
+
+    }
+
+    private static int getMaxBatchSize(int bindingsPerRow) {
+        return MAX_BINDINGS_PER_QUERY / bindingsPerRow;
     }
 
     @NonNull
     private static String insertQuery(@NotNull String tableName, @NotNull String... columns) {
-        final String[] values = new String[columns.length];
-        Arrays.fill(values, "?");
+        return insertQuery(tableName, 1, columns);
+    }
 
-        return "REPLACE INTO " + tableName + " (" + StringUtils.join(", ", columns) + ") VALUES (" + StringUtils.join(", ", values) + ")";
+    @NonNull
+    private static String insertQuery(@NotNull String tableName, int batchSize, @NotNull String... columns) {
+        if (batchSize * columns.length > MAX_BINDINGS_PER_QUERY) {
+            throw new IllegalArgumentException("The number of bindings cannot be bigger than " + MAX_BINDINGS_PER_QUERY);
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("REPLACE INTO ").append(tableName).append(" (");
+        for (int i = 0; i < columns.length; i++) {
+            if (i > 0) {
+                sb.append(", ");
+            }
+            sb.append(columns[i]);
+        }
+        sb.append(") VALUES ");
+        for (int i = 0; i < batchSize; i++) {
+            if (i > 0) {
+                sb.append(",");
+            }
+            sb.append("(");
+            for (int j = 0; j < columns.length; j++) {
+                if (j > 0) {
+                    sb.append(",");
+                }
+                sb.append("?");
+            }
+            sb.append(")");
+        }
+        return sb.toString();
     }
 
     public void saveRipartizioneGeografiche(@NotNull Collection<RipartizioneGeografica> ripartizioniGeografiche) {
-        save(ripartizioniGeografiche, insertQuery("RipartizioneGeografica", "nome"), (stmt, item) -> stmt.bindString(1, item.getNome()));
+        save(ripartizioniGeografiche, (stmt, item, start) -> stmt.bindString(start + 1, item.getNome()), "RipartizioneGeografica", "nome");
     }
 
     public void saveRegioni(@NotNull Collection<Regione> regioni) {
-        save(regioni, insertQuery("Regione", "codice", "nome", "ripartizioneGeografica"), (stmt, item) -> {
-            stmt.bindLong(1, item.getCodice());
-            stmt.bindString(2, item.getNome());
-            stmt.bindString(3, item.getRipartizioneGeografica().getNome());
-        });
+        save(regioni, (stmt, item, start) -> {
+            stmt.bindLong(start + 1, item.getCodice());
+            stmt.bindString(start + 2, item.getNome());
+            stmt.bindString(start + 3, item.getRipartizioneGeografica().getNome());
+        }, "Regione", "codice", "nome", "ripartizioneGeografica");
     }
 
     public void saveProvincie(@NotNull Collection<Provincia> provincie) {
-        save(provincie, insertQuery("Provincia", "codice", "nome", "regione"), (stmt, item) -> {
-            stmt.bindLong(1, item.getCodice());
-            stmt.bindString(2, item.getNome());
-            stmt.bindLong(3, item.getRegione().getCodice());
-        });
+        save(provincie, (stmt, item, start) -> {
+            stmt.bindLong(start + 1, item.getCodice());
+            stmt.bindString(start + 2, item.getNome());
+            stmt.bindLong(start + 3, item.getRegione().getCodice());
+        }, "Provincia", "codice", "nome", "regione");
     }
 
     public void saveComuni(@NotNull Collection<Comune> comuni) {
-        save(comuni, insertQuery("Comune", "codice", "provincia", "nome"), (stmt, item) -> {
-            stmt.bindLong(1, item.getComuneId().getCodice());
-            stmt.bindLong(2, item.getProvincia().getCodice());
-            stmt.bindString(3, item.getNome());
-        });
+        save(comuni, (stmt, item, start) -> {
+            stmt.bindLong(start + 1, item.getComuneId().getCodice());
+            stmt.bindLong(start + 2, item.getProvincia().getCodice());
+            stmt.bindString(start + 3, item.getNome());
+        }, "Comune", "codice", "provincia", "nome");
     }
 
     public void saveComparti(@NotNull Collection<Comparto> comparti) {
-        save(comparti, insertQuery("Comparto", "codice", "nome"), (stmt, item) -> {
-            stmt.bindString(1, item.getCodice());
-            stmt.bindString(2, item.getNome());
-        });
+        save(comparti, (stmt, item, start) -> {
+            stmt.bindString(start + 1, item.getCodice());
+            stmt.bindString(start + 2, item.getNome());
+        }, "Comparto", "codice", "nome");
     }
 
     public void saveSottocomparti(@NotNull Collection<Sottocomparto> sottocomparti) {
-        save(sottocomparti, insertQuery("Sottocomparto", "codice", "nome", "comparto"), (stmt, item) -> {
-            stmt.bindString(1, item.getCodice());
-            stmt.bindString(2, item.getNome());
-            stmt.bindString(3, item.getComparto().getCodice());
-        });
+        save(sottocomparti, (stmt, item, start) -> {
+            stmt.bindString(start + 1, item.getCodice());
+            stmt.bindString(start + 2, item.getNome());
+            stmt.bindString(start + 3, item.getComparto().getCodice());
+        }, "Sottocomparto", "codice", "nome", "comparto");
     }
 
     public void saveEnti(@NotNull Collection<Ente> enti) {
-        save(enti, insertQuery("Ente", "codice", "dataInclusione", "dataEsclusione", "codiceFiscale", "nome", "comune_codice", "provincia_codice", "numeroAbitanti", "sottocomparto"), (stmt, item) -> {
-            stmt.bindString(1, item.getCodice());
-            stmt.bindLong(2, item.getDataInclusione().getTime());
+        save(enti, (stmt, item, start) -> {
+            stmt.bindString(start + 1, item.getCodice());
+            stmt.bindLong(start + 2, item.getDataInclusione().getTime());
             if (item.hasDataEsclusione()) {
-                stmt.bindLong(3, item.getDataEsclusione().getTime());
+                stmt.bindLong(start + 3, item.getDataEsclusione().getTime());
             } else {
-                stmt.bindNull(3);
+                stmt.bindNull(start + 3);
             }
             if (item.getCodiceFiscale() != null) {
-                stmt.bindString(4, item.getCodiceFiscale());
+                stmt.bindString(start + 4, item.getCodiceFiscale());
             } else {
-                stmt.bindNull(4);
+                stmt.bindNull(start + 4);
             }
-            stmt.bindString(5, item.getNome());
-            stmt.bindLong(6, item.getComune().getComuneId().getCodice());
-            stmt.bindLong(7, item.getComune().getComuneId().getProvincia().getCodice());
+            stmt.bindString(start + 5, item.getNome());
+            stmt.bindLong(start + 6, item.getComune().getComuneId().getCodice());
+            stmt.bindLong(start + 7, item.getComune().getComuneId().getProvincia().getCodice());
             if (item.hasNumeroAbitanti()) {
-                stmt.bindLong(8, item.getNumeroAbitanti());
+                stmt.bindLong(start + 8, item.getNumeroAbitanti());
             } else {
-                stmt.bindNull(8);
+                stmt.bindNull(start + 8);
             }
-            stmt.bindString(9, item.getSottocomparto().getCodice());
-        });
+            stmt.bindString(start + 9, item.getSottocomparto().getCodice());
+        }, "Ente", "codice", "dataInclusione", "dataEsclusione", "codiceFiscale", "nome", "comune_codice", "provincia_codice", "numeroAbitanti", "sottocomparto");
     }
 
     public static String getTipoCodiceGestionale(@NotNull CodiceGestionale codiceGestionale) {
@@ -263,19 +330,19 @@ public class Database extends SQLiteOpenHelper {
     }
 
     public void saveCodiciGestionali(@NotNull Collection<? extends CodiceGestionale> codiciGestionali) {
-        save(codiciGestionali, insertQuery("CodiceGestionale", "codice", "tipo", "nome", "comparto", "inizioValidita", "fineValidita"), (stmt, item) -> {
-            stmt.bindString(1, item.getCodice());
-            stmt.bindString(2, getTipoCodiceGestionale(item));
-            stmt.bindString(3, item.getNome());
-            stmt.bindString(4, item.getComparto().getCodice());
-            stmt.bindLong(5, item.getInizioValidita().getTime());
+        save(codiciGestionali, (stmt, item, start) -> {
+            stmt.bindString(start + 1, item.getCodice());
+            stmt.bindString(start + 2, getTipoCodiceGestionale(item));
+            stmt.bindString(start + 3, item.getNome());
+            stmt.bindString(start + 4, item.getComparto().getCodice());
+            stmt.bindLong(start + 5, item.getInizioValidita().getTime());
             if (item.getFineValidita() != null) {
-                stmt.bindLong(6, item.getFineValidita().getTime());
+                stmt.bindLong(start + 6, item.getFineValidita().getTime());
             } else {
-                stmt.bindNull(6);
+                stmt.bindNull(start + 6);
             }
 
-        });
+        }, "CodiceGestionale", "codice", "tipo", "nome", "comparto", "inizioValidita", "fineValidita");
     }
 
     public static String getTipoOperazione(@NotNull Operazione<?> operazione) {
@@ -288,17 +355,16 @@ public class Database extends SQLiteOpenHelper {
         }
     }
 
-    public void saveOperazioni(@NotNull Iterable<Operazione> operazioni) {
-        save(operazioni, insertQuery("Operazione", "tipo", "codiceGestionale_codice", "codiceGestionale_tipo", "ente", "year", "month", "amount"), (stmt, item) -> {
-            stmt.bindString(1, getTipoOperazione(item));
-            stmt.bindString(2, item.getCodiceGestionale().getCodice());
-            stmt.bindString(3, getTipoCodiceGestionale(item.getCodiceGestionale()));
-            stmt.bindString(4, item.getEnte().getCodice());
-            stmt.bindLong(5, item.getYear());
-            stmt.bindLong(6, item.getMonth());
-            stmt.bindString(7, item.getAmount().toPlainString());
-
-        });
+    public void saveOperazioni(@NotNull Iterable<? extends Operazione> operazioni) {
+        save(operazioni, (stmt, item, start) -> {
+            stmt.bindString(start + 1, getTipoOperazione(item));
+            stmt.bindString(start + 2, item.getCodiceGestionale().getCodice());
+            stmt.bindString(start + 3, getTipoCodiceGestionale(item.getCodiceGestionale()));
+            stmt.bindString(start + 4, item.getEnte().getCodice());
+            stmt.bindLong(start + 5, item.getYear());
+            stmt.bindLong(start + 6, item.getMonth());
+            stmt.bindLong(start + 7, item.getAmount());
+        }, "Operazione", "tipo", "codiceGestionale_codice", "codiceGestionale_tipo", "ente", "year", "month", "amount");
     }
 
     private <K, V, R extends AutoMap<K, V>> R loadMap(@NotNull String query, @Nullable String[] selectionArgs, @NotNull R map, @NotNull Function<Cursor, V> f) {

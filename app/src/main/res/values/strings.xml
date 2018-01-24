@@ -22,4 +22,9 @@
     <string name="warning">Attenzione!</string>
     <string name="detail_level_regione">Livello dettagli regionale</string>
     <string name="detail_level_provincia">Livello dettagli provinciale</string>
+    <string name="downloading_anagrafiche">Scaricando anagrafiche…</string>
+    <string name="saving_anagrafiche">Salvando anagrafiche…</string>
+    <string name="loading_anagrafiche">Caricando anagrafiche…</string>
+    <string name="downloading_entrate">Scaricando entrate…</string>
+    <string name="downloading_uscite">Scaricando uscite…</string>
 </resources>
