@@ -6,6 +6,8 @@ import android.support.transition.TransitionManager;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Comune;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,6 +15,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import mama.pluto.dataAbstraction.AnagraficheExtended;
+import mama.pluto.dataAbstraction.ComuneStat;
 import mama.pluto.utils.AppSection;
 import mama.pluto.utils.BaseActivity;
 import mama.pluto.utils.DataRestrictedState;
@@ -63,6 +66,8 @@ public class EntiActivity extends BaseActivity {
             protected void onPostExecute(Exception e) {
                 if (e == null) {
                     anagrafiche = getAnagrafiche();
+                    ComuneStat stat = ComuneStat.getInstance(EntiActivity.this, anagrafiche, anagrafiche.getComuni().get(new Comune.ComuneId(27, anagrafiche.getProvincie().get(20))));
+                    System.out.println(stat.getSuperficie());
                     setupContentView();
                 } else {
                     setupErrorView(e);
