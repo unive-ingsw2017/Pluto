@@ -16,13 +16,13 @@ import org.jetbrains.annotations.NotNull;
 
 import mama.pluto.utils.DoubleMap;
 
-public class AnagraficheImproved {
+public class AnagraficheExtended {
 
     private final Anagrafiche anagrafiche;
     private final DoubleMap<Long, CodiceGestionale> codiceGestionaleIdMap;
     private final DoubleMap<Long, Ente> enteIdMap;
 
-    public AnagraficheImproved(Anagrafiche anagrafiche, DoubleMap<Long, CodiceGestionale> codiceGestionaleIdMap, DoubleMap<Long, Ente> enteIdMap) {
+    public AnagraficheExtended(Anagrafiche anagrafiche, DoubleMap<Long, CodiceGestionale> codiceGestionaleIdMap, DoubleMap<Long, Ente> enteIdMap) {
         //TODO: check that id maps are complete
         this.anagrafiche = anagrafiche;
         this.codiceGestionaleIdMap = codiceGestionaleIdMap;
@@ -100,8 +100,8 @@ public class AnagraficheImproved {
             codiceGestionaleIdMap.put(id, codiceGestionale);
         }
 
-        public AnagraficheImproved build(Anagrafiche anagrafiche) {
-            return new AnagraficheImproved(anagrafiche, codiceGestionaleIdMap, enteIdMap);
+        public AnagraficheExtended build(Anagrafiche anagrafiche) {
+            return new AnagraficheExtended(anagrafiche, codiceGestionaleIdMap, enteIdMap);
         }
     }
 }
