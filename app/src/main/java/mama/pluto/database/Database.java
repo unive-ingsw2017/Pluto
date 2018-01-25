@@ -14,6 +14,7 @@ import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.CodiceGestiona
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Comparto;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Comune;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Ente;
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.GeoItem;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Provincia;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Regione;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.RipartizioneGeografica;
@@ -29,8 +30,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import io.requery.android.database.sqlite.SQLiteBindableLong;
 import io.requery.android.database.sqlite.SQLiteDatabase;
@@ -38,6 +41,7 @@ import io.requery.android.database.sqlite.SQLiteOpenHelper;
 import io.requery.android.database.sqlite.SQLiteStatement;
 import mama.pluto.dataAbstraction.AnagraficheImproved;
 import mama.pluto.dataAbstraction.CategoryUtils;
+import mama.pluto.dataAbstraction.DataUtils;
 import mama.pluto.utils.BiConsumer;
 import mama.pluto.utils.Function;
 
@@ -565,5 +569,32 @@ public class Database extends SQLiteOpenHelper {
         progressListener.onProgress(1f);
 
         return builder.build(new Anagrafiche(comparti, sottocomparti, ripartizioneGeografiche, regioni, provincie, comuni, enti, codiciGestionaliEntrate, codiciGestionaliUscite));
+    }
+
+    @NotNull
+    public Map<Regione, Long> getRegioneBalances(@NotNull AnagraficheImproved a) {
+        return getBalances(a, DataUtils.SOTTOCOMPARTO_REGIONE, gi -> (Regione) gi);
+    }
+
+    @NotNull
+    public Map<Provincia, Long> getProvinciaBalances(@NotNull AnagraficheImproved a) {
+        return getBalances(a, DataUtils.SOTTOCOMPARTO_PROVINCIA, gi -> (Provincia) gi);
+    }
+
+    @NotNull
+    private <T extends GeoItem> Map<T, Long> getBalances(@NotNull AnagraficheImproved a, @NotNull String tipoSottocomparto, @NotNull Function<GeoItem, T> caster) {
+        try (Cursor cursor = getReadableDatabase().rawQuery(
+                "SELECT ente, SUM(CASE o.tipo WHEN ? THEN -o.amount ELSE o.amount END) " +
+                        "FROM Operazione o " +
+                        "INNER JOIN Ente e ON e.codice = o.ente " +
+                        "WHERE e.sottocomparto=? " +
+                        "GROUP BY o.ente", new String[]{TIPO_OPERAZIONE_USCITA, tipoSottocomparto})) {
+            final Map<T, Long> map = new HashMap<>();
+            while (cursor.moveToNext()) {
+                GeoItem gi = DataUtils.getGeoItemOfEnte(a.getEnti().get(cursor.getString(0)));
+                map.put(caster.apply(gi), cursor.getLong(1));
+            }
+            return map;
+        }
     }
 }

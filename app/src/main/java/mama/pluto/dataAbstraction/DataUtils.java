@@ -183,10 +183,19 @@ public final class DataUtils {
     }
 
     @NotNull
-    public static <K1, K2, V> Map<K2, V> mapConvertKeys(@NotNull Map<K1, V> map, @NotNull Function<K1, K2> transformer) {
+    public static <K1, K2, V> Map<K2, V> mapConvertKeys(@NotNull Map<K1, ? extends V> map, @NotNull Function<? super K1, ? extends K2> transformer) {
         final Map<K2, V> ret = new HashMap<>(map.size());
-        for (Map.Entry<K1, V> entry : map.entrySet()) {
+        for (Map.Entry<K1, ? extends V> entry : map.entrySet()) {
             ret.put(transformer.apply(entry.getKey()), entry.getValue());
+        }
+        return ret;
+    }
+
+    @NotNull
+    public static <K, V1, V2> Map<K, V2> mapConvertValues(@NotNull Map<? extends K, V1> map, @NotNull Function<? super V1, ? extends V2> transformer) {
+        final Map<K, V2> ret = new HashMap<>(map.size());
+        for (Map.Entry<? extends K, V1> entry : map.entrySet()) {
+            ret.put(entry.getKey(), transformer.apply(entry.getValue()));
         }
         return ret;
     }
