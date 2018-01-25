@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 import mama.pluto.R;
-import mama.pluto.dataAbstraction.AnagraficheImproved;
+import mama.pluto.dataAbstraction.AnagraficheExtended;
 import mama.pluto.dataAbstraction.DataUtils;
 import mama.pluto.view.DoubleLineListItem;
 
@@ -23,13 +23,13 @@ public class EntiSearchAdapter extends RecyclerView.Adapter<BaseViewHolder<View>
     private final static int VIEW_TYPE_ENTE = 1;
     private final static int VIEW_TYPE_EMPTY = 2;
 
-    private final AnagraficheImproved anagrafiche;
+    private final AnagraficheExtended anagrafiche;
     private RecyclerView recyclerView;
     private String searchQuery;
     private List<Ente> searchResults;
     private Consumer<Ente> onEnteSelected;
 
-    public EntiSearchAdapter(AnagraficheImproved anagrafiche) {
+    public EntiSearchAdapter(AnagraficheExtended anagrafiche) {
         this.anagrafiche = anagrafiche;
     }
 

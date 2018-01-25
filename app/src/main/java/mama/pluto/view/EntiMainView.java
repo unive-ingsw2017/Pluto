@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import mama.pluto.R;
-import mama.pluto.dataAbstraction.AnagraficheImproved;
+import mama.pluto.dataAbstraction.AnagraficheExtended;
 import mama.pluto.utils.EntiSearchAdapter;
 import mama.pluto.utils.MetricsUtils;
 import mama.pluto.utils.StringUtils;
@@ -33,7 +33,7 @@ import mama.pluto.view.selectors.HierarchySelectorView;
 public class EntiMainView extends BaseLayoutView {
 
     @NotNull
-    private final AnagraficheImproved anagrafiche;
+    private final AnagraficheExtended anagrafiche;
     private final MaterialSearchView searchView;
     private final FrameLayout content;
     private final HierarchySelectorView hierarchySelectorView;
@@ -43,7 +43,7 @@ public class EntiMainView extends BaseLayoutView {
     private final MenuItem searchMenuItem;
     private Ente selectedEnte;
 
-    public EntiMainView(@NotNull Context context, @NotNull AnagraficheImproved anagrafiche) {
+    public EntiMainView(@NotNull Context context, @NotNull AnagraficheExtended anagrafiche) {
         super(context);
         this.anagrafiche = anagrafiche;
         toolbar.inflateMenu(R.menu.enti_main_menu);

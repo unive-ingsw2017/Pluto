@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import mama.pluto.dataAbstraction.AnagraficheImproved;
+import mama.pluto.dataAbstraction.AnagraficheExtended;
 import mama.pluto.dataAbstraction.DataUtils;
 import mama.pluto.utils.AbstractSelectorAdapter;
 import mama.pluto.utils.StringUtils;
@@ -23,7 +23,7 @@ import mama.pluto.view.SingleLineListItem;
  */
 public class ComuneSelectorView extends AbstractGeoItemSelectorView<Provincia, Comune> {
 
-    public ComuneSelectorView(@NotNull Context context, @NotNull AnagraficheImproved anagrafiche, @NotNull Provincia provincia) {
+    public ComuneSelectorView(@NotNull Context context, @NotNull AnagraficheExtended anagrafiche, @NotNull Provincia provincia) {
         super(context, anagrafiche, provincia);
     }
 

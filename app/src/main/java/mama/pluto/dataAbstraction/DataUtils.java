@@ -28,7 +28,7 @@ public final class DataUtils {
     public static final String SOTTOCOMPARTO_REGIONE = "REGIONE";
 
     @NotNull
-    public static List<Ente> getEntiFromComune(@NotNull AnagraficheImproved anagrafiche, @NotNull Comune comune, boolean includeEnteOfComune) {
+    public static List<Ente> getEntiFromComune(@NotNull AnagraficheExtended anagrafiche, @NotNull Comune comune, boolean includeEnteOfComune) {
         List<Ente> ris = new ArrayList<>();
         for (Ente ente : anagrafiche.getEnti()) {
             if (ente.getComune().equals(comune) && (includeEnteOfComune || !ente.getSottocomparto().getCodice().equals(SOTTOCOMPARTO_COMUNE))) {
@@ -39,7 +39,7 @@ public final class DataUtils {
     }
 
     @NotNull
-    public static List<Ente> searchEnte(@NotNull AnagraficheImproved anagrafiche, @NotNull String query) {
+    public static List<Ente> searchEnte(@NotNull AnagraficheExtended anagrafiche, @NotNull String query) {
         query = query.toLowerCase();
         List<Ente> ris = new ArrayList<>();
         for (Ente ente : anagrafiche.getEnti()) {
@@ -61,7 +61,7 @@ public final class DataUtils {
     }
 
     @NotNull
-    public static List<Ente> getRegioni(@NotNull AnagraficheImproved anagrafiche) {
+    public static List<Ente> getRegioni(@NotNull AnagraficheExtended anagrafiche) {
         List<Ente> ris = new ArrayList<>();
         for (Ente ente : anagrafiche.getEnti()) {
             if (ente.getSottocomparto().getCodice().equals(SOTTOCOMPARTO_REGIONE)) {
@@ -72,7 +72,7 @@ public final class DataUtils {
     }
 
     @NotNull
-    public static List<Ente> getProvince(@NotNull AnagraficheImproved anagrafiche) {
+    public static List<Ente> getProvince(@NotNull AnagraficheExtended anagrafiche) {
         List<Ente> ris = new ArrayList<>();
         for (Ente ente : anagrafiche.getEnti()) {
             if (ente.getSottocomparto().getCodice().equals(SOTTOCOMPARTO_PROVINCIA)) {
@@ -83,7 +83,7 @@ public final class DataUtils {
     }
 
     @NotNull
-    public static List<Ente> getComuni(@NotNull AnagraficheImproved anagrafiche) {
+    public static List<Ente> getComuni(@NotNull AnagraficheExtended anagrafiche) {
         List<Ente> ris = new ArrayList<>();
         for (Ente ente : anagrafiche.getEnti()) {
             if (ente.getSottocomparto().getCodice().equals(SOTTOCOMPARTO_COMUNE)) {
@@ -95,7 +95,7 @@ public final class DataUtils {
 
 
     @NotNull
-    public static Ente getEnteOfGeoItem(@NotNull AnagraficheImproved anagrafiche, @NotNull GeoItem geoItem) {
+    public static Ente getEnteOfGeoItem(@NotNull AnagraficheExtended anagrafiche, @NotNull GeoItem geoItem) {
         if (geoItem instanceof Comune) {
             return getEnteOfComune(anagrafiche, ((Comune) geoItem));
         } else if (geoItem instanceof Provincia) {
@@ -108,12 +108,12 @@ public final class DataUtils {
     }
 
     @NotNull
-    public static Ente getEnteOfRegione(@NotNull AnagraficheImproved anagrafiche, @NotNull Regione regione) {
+    public static Ente getEnteOfRegione(@NotNull AnagraficheExtended anagrafiche, @NotNull Regione regione) {
         return getEnteOf(anagrafiche, regione, SOTTOCOMPARTO_REGIONE, e -> e.getComune().getProvincia().getRegione());
     }
 
     @NotNull
-    public static Ente getEnteOfProvincia(@NotNull AnagraficheImproved anagrafiche, @NotNull Provincia provincia) {
+    public static Ente getEnteOfProvincia(@NotNull AnagraficheExtended anagrafiche, @NotNull Provincia provincia) {
         Ente ret = optEnteOf(anagrafiche, provincia, SOTTOCOMPARTO_PROVINCIA, e -> e.getComune().getProvincia());
         if (ret == null) {
             ret = getEnteOf(anagrafiche, provincia, SOTTOCOMPARTO_REGIONE, e -> e.getComune().getProvincia());
@@ -122,12 +122,12 @@ public final class DataUtils {
     }
 
     @NotNull
-    public static Ente getEnteOfComune(@NotNull AnagraficheImproved anagrafiche, @NotNull Comune comune) {
+    public static Ente getEnteOfComune(@NotNull AnagraficheExtended anagrafiche, @NotNull Comune comune) {
         return getEnteOf(anagrafiche, comune, SOTTOCOMPARTO_COMUNE, Ente::getComune);
     }
 
     @NotNull
-    private static <T extends GeoItem> Ente getEnteOf(@NotNull AnagraficheImproved anagrafiche, @NotNull T geoItem, @NotNull String sottocompartoCode, @NotNull Function<Ente, T> producer) {
+    private static <T extends GeoItem> Ente getEnteOf(@NotNull AnagraficheExtended anagrafiche, @NotNull T geoItem, @NotNull String sottocompartoCode, @NotNull Function<Ente, T> producer) {
         Ente ente = optEnteOf(anagrafiche, geoItem, sottocompartoCode, producer);
         if (ente == null) {
             throw new IllegalStateException("Ente for " + sottocompartoCode + " " + geoItem.getNome() + " not found");
@@ -136,7 +136,7 @@ public final class DataUtils {
     }
 
     @Nullable
-    private static <T extends GeoItem> Ente optEnteOf(@NotNull AnagraficheImproved anagrafiche, @NotNull T geoItem, @NotNull String sottocompartoCode, @NotNull Function<Ente, T> producer) {
+    private static <T extends GeoItem> Ente optEnteOf(@NotNull AnagraficheExtended anagrafiche, @NotNull T geoItem, @NotNull String sottocompartoCode, @NotNull Function<Ente, T> producer) {
         for (Ente ente : anagrafiche.getEnti()) {
             if (ente.getSottocomparto().getCodice().equals(sottocompartoCode) && producer.apply(ente).equals(geoItem)) {
                 return ente;
@@ -168,7 +168,7 @@ public final class DataUtils {
         }
     }
 
-    public static int getPopulationOfGeoItem(@NotNull AnagraficheImproved a, @NotNull GeoItem g) {
+    public static int getPopulationOfGeoItem(@NotNull AnagraficheExtended a, @NotNull GeoItem g) {
         if (g instanceof Comune) {
             return getEnteOfComune(a, (Comune) g).getNumeroAbitanti();
         } else {

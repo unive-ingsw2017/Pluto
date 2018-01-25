@@ -2,7 +2,6 @@ package mama.pluto.view.selectors;
 
 import android.content.Context;
 
-import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Comune;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Ente;
 
@@ -11,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collections;
 import java.util.List;
 
-import mama.pluto.dataAbstraction.AnagraficheImproved;
+import mama.pluto.dataAbstraction.AnagraficheExtended;
 import mama.pluto.dataAbstraction.DataUtils;
 import mama.pluto.utils.AbstractEnteSelectorAdapter;
 
@@ -20,7 +19,7 @@ import mama.pluto.utils.AbstractEnteSelectorAdapter;
  */
 public class EnteSelectorView extends AbstractEnteSelectorView<Comune> {
 
-    public EnteSelectorView(@NotNull Context context, @NotNull AnagraficheImproved anagrafiche, @NotNull Comune comune) {
+    public EnteSelectorView(@NotNull Context context, @NotNull AnagraficheExtended anagrafiche, @NotNull Comune comune) {
         super(context, anagrafiche, comune);
     }
 

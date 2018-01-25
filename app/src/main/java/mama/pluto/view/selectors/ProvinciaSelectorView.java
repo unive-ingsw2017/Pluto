@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import mama.pluto.dataAbstraction.AnagraficheImproved;
+import mama.pluto.dataAbstraction.AnagraficheExtended;
 import mama.pluto.utils.AbstractSelectorAdapter;
 import mama.pluto.utils.StringUtils;
 import mama.pluto.view.SingleLineListItem;
@@ -20,7 +20,7 @@ import mama.pluto.view.SingleLineListItem;
  */
 public class ProvinciaSelectorView extends AbstractGeoItemSelectorView<Regione, Provincia> {
 
-    public ProvinciaSelectorView(@NotNull Context context, @NotNull AnagraficheImproved anagrafiche, @NotNull Regione regione) {
+    public ProvinciaSelectorView(@NotNull Context context, @NotNull AnagraficheExtended anagrafiche, @NotNull Regione regione) {
         super(context, anagrafiche, regione);
     }
 

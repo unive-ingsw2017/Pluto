@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.util.Arrays;
 
-import mama.pluto.dataAbstraction.AnagraficheImproved;
+import mama.pluto.dataAbstraction.AnagraficheExtended;
 import mama.pluto.database.Database;
 
 public class InitialDataLoader extends AsyncTask<Void, Progress, Exception> {
@@ -28,7 +28,7 @@ public class InitialDataLoader extends AsyncTask<Void, Progress, Exception> {
     private final int yearToDownload;
 
     @Nullable
-    private AnagraficheImproved anagrafiche;
+    private AnagraficheExtended anagrafiche;
     private final float[] progresses = new float[4];
 
     private static final int[] progressesWeights = new int[4];
@@ -55,7 +55,7 @@ public class InitialDataLoader extends AsyncTask<Void, Progress, Exception> {
     }
 
     @NotNull
-    public AnagraficheImproved getAnagrafiche() {
+    public AnagraficheExtended getAnagrafiche() {
         if (anagrafiche == null) {
             throw new IllegalStateException("Anagrafiche not loaded yet");
         }

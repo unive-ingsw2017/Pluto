@@ -11,7 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import org.jetbrains.annotations.NotNull;
 
 import mama.pluto.R;
-import mama.pluto.dataAbstraction.AnagraficheImproved;
+import mama.pluto.dataAbstraction.AnagraficheExtended;
 import mama.pluto.utils.MetricsUtils;
 
 /**
@@ -19,9 +19,9 @@ import mama.pluto.utils.MetricsUtils;
  */
 public abstract class AbstractSelectorView extends RecyclerView {
     @NotNull
-    protected final AnagraficheImproved anagrafiche;
+    protected final AnagraficheExtended anagrafiche;
 
-    public AbstractSelectorView(@NotNull Context context, @NonNull AnagraficheImproved anagrafiche) {
+    public AbstractSelectorView(@NotNull Context context, @NonNull AnagraficheExtended anagrafiche) {
         super(context);
         this.anagrafiche = anagrafiche;
         final int dp32 = MetricsUtils.dpToPixel(getContext(), 32);
@@ -38,7 +38,7 @@ public abstract class AbstractSelectorView extends RecyclerView {
     }
 
     @NonNull
-    public AnagraficheImproved getAnagrafiche() {
+    public AnagraficheExtended getAnagrafiche() {
         return anagrafiche;
     }
 }

@@ -7,16 +7,16 @@ import android.view.View;
 
 import org.jetbrains.annotations.NotNull;
 
-import mama.pluto.dataAbstraction.AnagraficheImproved;
+import mama.pluto.dataAbstraction.AnagraficheExtended;
 import mama.pluto.utils.AppSection;
 import mama.pluto.utils.BaseActivity;
 import mama.pluto.view.HeatMapMainView;
 
 public class HeatMapAppSection extends AppSection {
     @NotNull
-    private final AnagraficheImproved anagrafiche;
+    private final AnagraficheExtended anagrafiche;
 
-    public HeatMapAppSection(@NonNull AnagraficheImproved anagrafiche) {
+    public HeatMapAppSection(@NonNull AnagraficheExtended anagrafiche) {
         this.anagrafiche = anagrafiche;
     }
 

@@ -39,7 +39,7 @@ import io.requery.android.database.sqlite.SQLiteBindableLong;
 import io.requery.android.database.sqlite.SQLiteDatabase;
 import io.requery.android.database.sqlite.SQLiteOpenHelper;
 import io.requery.android.database.sqlite.SQLiteStatement;
-import mama.pluto.dataAbstraction.AnagraficheImproved;
+import mama.pluto.dataAbstraction.AnagraficheExtended;
 import mama.pluto.dataAbstraction.CategoryUtils;
 import mama.pluto.dataAbstraction.DataUtils;
 import mama.pluto.utils.BiConsumer;
@@ -153,8 +153,8 @@ public class Database extends SQLiteOpenHelper {
     /**
      * @return the Mpa of generated Ids for CodiceGestionale
      */
-    public AnagraficheImproved saveAnagrafiche(@NotNull Anagrafiche anagrafiche, @NotNull OnProgressListener onProgressListener) {
-        final AnagraficheImproved.Builder builder = new AnagraficheImproved.Builder();
+    public AnagraficheExtended saveAnagrafiche(@NotNull Anagrafiche anagrafiche, @NotNull OnProgressListener onProgressListener) {
+        final AnagraficheExtended.Builder builder = new AnagraficheExtended.Builder();
 
         onProgressListener.onProgress(0f);
 
@@ -360,7 +360,7 @@ public class Database extends SQLiteOpenHelper {
         }, "Sottocomparto", "codice", "nome", "comparto");
     }
 
-    public void saveEnti(@NotNull Collection<Ente> enti, AnagraficheImproved.Builder toFillWithIds) {
+    public void saveEnti(@NotNull Collection<Ente> enti, AnagraficheExtended.Builder toFillWithIds) {
         save(enti, (item, toFill) -> {
             toFill[0] = item.getCodice();
             toFill[1] = item.getDataInclusione().getTime();
@@ -384,7 +384,7 @@ public class Database extends SQLiteOpenHelper {
         }
     }
 
-    public void saveCodiciGestionali(@NotNull Collection<? extends CodiceGestionale> codiciGestionali, AnagraficheImproved.Builder toFillWithIds) {
+    public void saveCodiciGestionali(@NotNull Collection<? extends CodiceGestionale> codiciGestionali, AnagraficheExtended.Builder toFillWithIds) {
         save(codiciGestionali, (item, toFill) -> {
             toFill[0] = item.getCodice();
             toFill[1] = getTipoCodiceGestionale(item);
@@ -410,11 +410,11 @@ public class Database extends SQLiteOpenHelper {
         getWritableDatabase().execSQL("DELETE FROM Operazione");
     }
 
-    public void saveOperazioni(@NotNull Iterable<? extends Operazione> operazioni, AnagraficheImproved anagraficheImproved) {
+    public void saveOperazioni(@NotNull Iterable<? extends Operazione> operazioni, AnagraficheExtended anagraficheExtended) {
         save(operazioni, (item, toFill) -> {
             toFill[0] = getTipoOperazione(item);
-            bindNumber(toFill, 1, anagraficheImproved.getIdCodiceGestionale(item.getCodiceGestionale()));
-            bindNumber(toFill, 2, anagraficheImproved.getIdEnte(item.getEnte()));
+            bindNumber(toFill, 1, anagraficheExtended.getIdCodiceGestionale(item.getCodiceGestionale()));
+            bindNumber(toFill, 2, anagraficheExtended.getIdEnte(item.getEnte()));
             bindNumber(toFill, 3, item.getYear());
             bindNumber(toFill, 4, item.getMonth());
             bindNumber(toFill, 5, item.getAmount());
@@ -490,7 +490,7 @@ public class Database extends SQLiteOpenHelper {
         );
     }
 
-    public Ente.@NotNull Map loadEnti(@NotNull Comune.Map comuni, @NotNull Provincia.Map provincie, @NotNull Sottocomparto.Map sottocomparti, @NotNull AnagraficheImproved.Builder builder) {
+    public Ente.@NotNull Map loadEnti(@NotNull Comune.Map comuni, @NotNull Provincia.Map provincie, @NotNull Sottocomparto.Map sottocomparti, @NotNull AnagraficheExtended.Builder builder) {
         return loadMap("SELECT id, codice, dataInclusione, dataEsclusione, codiceFiscale, nome, comune_codice, provincia_codice, numeroAbitanti, sottocomparto FROM Ente", null, new Ente.Map(), c -> {
                     Ente ret = new Ente(
                             c.getString(1),
@@ -513,7 +513,7 @@ public class Database extends SQLiteOpenHelper {
     }
 
     @NotNull
-    public <T extends CodiceGestionale, R extends CodiceGestionale.Map<T>> R loadCodiciGestionali(@NotNull Comparto.Map comparti, @NotNull AnagraficheImproved.Builder toFill, @NotNull String tipo, @NotNull R map, @NotNull CodiceGestionaleConstructor<T> codiceGestionaleConstructor) {
+    public <T extends CodiceGestionale, R extends CodiceGestionale.Map<T>> R loadCodiciGestionali(@NotNull Comparto.Map comparti, @NotNull AnagraficheExtended.Builder toFill, @NotNull String tipo, @NotNull R map, @NotNull CodiceGestionaleConstructor<T> codiceGestionaleConstructor) {
         return loadMap("SELECT id, codice, nome, comparto, inizioValidita, fineValidita FROM CodiceGestionale WHERE tipo=?", new String[]{tipo}, map, c -> {
                     T ret = codiceGestionaleConstructor.construct(
                             c.getString(1),
@@ -528,17 +528,17 @@ public class Database extends SQLiteOpenHelper {
         );
     }
 
-    public CodiceGestionaleEntrate.@NotNull Map loadCodiciGestionaliEntrate(@NotNull Comparto.Map comparti, @NotNull AnagraficheImproved.Builder toFill) {
+    public CodiceGestionaleEntrate.@NotNull Map loadCodiciGestionaliEntrate(@NotNull Comparto.Map comparti, @NotNull AnagraficheExtended.Builder toFill) {
         return loadCodiciGestionali(comparti, toFill, TIPO_CODICE_GESTIONALE_ENTRATA, new CodiceGestionaleEntrate.Map(), CodiceGestionaleEntrate::new);
     }
 
-    public CodiceGestionaleUscite.@NotNull Map loadCodiciGestionaliUscite(@NotNull Comparto.Map comparti, @NotNull AnagraficheImproved.Builder toFill) {
+    public CodiceGestionaleUscite.@NotNull Map loadCodiciGestionaliUscite(@NotNull Comparto.Map comparti, @NotNull AnagraficheExtended.Builder toFill) {
         return loadCodiciGestionali(comparti, toFill, TIPO_CODICE_GESTIONALE_USCITA, new CodiceGestionaleUscite.Map(), CodiceGestionaleUscite::new);
     }
 
     @NotNull
-    public AnagraficheImproved loadAnagrafiche(@NotNull OnProgressListener progressListener) {
-        final AnagraficheImproved.Builder builder = new AnagraficheImproved.Builder();
+    public AnagraficheExtended loadAnagrafiche(@NotNull OnProgressListener progressListener) {
+        final AnagraficheExtended.Builder builder = new AnagraficheExtended.Builder();
         progressListener.onProgress(0f);
 
         final Comparto.Map comparti = loadComparti();
@@ -572,17 +572,17 @@ public class Database extends SQLiteOpenHelper {
     }
 
     @NotNull
-    public Map<Regione, Long> getRegioneBalances(@NotNull AnagraficheImproved a) {
+    public Map<Regione, Long> getRegioneBalances(@NotNull AnagraficheExtended a) {
         return getBalances(a, DataUtils.SOTTOCOMPARTO_REGIONE, gi -> (Regione) gi);
     }
 
     @NotNull
-    public Map<Provincia, Long> getProvinciaBalances(@NotNull AnagraficheImproved a) {
+    public Map<Provincia, Long> getProvinciaBalances(@NotNull AnagraficheExtended a) {
         return getBalances(a, DataUtils.SOTTOCOMPARTO_PROVINCIA, gi -> (Provincia) gi);
     }
 
     @NotNull
-    private <T extends GeoItem> Map<T, Long> getBalances(@NotNull AnagraficheImproved a, @NotNull String tipoSottocomparto, @NotNull Function<GeoItem, T> caster) {
+    private <T extends GeoItem> Map<T, Long> getBalances(@NotNull AnagraficheExtended a, @NotNull String tipoSottocomparto, @NotNull Function<GeoItem, T> caster) {
         try (Cursor cursor = getReadableDatabase().rawQuery(
                 "SELECT ente, SUM(CASE o.tipo WHEN ? THEN -o.amount ELSE o.amount END) " +
                         "FROM Operazione o " +

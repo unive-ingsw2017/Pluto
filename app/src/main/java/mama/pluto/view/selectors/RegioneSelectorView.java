@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import mama.pluto.dataAbstraction.AnagraficheImproved;
+import mama.pluto.dataAbstraction.AnagraficheExtended;
 import mama.pluto.utils.AbstractSelectorAdapter;
 import mama.pluto.utils.StringUtils;
 import mama.pluto.view.SingleLineListItem;
@@ -24,7 +24,7 @@ import mama.pluto.view.TutorialView;
  */
 public class RegioneSelectorView extends AbstractGeoItemSelectorView<GeoItem, Regione> {
 
-    public RegioneSelectorView(@NotNull Context context, @NotNull AnagraficheImproved anagrafiche) {
+    public RegioneSelectorView(@NotNull Context context, @NotNull AnagraficheExtended anagrafiche) {
         super(context, anagrafiche, null);
     }
 

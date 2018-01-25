@@ -13,7 +13,7 @@ import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.GeoItem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import mama.pluto.dataAbstraction.AnagraficheImproved;
+import mama.pluto.dataAbstraction.AnagraficheExtended;
 import mama.pluto.dataAbstraction.DataUtils;
 import mama.pluto.dataAbstraction.EnteSummary;
 import mama.pluto.view.EnteSummaryView;
@@ -29,7 +29,7 @@ public abstract class AbstractSelectorAdapter<V extends View, T> extends Recycle
     private final static int VIEW_TYPE_DIVIDER = 1;
     private final static int VIEW_TYPE_ITEM = 2;
     @NotNull
-    private final AnagraficheImproved anagrafiche;
+    private final AnagraficheExtended anagrafiche;
 
     @Nullable
     private RecyclerView recyclerView;
@@ -41,12 +41,12 @@ public abstract class AbstractSelectorAdapter<V extends View, T> extends Recycle
     private GeoItem mainGeoItem = null;
     private boolean showHeader;
 
-    protected AbstractSelectorAdapter(@NonNull AnagraficheImproved anagrafiche) {
+    protected AbstractSelectorAdapter(@NonNull AnagraficheExtended anagrafiche) {
         this.anagrafiche = anagrafiche;
     }
 
     @NonNull
-    public AnagraficheImproved getAnagrafiche() {
+    public AnagraficheExtended getAnagrafiche() {
         return anagrafiche;
     }
 

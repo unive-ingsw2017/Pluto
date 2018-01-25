@@ -11,14 +11,14 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 
 import mama.pluto.R;
-import mama.pluto.dataAbstraction.AnagraficheImproved;
+import mama.pluto.dataAbstraction.AnagraficheExtended;
 import mama.pluto.database.Database;
 
 public class HeatMapMainView extends BaseLayoutView {
 
     private final HeatMapView heatMapView;
 
-    public HeatMapMainView(Context context, @NotNull AnagraficheImproved anagrafiche) {
+    public HeatMapMainView(Context context, @NotNull AnagraficheExtended anagrafiche) {
         super(context);
         getToolbar().setTitle(R.string.heat_map);
         getToolbar().inflateMenu(R.menu.heatmap_menu);

@@ -13,7 +13,7 @@ import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.RipartizioneGe
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import mama.pluto.dataAbstraction.AnagraficheImproved;
+import mama.pluto.dataAbstraction.AnagraficheExtended;
 import mama.pluto.utils.Consumer;
 
 /**
@@ -23,7 +23,7 @@ import mama.pluto.utils.Consumer;
 public class HierarchySelectorView extends FrameLayout {
     private final static boolean ENABLE_SKIPPING = true;
     @NotNull
-    private final AnagraficheImproved anagrafiche;
+    private final AnagraficheExtended anagrafiche;
     @Nullable
     private Consumer<@Nullable GeoItem> onSelectedGeoItemChanges;
     @Nullable
@@ -31,7 +31,7 @@ public class HierarchySelectorView extends FrameLayout {
     @Nullable
     private GeoItem selectedGeoItem = null;
 
-    public HierarchySelectorView(Context context, @NotNull AnagraficheImproved anagrafiche) {
+    public HierarchySelectorView(Context context, @NotNull AnagraficheExtended anagrafiche) {
         super(context);
         this.anagrafiche = anagrafiche;
         setSelectedGeoItem(null);
