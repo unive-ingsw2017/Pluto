@@ -61,5 +61,3 @@ freeline_project_description.json
 sqlite-android/src/main/obj/
 
 sqlite-android/src/main/jniLibs/
-
-sqlite-android/build\.gradle

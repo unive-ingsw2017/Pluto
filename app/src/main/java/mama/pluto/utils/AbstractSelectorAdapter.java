@@ -13,6 +13,7 @@ import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.GeoItem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import mama.pluto.R;
 import mama.pluto.dataAbstraction.AnagraficheExtended;
 import mama.pluto.dataAbstraction.DataUtils;
 import mama.pluto.dataAbstraction.EnteSummary;
@@ -154,7 +155,7 @@ public abstract class AbstractSelectorAdapter<V extends View, T> extends Recycle
 
         EnteSummaryView ret = new EnteSummaryView(recyclerView.getContext());
         if (onEnteSelected != null) {
-            ret.addExpandButton(this::onEnteSelected);
+            ret.addExpandButton(getContext().getString(R.string.view_all_ente_details), this::onEnteSelected);
         }
         ret.setBackgroundColor(0x10000000);
         return ret;

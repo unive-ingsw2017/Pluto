@@ -117,10 +117,10 @@ public class EnteSummaryView extends LinearLayout {
         }
     }
 
-    public void addExpandButton(Consumer<Ente> onExpandPressed) {
+    public void addExpandButton(String text, Consumer<Ente> onExpandPressed) {
         Button button = new Button(getContext(), null, android.R.attr.borderlessButtonStyle);
-        button.setText(R.string.view_all_ente_details);
         button.setOnClickListener(view -> onExpandPressed.consume(ente));
+        button.setText(text);
         addView(button);
 
         int dp8 = MetricsUtils.dpToPixel(getContext(), 8);
