@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import mama.pluto.utils.Function;
-import mama.pluto.utils.Producer;
 
 public final class DataUtils {
     private DataUtils() {
@@ -30,10 +29,10 @@ public final class DataUtils {
     public static final String SOTTOCOMPARTO_REGIONE = "REGIONE";
 
     @NotNull
-    public static List<Ente> getEntiFromComune(@NotNull Anagrafiche anagrafiche, @NotNull Comune comune) {
+    public static List<Ente> getEntiFromComune(@NotNull Anagrafiche anagrafiche, @NotNull Comune comune, boolean includeEnteOfComune) {
         List<Ente> ris = new ArrayList<>();
         for (Ente ente : anagrafiche.getEnti()) {
-            if (ente.getComune().equals(comune)) {
+            if (ente.getComune().equals(comune) && (includeEnteOfComune || !ente.getSottocomparto().getCodice().equals(SOTTOCOMPARTO_COMUNE))) {
                 ris.add(ente);
             }
         }
@@ -116,7 +115,11 @@ public final class DataUtils {
 
     @NotNull
     public static Ente getEnteOfProvincia(@NotNull Anagrafiche anagrafiche, @NotNull Provincia provincia) {
-        return getEnteOf(anagrafiche, provincia, SOTTOCOMPARTO_PROVINCIA, e -> e.getComune().getProvincia());
+        Ente ret = optEnteOf(anagrafiche, provincia, SOTTOCOMPARTO_PROVINCIA, e -> e.getComune().getProvincia());
+        if (ret == null) {
+            ret = getEnteOf(anagrafiche, provincia, SOTTOCOMPARTO_REGIONE, e -> e.getComune().getProvincia());
+        }
+        return ret;
     }
 
     @NotNull
@@ -126,12 +129,21 @@ public final class DataUtils {
 
     @NotNull
     private static <T extends GeoItem> Ente getEnteOf(@NotNull Anagrafiche anagrafiche, @NotNull T geoItem, @NotNull String sottocompartoCode, @NotNull Function<Ente, T> producer) {
+        Ente ente = optEnteOf(anagrafiche, geoItem, sottocompartoCode, producer);
+        if (ente == null) {
+            throw new IllegalStateException("Ente for " + sottocompartoCode + " " + geoItem.getNome() + " not found");
+        }
+        return ente;
+    }
+
+    @Nullable
+    private static <T extends GeoItem> Ente optEnteOf(@NotNull Anagrafiche anagrafiche, @NotNull T geoItem, @NotNull String sottocompartoCode, @NotNull Function<Ente, T> producer) {
         for (Ente ente : anagrafiche.getEnti()) {
             if (ente.getSottocomparto().getCodice().equals(sottocompartoCode) && producer.apply(ente).equals(geoItem)) {
                 return ente;
             }
         }
-        throw new IllegalStateException("Ente for " + sottocompartoCode + " " + geoItem.getNome() + " not found");
+        return null;
     }
 
     @NotNull

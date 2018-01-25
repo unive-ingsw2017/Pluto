@@ -8,6 +8,7 @@ import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Ente;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
 import java.util.List;
 
 import mama.pluto.dataAbstraction.DataUtils;
@@ -25,7 +26,9 @@ public class EnteSelectorView extends AbstractEnteSelectorView<Comune> {
     @Override
     protected AbstractEnteSelectorAdapter createAdapter() {
         assert getMainGeoItem() != null;
-        final List<Ente> enti = DataUtils.getEntiFromComune(getAnagrafiche(), getMainGeoItem());
+        final List<Ente> enti = DataUtils.getEntiFromComune(getAnagrafiche(), getMainGeoItem(), false);
+        Collections.sort(enti, (e1, e2) -> e1.getNome().compareToIgnoreCase(e2.getNome()));
+        //TODO: gestire se non ci sono enti
         return new AbstractEnteSelectorAdapter(anagrafiche) {
             @Override
             protected Ente getItem(int position) {

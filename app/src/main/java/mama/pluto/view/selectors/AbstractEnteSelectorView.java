@@ -40,6 +40,7 @@ public abstract class AbstractEnteSelectorView<G extends GeoItem> extends Abstra
 
     public void setOnEnteSelected(@Nullable Consumer<Ente> onGeoItemSelected) {
         adapter.setOnItemSelected(onGeoItemSelected);
+        adapter.setOnEnteSelected(onGeoItemSelected);
     }
 
     protected abstract AbstractEnteSelectorAdapter createAdapter();

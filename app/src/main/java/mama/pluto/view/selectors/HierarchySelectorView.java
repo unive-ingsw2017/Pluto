@@ -21,7 +21,7 @@ import mama.pluto.utils.Consumer;
  */
 
 public class HierarchySelectorView extends FrameLayout {
-
+    private final static boolean ENABLE_SKIPPING = true;
     @NotNull
     private final Anagrafiche anagrafiche;
     @Nullable
@@ -50,6 +50,18 @@ public class HierarchySelectorView extends FrameLayout {
         return selectedGeoItem;
     }
 
+    public void setSelectedGeoItemSkippingObvious(@NotNull GeoItem selectedGeoItem) {
+        if (isSkippable(selectedGeoItem)) {
+            setSelectedGeoItemSkippingObvious(selectedGeoItem.getChildren().iterator().next());
+        } else {
+            setSelectedGeoItem(selectedGeoItem);
+        }
+    }
+
+    private boolean isSkippable(@Nullable GeoItem selectedGeoItem) {
+        return ENABLE_SKIPPING && selectedGeoItem != null && selectedGeoItem.getChildren() != null && selectedGeoItem.getChildren().size() == 1;
+    }
+
     public void setSelectedGeoItem(@Nullable GeoItem selectedGeoItem) {
         this.selectedGeoItem = selectedGeoItem;
         final AbstractSelectorView selector;
@@ -61,16 +73,15 @@ public class HierarchySelectorView extends FrameLayout {
             AbstractGeoItemSelectorView<?, ?> geoItemSelector;
             if (selectedGeoItem == null) {
                 geoItemSelector = new RegioneSelectorView(getContext(), anagrafiche);
-                geoItemSelector.setOnGeoItemSelected(this::setSelectedGeoItem);
             } else if (selectedGeoItem instanceof Regione) {
                 geoItemSelector = new ProvinciaSelectorView(getContext(), anagrafiche, (Regione) selectedGeoItem);
-                geoItemSelector.setOnGeoItemSelected(this::setSelectedGeoItem);
             } else if (selectedGeoItem instanceof Provincia) {
                 geoItemSelector = new ComuneSelectorView(getContext(), anagrafiche, (Provincia) selectedGeoItem);
-                geoItemSelector.setOnGeoItemSelected(this::setSelectedGeoItem);
             } else {
                 throw new IllegalStateException();
             }
+            geoItemSelector.setOnGeoItemSelected(this::setSelectedGeoItemSkippingObvious);
+            geoItemSelector.setOnEnteSelected(onEnteSelected);
             selector = geoItemSelector;
         }
         addView(selector, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
@@ -84,6 +95,10 @@ public class HierarchySelectorView extends FrameLayout {
             return false;
         } else {
             GeoItem parent = this.selectedGeoItem.getParent();
+            while (isSkippable(parent)) {
+                assert parent != null;
+                parent = parent.getParent();
+            }
             if (parent instanceof RipartizioneGeografica) {
                 parent = null;
             }

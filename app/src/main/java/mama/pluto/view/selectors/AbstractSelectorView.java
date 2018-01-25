@@ -25,8 +25,8 @@ public abstract class AbstractSelectorView extends RecyclerView {
     public AbstractSelectorView(@NotNull Context context, @NonNull Anagrafiche anagrafiche) {
         super(context);
         this.anagrafiche = anagrafiche;
-        final int dp8 = MetricsUtils.dpToPixel(getContext(), 8);
-        setPadding(0, dp8, 0, dp8);
+        final int dp32 = MetricsUtils.dpToPixel(getContext(), 32);
+        setPadding(0, 0, 0, dp32);
         setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL);
         dividerItemDecoration.setDrawable(getResources().getDrawable(R.drawable.divider));

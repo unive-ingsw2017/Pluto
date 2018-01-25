@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Ente;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.GeoItem;
 
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +35,10 @@ public abstract class AbstractSelectorAdapter<V extends View, T> extends Recycle
     @Nullable
     private Consumer<? super T> onItemSelected;
     @Nullable
+    private Consumer<Ente> onEnteSelected;
+    @Nullable
     private GeoItem mainGeoItem = null;
+    private boolean showHeader;
 
     protected AbstractSelectorAdapter(@NonNull Anagrafiche anagrafiche) {
         this.anagrafiche = anagrafiche;
@@ -47,6 +51,11 @@ public abstract class AbstractSelectorAdapter<V extends View, T> extends Recycle
 
     public void setMainGeoItem(@Nullable GeoItem mainGeoItem) {
         this.mainGeoItem = mainGeoItem;
+        setShowHeader(true);
+    }
+
+    public void setShowHeader(boolean showHeader) {
+        this.showHeader = showHeader;
         notifyDataSetChanged();
     }
 
@@ -65,7 +74,7 @@ public abstract class AbstractSelectorAdapter<V extends View, T> extends Recycle
 
     @Override
     public final int getItemCount() {
-        int ret = (mainGeoItem == null ? 0 : 1);
+        int ret = (showHeader ? 1 : 0);
         String previousDivider = null;
         for (int i = 0; i < getItemCount2(); i++) {
             ret++;
@@ -88,7 +97,7 @@ public abstract class AbstractSelectorAdapter<V extends View, T> extends Recycle
 
     @Override
     public int getItemViewType(int position) {
-        if (mainGeoItem != null) {
+        if (showHeader) {
             position--;
         }
         if (position == -1) {
@@ -112,12 +121,16 @@ public abstract class AbstractSelectorAdapter<V extends View, T> extends Recycle
         this.onItemSelected = onItemSelected;
     }
 
+    public void setOnEnteSelected(@Nullable Consumer<Ente> onEnteSelected) {
+        this.onEnteSelected = onEnteSelected;
+    }
+
     @Override
     public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         final View view;
         switch (viewType) {
             case VIEW_TYPE_HEADER:
-                view = createMainGeoItemView();
+                view = createHeaderView(getContext());
                 break;
             case VIEW_TYPE_DIVIDER:
                 view = createDivider(getContext());
@@ -134,17 +147,29 @@ public abstract class AbstractSelectorAdapter<V extends View, T> extends Recycle
         return ret;
     }
 
-    protected View createMainGeoItemView() {
+    protected View createHeaderView(@NotNull Context context) {
         ensureRecyclerView();
         assert recyclerView != null;
 
         EnteSummaryView ret = new EnteSummaryView(recyclerView.getContext());
+        if (onEnteSelected != null) {
+            ret.addExpandButton(this::onEnteSelected);
+        }
         ret.setBackgroundColor(0x10000000);
         return ret;
     }
 
-    protected void bindMainGeoItemView(@NotNull View mainEnteView, @NotNull GeoItem mainGeoItem) {
-        ((EnteSummaryView) mainEnteView).setEnte(DataUtils.getEnteOfGeoItem(anagrafiche, mainGeoItem));
+    protected void onEnteSelected(@NotNull Ente e) {
+        if (onEnteSelected != null) {
+            onEnteSelected.consume(e);
+        }
+    }
+
+    protected void bindHeaderView(@NotNull View mainEnteView, @Nullable GeoItem mainGeoItem) {
+        if (mainGeoItem == null) {
+            throw new IllegalStateException();
+        }
+        ((EnteSummaryView) mainEnteView).setEnte(DataUtils.getEnteOfGeoItem(anagrafiche, mainGeoItem), mainGeoItem);
     }
 
     @Override
@@ -162,10 +187,9 @@ public abstract class AbstractSelectorAdapter<V extends View, T> extends Recycle
     @Override
     public void onBindViewHolder(BaseViewHolder holder, int position) {
         if (holder.getItemViewType() == VIEW_TYPE_HEADER) {
-            assert mainGeoItem != null;
-            bindMainGeoItemView(holder.getView(), mainGeoItem);
+            bindHeaderView(holder.getView(), mainGeoItem);
         }
-        if (mainGeoItem != null) {
+        if (showHeader) {
             position--;
         }
         String previousDivider = null;
@@ -182,15 +206,19 @@ public abstract class AbstractSelectorAdapter<V extends View, T> extends Recycle
                 //noinspection unchecked
                 bindView(((V) holder.getView()), item);
                 holder.getView().setOnClickListener(v -> {
-                    if (onItemSelected != null) {
-                        onItemSelected.consume(item);
-                    }
+                    onItemSelected(item);
                 });
                 break;
             case VIEW_TYPE_DIVIDER:
                 assert previousDivider != null;
                 ((TextView) holder.getView()).setText(StringUtils.toNormalCase(previousDivider));
                 break;
+        }
+    }
+
+    protected void onItemSelected(T item) {
+        if (onItemSelected != null) {
+            onItemSelected.consume(item);
         }
     }
 
