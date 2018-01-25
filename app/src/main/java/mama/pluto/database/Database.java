@@ -51,8 +51,8 @@ public class Database extends SQLiteOpenHelper {
     public static final int VERSION = 1;
     public static final String TIPO_CODICE_GESTIONALE_ENTRATA = "ENTRATA";
     public static final String TIPO_CODICE_GESTIONALE_USCITA = "USCITA";
-    public static final String TIPO_OPERAZIONE_ENTRATA = "ENTRATA";
-    public static final String TIPO_OPERAZIONE_USCITA = "USCITA";
+    public static final int TIPO_OPERAZIONE_ENTRATA = 0;
+    public static final int TIPO_OPERAZIONE_USCITA = 1;
     public static final int MAX_BINDINGS_PER_QUERY = 999;
     public static final int OPTIMAL_TRANSACTION_SIZE = 20_000;
 
@@ -117,13 +117,14 @@ public class Database extends SQLiteOpenHelper {
                 "comparto TEXT NOT NULL REFERENCES Comparto(codice), " +
                 "inizioValidita INTEGER NOT NULL," +
                 "fineValidita INTEGER," +
-                "category INTEGER NOT NULL" +
+                "category INTEGER NOT NULL," +
+                "CONSTRAINT codice_tipo UNIQUE(codice,tipo)" +
                 ")");
         db.execSQL("CREATE INDEX codiceGestionale_comparto ON CodiceGestionale(comparto)");
 
         //DATI
         db.execSQL("CREATE TABLE Operazione (" +
-                "tipo TEXT NOT NULL," +
+                "tipo INTEGER NOT NULL," +
                 "codiceGestionale INTEGER NOT NULL REFERENCES CodiceGestionale(id)," +
                 "ente INTEGER NOT NULL REFERENCES Ente(id)," +
                 "year INTEGER NOT NULL," +
@@ -396,7 +397,7 @@ public class Database extends SQLiteOpenHelper {
         }, "CodiceGestionale", toFillWithIds::put, "codice", "tipo", "nome", "comparto", "inizioValidita", "fineValidita", "category");
     }
 
-    public static String getTipoOperazione(@NotNull Operazione<?> operazione) {
+    public static int getTipoOperazione(@NotNull Operazione<?> operazione) {
         if (operazione instanceof Entrata) {
             return TIPO_OPERAZIONE_ENTRATA;
         } else if (operazione instanceof Uscita) {
@@ -412,7 +413,7 @@ public class Database extends SQLiteOpenHelper {
 
     public void saveOperazioni(@NotNull Iterable<? extends Operazione> operazioni, AnagraficheExtended anagraficheExtended) {
         save(operazioni, (item, toFill) -> {
-            toFill[0] = getTipoOperazione(item);
+            bindNumber(toFill, 0, getTipoOperazione(item));
             bindNumber(toFill, 1, anagraficheExtended.getIdCodiceGestionale(item.getCodiceGestionale()));
             bindNumber(toFill, 2, anagraficheExtended.getIdEnte(item.getEnte()));
             bindNumber(toFill, 3, item.getYear());
@@ -588,7 +589,7 @@ public class Database extends SQLiteOpenHelper {
                         "FROM Operazione o " +
                         "INNER JOIN Ente e ON e.codice = o.ente " +
                         "WHERE e.sottocomparto=? " +
-                        "GROUP BY o.ente", new String[]{TIPO_OPERAZIONE_USCITA, tipoSottocomparto})) {
+                        "GROUP BY o.ente", new Object[]{TIPO_OPERAZIONE_USCITA, tipoSottocomparto})) {
             final Map<T, Long> map = new HashMap<>();
             while (cursor.moveToNext()) {
                 GeoItem gi = DataUtils.getGeoItemOfEnte(a.getEnti().get(cursor.getString(0)));

@@ -84,7 +84,7 @@ public class EnteView extends RecyclerView {
                     view = new EnteSummaryView(getContext());
                     break;
                 case VIEW_TYPE_CATEGORY:
-                    view = new CategoryBalanceView(getContext());
+                    view = new CategoryBalanceView(getContext(), anagrafiche);
                     break;
                 default:
                     throw new IllegalStateException();
@@ -100,7 +100,7 @@ public class EnteView extends RecyclerView {
                 ((EnteSummaryView) holder.itemView).setEnte(enteSummary, ente, geoItem);
             } else {
                 Category category = categoriesList.get(position - 1);
-                ((CategoryBalanceView) holder.itemView).setCategory(category, enteSummary.getEntrateMap().get(category), enteSummary.getUsciteMap().get(category));
+                ((CategoryBalanceView) holder.itemView).setCategory(enteSummary, category);
             }
         }
 

@@ -1,10 +1,19 @@
 package mama.pluto.dataAbstraction;
 
+import android.content.Context;
+import android.database.Cursor;
+
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.CodiceGestionale;
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.CodiceGestionaleEntrate;
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.CodiceGestionaleUscite;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Comune;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Ente;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.GeoItem;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Provincia;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Regione;
+import com.github.mmauro94.siopeDownloader.datastruct.operazioni.Entrata;
+import com.github.mmauro94.siopeDownloader.datastruct.operazioni.Operazione;
+import com.github.mmauro94.siopeDownloader.datastruct.operazioni.Uscita;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,6 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.requery.android.database.sqlite.SQLiteDatabase;
+import mama.pluto.database.Database;
 import mama.pluto.utils.Function;
 
 public final class DataUtils {
@@ -196,6 +207,30 @@ public final class DataUtils {
         final Map<K, V2> ret = new HashMap<>(map.size());
         for (Map.Entry<? extends K, V1> entry : map.entrySet()) {
             ret.put(entry.getKey(), transformer.apply(entry.getValue()));
+        }
+        return ret;
+    }
+
+    public static List<Operazione<?>> loadAllOperazioni(@NotNull Context context, @NotNull AnagraficheExtended anagrafiche, @NotNull Ente ente, @NotNull Category category, boolean hideZeros) {
+        SQLiteDatabase db = Database.getInstance(context).getReadableDatabase();
+        List<Operazione<?>> ret = new ArrayList<>();
+        try (Cursor c = db.rawQuery("SELECT o.tipo, o.codiceGestionale, o.year, o.month, o.amount " +
+                "FROM Operazione o " +
+                "INNER JOIN CodiceGestionale cg ON o.codiceGestionale = cg.id " +
+                "WHERE ente = ? AND cg.category=? " + (hideZeros ? "AND amount != 0 " : "") +
+                "ORDER BY amount DESC, cg.nome ASC", new Number[]{anagrafiche.getIdEnte(ente), category.getId()})) {
+            while (c.moveToNext()) {
+                final Operazione operazione;
+                CodiceGestionale codiceGestionale = anagrafiche.getCodiceGestionaleById(c.getLong(1));
+                if (c.getLong(0) == Database.TIPO_OPERAZIONE_ENTRATA) {
+                    operazione = new Entrata(ente, c.getInt(2), c.getInt(3), (CodiceGestionaleEntrate) codiceGestionale, c.getLong(4));
+                } else if (c.getLong(0) == Database.TIPO_OPERAZIONE_USCITA) {
+                    operazione = new Uscita(ente, c.getInt(2), c.getInt(3), (CodiceGestionaleUscite) codiceGestionale, c.getLong(4));
+                } else {
+                    throw new IllegalStateException();
+                }
+                ret.add(operazione);
+            }
         }
         return ret;
     }

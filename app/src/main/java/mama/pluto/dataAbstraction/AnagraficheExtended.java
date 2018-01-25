@@ -23,7 +23,27 @@ public class AnagraficheExtended {
     private final DoubleMap<Long, Ente> enteIdMap;
 
     public AnagraficheExtended(Anagrafiche anagrafiche, DoubleMap<Long, CodiceGestionale> codiceGestionaleIdMap, DoubleMap<Long, Ente> enteIdMap) {
-        //TODO: check that id maps are complete
+        if (anagrafiche.getCodiciGestionaliEntrate().size() + anagrafiche.getCodiciGestionaliUscite().size() != codiceGestionaleIdMap.size()) {
+            throw new IllegalArgumentException();
+        }
+        if (anagrafiche.getEnti().size() != enteIdMap.size()) {
+            throw new IllegalArgumentException();
+        }
+        for (Ente ente : anagrafiche.getEnti()) {
+            if (!enteIdMap.containsK2(ente)) {
+                throw new IllegalArgumentException();
+            }
+        }
+        for (CodiceGestionaleEntrate cg : anagrafiche.getCodiciGestionaliEntrate()) {
+            if (!codiceGestionaleIdMap.containsK2(cg)) {
+                throw new IllegalArgumentException();
+            }
+        }
+        for (CodiceGestionaleEntrate cg : anagrafiche.getCodiciGestionaliEntrate()) {
+            if (!codiceGestionaleIdMap.containsK2(cg)) {
+                throw new IllegalArgumentException();
+            }
+        }
         this.anagrafiche = anagrafiche;
         this.codiceGestionaleIdMap = codiceGestionaleIdMap;
         this.enteIdMap = enteIdMap;
@@ -83,6 +103,24 @@ public class AnagraficheExtended {
         Long ret = enteIdMap.getK1(ente);
         if (ret == null) {
             throw new IllegalArgumentException("Unknown ente");
+        } else {
+            return ret;
+        }
+    }
+
+    public Ente getEnteById(long idEnte) {
+        Ente ret = enteIdMap.getK2(idEnte);
+        if (ret == null) {
+            throw new IllegalArgumentException("Unknown ente id");
+        } else {
+            return ret;
+        }
+    }
+
+    public CodiceGestionale getCodiceGestionaleById(long idCodiceGestionale) {
+        CodiceGestionale ret = codiceGestionaleIdMap.getK2(idCodiceGestionale);
+        if (ret == null) {
+            throw new IllegalArgumentException("Unknown codice gestionale");
         } else {
             return ret;
         }

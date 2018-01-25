@@ -34,7 +34,12 @@
     <string name="ente_codice_fiscale_x">&lt;b>Codice fiscale ente:&lt;/b> %s</string>
     <string name="ente_sottocomparto_x">&lt;b>Sottocomparto:&lt;/b> %s</string>
     <string name="ente_comparto_x">&lt;b>Comparto:&lt;/b> %s</string>
+    <string name="spese_x">&lt;b>Uscite:&lt;/b> %s</string>
+    <string name="entrate_x">&lt;b>Entrate:&lt;/b> %s</string>
+    <string name="bilancio_x">&lt;b>Bilancio:&lt;/b> %s</string>
+    <string name="view_all_movements">Visualizza tutti i movimenti</string>
     <string name="italia">Italia</string>
     <string name="view_all_ente_details">Più dettagli</string>
     <string name="main_tutorial">Per iniziare, seleziona un ente di tuo interesse.\nSe preferisci, puoi cercarloTODODOODOD</string>
+    <string name="disclaimer_zero_amount_hidden">NB: transazioni di 0€ sono state nascoste</string>
 </resources>

@@ -2,74 +2,88 @@ package mama.pluto.view;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.support.v7.widget.CardView;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
+import android.text.Html;
 import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Space;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.NotNull;
+
 import mama.pluto.R;
+import mama.pluto.dataAbstraction.AnagraficheExtended;
 import mama.pluto.dataAbstraction.Category;
+import mama.pluto.dataAbstraction.EnteSummary;
 import mama.pluto.utils.EuroFormattingUtils;
 import mama.pluto.utils.MetricsUtils;
 
-public class CategoryBalanceView extends CardView {
+public class CategoryBalanceView extends CollapsableCardView {
+    @NotNull
+    private final AnagraficheExtended anagrafiche;
+    private final TextView categoryNameView;
+    private final TextView inView;
+    private final TextView outView;
+    private final TextView equalsView;
+    private final TextView totalView;
+    @Nullable
+    private EnteSummary enteSummary;
+    @Nullable
+    private Category category;
 
-    private final LinearLayout header;
-    private final TextView categoryName;
-    private final TextView in;
-    private final TextView out;
-    private final TextView equals;
-    private final TextView total;
-
-    public CategoryBalanceView(Context context) {
+    public CategoryBalanceView(@NotNull Context context, @NonNull AnagraficheExtended anagrafiche) {
         super(context);
-        LinearLayout ll = new LinearLayout(context);
-        ll.setOrientation(LinearLayout.VERTICAL);
-        addView(ll);
-        setUseCompatPadding(true);
-        setRadius(MetricsUtils.dpToPixel(context, 4));
-
-        header = new LinearLayout(context);
-        header.setGravity(Gravity.CENTER_VERTICAL);
-        ll.addView(header);
-
+        this.anagrafiche = anagrafiche;
         int dp2 = MetricsUtils.dpToPixel(context, 2);
         int dp8 = MetricsUtils.dpToPixel(context, 8);
-        int dp16 = MetricsUtils.dpToPixel(context, 16);
-        ll.setPadding(dp16, dp16, dp16, dp16);
+        header.setOnClickListener(view -> toggle(true));
+        header.setGravity(Gravity.CENTER_VERTICAL);
 
-        categoryName = new TextView(context);
-        categoryName.setTextColor(Color.BLACK);
-        categoryName.setPadding(0, 0, dp8, 0);
-        header.addView(categoryName);
+
+        categoryNameView = new TextView(context);
+        categoryNameView.setTextColor(Color.BLACK);
+        categoryNameView.setPadding(0, 0, dp8, 0);
+        header.addView(categoryNameView);
 
         header.addView(new Space(getContext()), new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
 
-        in = new TextView(context);
-        in.setTextColor(EuroFormattingUtils.POSITIVE_COLOR);
-        in.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_trending_up_green_16dp, 0);
-        header.addView(in);
+        inView = new TextView(context);
+        inView.setTextColor(EuroFormattingUtils.POSITIVE_COLOR);
+        inView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_trending_up_green_16dp, 0);
+        header.addView(inView);
 
-        out = new TextView(context);
-        out.setTextColor(EuroFormattingUtils.NEGATIVE_COLOR);
-        out.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_trending_down_red_16dp, 0);
-        header.addView(out);
+        outView = new TextView(context);
+        outView.setTextColor(EuroFormattingUtils.NEGATIVE_COLOR);
+        outView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_trending_down_red_16dp, 0);
+        header.addView(outView);
 
-        equals = new TextView(context);
-        equals.setTextColor(Color.BLACK);
-        equals.setText("=");
-        equals.setPadding(dp2, 0, dp2, 0);
-        header.addView(equals);
+        equalsView = new TextView(context);
+        equalsView.setTextColor(Color.BLACK);
+        equalsView.setText("=");
+        equalsView.setPadding(dp2, 0, dp2, 0);
+        header.addView(equalsView);
 
-        total = new TextView(context);
-        total.setGravity(Gravity.START);
-        total.setMinWidth(MetricsUtils.dpToPixel(context, 104));
-        header.addView(total);
+        totalView = new TextView(context);
+        totalView.setGravity(Gravity.START);
+        totalView.setMinWidth(MetricsUtils.dpToPixel(context, 104));
+        header.addView(totalView);
     }
 
-    public void setCategory(Category category, Long in, Long out) {
-        categoryName.setText(category.getName());
+    public void setCategory(@NotNull EnteSummary enteSummary, @NotNull Category category) {
+        if (!isCollapsed()) {
+            collapse(false);
+        }
+        this.enteSummary = enteSummary;
+        this.category = category;
+        Long in = enteSummary.getEntrateMap().get(category);
+        Long out = enteSummary.getUsciteMap().get(category);
+
+        categoryNameView.setText(category.getName());
         long total = 0;
         if (in != null) {
             total += in;
@@ -80,24 +94,59 @@ public class CategoryBalanceView extends CardView {
         EuroFormattingUtils.Base base = EuroFormattingUtils.Base.getBase(in, out, total);
 
         if (in != null && out != null) {
-            this.in.setVisibility(VISIBLE);
-            this.out.setVisibility(VISIBLE);
-            this.equals.setVisibility(VISIBLE);
-            this.in.setText(base.format(in, false));
-            this.out.setText(base.format(-out, false));
+            this.inView.setVisibility(VISIBLE);
+            this.outView.setVisibility(VISIBLE);
+            this.equalsView.setVisibility(VISIBLE);
+            this.inView.setText(base.format(in, false));
+            this.outView.setText(base.format(-out, false));
         } else {
-            this.in.setVisibility(GONE);
-            this.out.setVisibility(GONE);
-            this.equals.setVisibility(GONE);
+            this.inView.setVisibility(GONE);
+            this.outView.setVisibility(GONE);
+            this.equalsView.setVisibility(GONE);
         }
 
-        this.total.setText(base.format(total, false) + " " + base.getUnitOfMeasure());
+        this.totalView.setText(base.format(total, false) + " " + base.getUnitOfMeasure());
         if (total >= 0) {
-            this.total.setTextColor(EuroFormattingUtils.POSITIVE_COLOR);
-            this.total.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_trending_up_green_16dp, 0);
+            this.totalView.setTextColor(EuroFormattingUtils.POSITIVE_COLOR);
+            this.totalView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_trending_up_green_16dp, 0);
         } else {
-            this.total.setTextColor(EuroFormattingUtils.NEGATIVE_COLOR);
-            this.total.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_trending_down_red_16dp, 0);
+            this.totalView.setTextColor(EuroFormattingUtils.NEGATIVE_COLOR);
+            this.totalView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_trending_down_red_16dp, 0);
         }
+    }
+
+    @Override
+    protected View createExpandedView() {
+        if (category == null || enteSummary == null) {
+            throw new IllegalStateException();
+        }
+        final LinearLayout ll = new LinearLayout(getContext());
+        ll.setOrientation(LinearLayout.VERTICAL);
+        final int dp16 = MetricsUtils.dpToPixel(getContext(), 16);
+        ll.setPadding(dp16, 0, dp16, 0);
+
+        Long in = enteSummary.getEntrateMap().get(category);
+        Long out = enteSummary.getUsciteMap().get(category);
+
+        addItem(ll, R.string.spese_x, out == null ? "-" : EuroFormattingUtils.formatEuroCentString(out, false, true));
+        addItem(ll, R.string.entrate_x, in == null ? "-" : EuroFormattingUtils.formatEuroCentString(in, false, true));
+        long total = (in == null ? 0 : in) - (out == null ? 0 : out);
+        addItem(ll, R.string.bilancio_x, EuroFormattingUtils.formatEuroCentString(total, false, true));
+
+        Button button = new Button(getContext(), null, android.R.attr.borderlessButtonStyle);
+        button.setText(R.string.view_all_movements);
+        button.setOnClickListener(view ->
+                new AllMovementsDialog(getContext(), anagrafiche, enteSummary.getEnte(), category)
+                        .setTitle(category.getName())
+                        .show());
+        ll.addView(button);
+        return ll;
+    }
+
+    private void addItem(ViewGroup vg, @StringRes int stringRes, Object... bindings) {
+        TextView tv = new TextView(getContext());
+        tv.setText(Html.fromHtml(getResources().getString(stringRes, bindings)));
+
+        vg.addView(tv);
     }
 }
