@@ -28,6 +28,9 @@ public class RegioneSelectorView extends AbstractGeoItemSelectorView<GeoItem, Re
         super(context, anagrafiche, null);
     }
 
+    public void setShowTutorial(boolean showTutorial) {
+        adapter.setShowHeader(showTutorial);
+    }
 
     @Override
     protected AbstractSelectorAdapter<?, Regione> createAdapter() {
@@ -43,9 +46,6 @@ public class RegioneSelectorView extends AbstractGeoItemSelectorView<GeoItem, Re
                 }
         );
         return new AbstractSelectorAdapter<SingleLineListItem, Regione>(anagrafiche) {
-            {
-                setShowHeader(true);
-            }
 
             @Override
             protected View createHeaderView(@NotNull Context context) {

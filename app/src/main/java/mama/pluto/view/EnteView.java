@@ -6,6 +6,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Ente;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.GeoItem;
@@ -19,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import mama.pluto.R;
 import mama.pluto.dataAbstraction.AnagraficheExtended;
 import mama.pluto.dataAbstraction.Category;
 import mama.pluto.dataAbstraction.EnteSummary;
@@ -66,6 +68,10 @@ public class EnteView extends RecyclerView {
         myAdapter.notifyDataSetChanged();
     }
 
+    public void compare(@NotNull Ente ente2) {
+        Toast.makeText(getContext(), "Compare con " + ente2.getNome(), Toast.LENGTH_SHORT).show();//TODO
+    }
+
     private class MyAdapter extends Adapter {
 
         public static final int VIEW_TYPE_SUMMARY = 0;
@@ -81,10 +87,16 @@ public class EnteView extends RecyclerView {
             View view;
             switch (viewType) {
                 case VIEW_TYPE_SUMMARY:
-                    view = new EnteSummaryView(getContext());
+                    EnteSummaryView sv = new EnteSummaryView(getContext());
+                    sv.addExpandButton(getResources().getString(R.string.compare), ente ->
+                            new EnteSelectorDialog(getContext(), anagrafiche, EnteView.this::compare)
+                                    .setTitle(R.string.choose_ente_to_compare)
+                                    .show()
+                    );
+                    view = sv;
                     break;
                 case VIEW_TYPE_CATEGORY:
-                    view = new CategoryBalanceView(getContext());
+                    view = new CategoryBalanceView(getContext(), anagrafiche);
                     break;
                 default:
                     throw new IllegalStateException();
@@ -100,7 +112,7 @@ public class EnteView extends RecyclerView {
                 ((EnteSummaryView) holder.itemView).setEnte(enteSummary, ente, geoItem);
             } else {
                 Category category = categoriesList.get(position - 1);
-                ((CategoryBalanceView) holder.itemView).setCategory(category, enteSummary.getEntrateMap().get(category), enteSummary.getUsciteMap().get(category));
+                ((CategoryBalanceView) holder.itemView).setCategory(enteSummary, category);
             }
         }
 

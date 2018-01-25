@@ -83,6 +83,7 @@ public class EntiMainView extends BaseLayoutView {
 
 
         hierarchySelectorView = new HierarchySelectorView(getContext(), anagrafiche);
+        hierarchySelectorView.setShowTutorial(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             hierarchySelectorView.setElevation(MetricsUtils.dpToPixel(getContext(), 4f));
         }

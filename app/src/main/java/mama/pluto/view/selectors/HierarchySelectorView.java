@@ -30,11 +30,17 @@ public class HierarchySelectorView extends FrameLayout {
     private Consumer<@NotNull Ente> onEnteSelected;
     @Nullable
     private GeoItem selectedGeoItem = null;
+    private boolean showTutorial;
 
     public HierarchySelectorView(Context context, @NotNull AnagraficheExtended anagrafiche) {
         super(context);
         this.anagrafiche = anagrafiche;
         setSelectedGeoItem(null);
+    }
+
+    public void setShowTutorial(boolean showTutorial) {
+        this.showTutorial = showTutorial;
+        setSelectedGeoItem(selectedGeoItem);
     }
 
     public void setOnSelectedGeoItemChanges(@NotNull Consumer<@Nullable GeoItem> onSelectedGeoItemChanges) {
@@ -72,7 +78,9 @@ public class HierarchySelectorView extends FrameLayout {
         } else {
             AbstractGeoItemSelectorView<?, ?> geoItemSelector;
             if (selectedGeoItem == null) {
-                geoItemSelector = new RegioneSelectorView(getContext(), anagrafiche);
+                RegioneSelectorView regioneSelectorView = new RegioneSelectorView(getContext(), anagrafiche);
+                regioneSelectorView.setShowTutorial(showTutorial);
+                geoItemSelector = regioneSelectorView;
             } else if (selectedGeoItem instanceof Regione) {
                 geoItemSelector = new ProvinciaSelectorView(getContext(), anagrafiche, (Regione) selectedGeoItem);
             } else if (selectedGeoItem instanceof Provincia) {

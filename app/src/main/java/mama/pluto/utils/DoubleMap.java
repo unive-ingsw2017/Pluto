@@ -71,6 +71,9 @@ public class DoubleMap<K1, K2> implements Iterable<Pair<K1, K2>> {
         return k1s.get(k1);
     }
 
+    public int size() {
+        return k1s.size();
+    }
 
     @NonNull
     @Override

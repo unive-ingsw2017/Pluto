@@ -100,7 +100,7 @@ public final class EnteSummary {
             final Map<Category, Long> usciteMap = new HashMap<>(cursor.getCount() / 2);
             while (cursor.moveToNext()) {
                 final Map<Category, Long> map;
-                switch (cursor.getString(0)) {
+                switch (cursor.getInt(0)) {
                     case Database.TIPO_OPERAZIONE_ENTRATA:
                         map = entrateMap;
                         break;

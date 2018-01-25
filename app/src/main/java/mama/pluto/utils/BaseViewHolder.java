@@ -1,10 +1,11 @@
 package mama.pluto.utils;
 
-import org.jetbrains.annotations.NotNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.View;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by MMarco on 16/11/2017.
@@ -31,6 +32,12 @@ public class BaseViewHolder<V extends View> extends RecyclerView.ViewHolder {
             throw new UnsupportedOperationException("Use gridLayoutManager.setSpanSizeLookup to set the full width");
         }
         itemView.getLayoutParams().width = RecyclerView.LayoutParams.MATCH_PARENT;
-
     }
+
+    public static <V extends View> BaseViewHolder<V> getFullInstance(RecyclerView recyclerView, V view) {
+        BaseViewHolder<V> ret = new BaseViewHolder<>(view);
+        ret.setFullWidth(recyclerView);
+        return ret;
+    }
+
 }
