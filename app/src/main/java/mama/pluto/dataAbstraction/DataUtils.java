@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +20,10 @@ import java.util.Map;
 import mama.pluto.utils.Function;
 import mama.pluto.utils.Producer;
 
-public class DataUtils {
+public final class DataUtils {
+    private DataUtils() {
+        throw new IllegalStateException();
+    }
 
     public static final String SOTTOCOMPARTO_COMUNE = "COMUNE";
     public static final String SOTTOCOMPARTO_PROVINCIA = "PROVINCIA";
@@ -133,7 +137,7 @@ public class DataUtils {
     @NotNull
     public static GeoItem getGeoItemOfEnte(@NotNull Ente ente) {
         GeoItem geoItem = optGeoItemOfEnte(ente);
-        if(geoItem == null) {
+        if (geoItem == null) {
             throw new IllegalArgumentException("Invalid ente");
         }
         return geoItem;
@@ -150,6 +154,20 @@ public class DataUtils {
                 return ente.getComune().getProvincia().getRegione();
             default:
                 return null;
+        }
+    }
+
+    public static int getPopulationOfGeoItem(@NotNull Anagrafiche a, @NotNull GeoItem g) {
+        if (g instanceof Comune) {
+            return getEnteOfComune(a, (Comune) g).getNumeroAbitanti();
+        } else {
+            final Collection<? extends GeoItem> children = g.getChildren();
+            assert children != null;
+            int ret = 0;
+            for (GeoItem c : children) {
+                ret += getPopulationOfGeoItem(a, c);
+            }
+            return ret;
         }
     }
 

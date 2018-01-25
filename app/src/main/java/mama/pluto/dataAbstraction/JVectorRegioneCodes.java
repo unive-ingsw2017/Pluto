@@ -1,5 +1,6 @@
 package mama.pluto.dataAbstraction;
 
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Regione;
 
 import org.jetbrains.annotations.NotNull;
@@ -7,13 +8,15 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 
+import mama.pluto.utils.DoubleMap;
+
 public class JVectorRegioneCodes {
 
     private JVectorRegioneCodes() {
         throw new IllegalStateException();
     }
 
-    public static final Map<Integer, String> MAP = new HashMap<Integer, String>() {
+    public static final DoubleMap<Integer, String> MAP = new DoubleMap<Integer, String>() {
         {
             put(1, "IT-21"); //Piemonte
             put(2, "IT-23"); //Valle d'Aosta
@@ -41,11 +44,21 @@ public class JVectorRegioneCodes {
 
     @NotNull
     public static String getJVectorCode(@NotNull Regione regione) {
-        String ret = MAP.get(regione.getCodice());
+        String ret = MAP.getK2(regione.getCodice());
         if (ret != null) {
             return ret;
         } else {
             throw new IllegalStateException("Regione " + regione.getNome() + " with code " + regione.getCodice() + " not in map");
+        }
+    }
+
+    @NotNull
+    public static Regione getRegione(@NotNull Anagrafiche anagrafiche, @NotNull String jVectorCode) {
+        Integer ret = MAP.getK1(jVectorCode);
+        if (ret != null) {
+            return anagrafiche.getRegioni().get(ret);
+        } else {
+            throw new IllegalStateException("Regione with jvector code " + jVectorCode + " not in map");
         }
     }
 }

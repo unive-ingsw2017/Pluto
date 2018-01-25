@@ -36,6 +36,7 @@ import io.requery.android.database.sqlite.SQLiteBindableLong;
 import io.requery.android.database.sqlite.SQLiteDatabase;
 import io.requery.android.database.sqlite.SQLiteOpenHelper;
 import io.requery.android.database.sqlite.SQLiteStatement;
+import mama.pluto.dataAbstraction.CategoryUtils;
 import mama.pluto.utils.Function;
 
 public class Database extends SQLiteOpenHelper {
@@ -44,8 +45,8 @@ public class Database extends SQLiteOpenHelper {
     public static final int VERSION = 1;
     public static final String TIPO_CODICE_GESTIONALE_ENTRATA = "ENTRATA";
     public static final String TIPO_CODICE_GESTIONALE_USCITA = "USCITA";
-    public static final String TIPO_ENTE_ENTRATA = "ENTRATA";
-    public static final String TIPO_ENTE_USCITA = "USCITA";
+    public static final String TIPO_OPERAZIONE_ENTRATA = "ENTRATA";
+    public static final String TIPO_OPERAZIONE_USCITA = "USCITA";
     public static final int MAX_BINDINGS_PER_QUERY = 999;
     public static final int OPTIMAL_TRANSACTION_SIZE = 20_000;
 
@@ -101,6 +102,7 @@ public class Database extends SQLiteOpenHelper {
                 "comparto TEXT NOT NULL REFERENCES Comparto(codice), " +
                 "inizioValidita INTEGER NOT NULL," +
                 "fineValidita INTEGER," +
+                "category INTEGER NOT NULL," +
                 "PRIMARY KEY (codice, tipo)" +
                 ")");
 
@@ -116,7 +118,6 @@ public class Database extends SQLiteOpenHelper {
                 "PRIMARY KEY (tipo, codiceGestionale_codice, codiceGestionale_tipo, ente, year, month)," +
                 "FOREIGN KEY (codiceGestionale_codice, codiceGestionale_tipo) REFERENCES CodiceGestionale(codice, tipo)" +
                 ")");
-
     }
 
 
@@ -171,13 +172,16 @@ public class Database extends SQLiteOpenHelper {
     }
 
     private <T> void save(@NotNull Iterable<T> collection, @NotNull Binder<T> bindValues, @NotNull String tableName, @NotNull String... columns) {
+        save(getWritableDatabase(), collection, bindValues, tableName, columns);
+    }
+
+    private <T> void save(@NotNull SQLiteDatabase writableDb, @NotNull Iterable<T> collection, @NotNull Binder<T> bindValues, @NotNull String tableName, @NotNull String... columns) {
         long now = System.currentTimeMillis();
         final int maxBatchSize = getMaxBatchSize(columns.length);
 
         final SparseArray<SQLiteStatement> statements = new SparseArray<>(2);
-        final SQLiteDatabase db = getWritableDatabase();
         try {
-            db.beginTransaction();
+            writableDb.beginTransaction();
             int transactionBatch = 0;
             List<T> batch = new ArrayList<>(maxBatchSize);
             Iterator<T> iterator = collection.iterator();
@@ -191,7 +195,7 @@ public class Database extends SQLiteOpenHelper {
                 final int batchSize = batch.size();
                 SQLiteStatement stmt = statements.get(batchSize);
                 if (stmt == null) {
-                    stmt = db.compileStatement(insertQuery(tableName, batchSize, columns));
+                    stmt = writableDb.compileStatement(insertQuery(tableName, batchSize, columns));
                     statements.put(batchSize, stmt);
                 }
                 for (int i = 0; i < batchSize; i++) {
@@ -203,14 +207,14 @@ public class Database extends SQLiteOpenHelper {
                 transactionBatch++;
                 stmt.executeInsert();
                 if (transactionBatch % OPTIMAL_TRANSACTION_SIZE == 0) {
-                    db.setTransactionSuccessful();
-                    db.endTransaction();
-                    db.beginTransaction();
+                    writableDb.setTransactionSuccessful();
+                    writableDb.endTransaction();
+                    writableDb.beginTransaction();
                 }
             }
-            db.setTransactionSuccessful();
+            writableDb.setTransactionSuccessful();
         } finally {
-            db.endTransaction();
+            writableDb.endTransaction();
             for (int i = 0; i < statements.size(); i++) {
                 statements.valueAt(i).close();
             }
@@ -357,14 +361,15 @@ public class Database extends SQLiteOpenHelper {
             toFill[3] = item.getComparto().getCodice();
             toFill[4] = item.getInizioValidita().getTime();
             toFill[5] = item.getFineValidita() != null ? item.getFineValidita().getTime() : null;
-        }, "CodiceGestionale", "codice", "tipo", "nome", "comparto", "inizioValidita", "fineValidita");
+            toFill[6] = CategoryUtils.getCategory(item).getId();
+        }, "CodiceGestionale", "codice", "tipo", "nome", "comparto", "inizioValidita", "fineValidita", "category");
     }
 
     public static String getTipoOperazione(@NotNull Operazione<?> operazione) {
         if (operazione instanceof Entrata) {
-            return TIPO_ENTE_ENTRATA;
+            return TIPO_OPERAZIONE_ENTRATA;
         } else if (operazione instanceof Uscita) {
-            return TIPO_ENTE_USCITA;
+            return TIPO_OPERAZIONE_USCITA;
         } else {
             throw new IllegalStateException();
         }

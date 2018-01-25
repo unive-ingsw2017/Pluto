@@ -5,6 +5,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Provincia;
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Regione;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -25,10 +27,22 @@ public class HeatMapMainView extends BaseLayoutView {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.detail_level_provincia:
-                        heatMapView.setupForProvinciaLevel("SpeseP", HeatMapView.MapProjection.MERCATOR, new HashMap<>());
+                        heatMapView.setupForProvinciaLevel("SpeseP", HeatMapView.MapProjection.MERCATOR, new HashMap<Provincia, Float>() {
+                            {
+                                for (Provincia provincia : anagrafiche.getProvincie()) {
+                                    put(provincia, (float) Math.random());
+                                }
+                            }
+                        });
                         break;
                     case R.id.detail_level_regione:
-                        heatMapView.setupForRegioneLevel("SpeseR", HeatMapView.MapProjection.MERCATOR, new HashMap<>());
+                        heatMapView.setupForRegioneLevel("SpeseR", HeatMapView.MapProjection.MERCATOR, new HashMap<Regione, Float>(){
+                            {
+                                for (Regione regione : anagrafiche.getRegioni()) {
+                                    put(regione, (float) Math.random());
+                                }
+                            }
+                        });
                         break;
                     default:
                         throw new IllegalStateException();

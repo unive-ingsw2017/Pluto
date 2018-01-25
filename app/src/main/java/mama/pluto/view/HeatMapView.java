@@ -14,6 +14,7 @@ import org.json.JSONObject;
 import java.util.Map;
 
 import mama.pluto.dataAbstraction.DataUtils;
+import mama.pluto.dataAbstraction.JVectorProvinciaCodes;
 import mama.pluto.dataAbstraction.JVectorRegioneCodes;
 
 public class HeatMapView extends WebView {
@@ -32,12 +33,10 @@ public class HeatMapView extends WebView {
         }
     }
 
-    private String label;
-    private Map<?, Float> data;
     private MapProjection mapProjection;
     private boolean isRegionLevel;
 
-    @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface"})
+    @SuppressLint("SetJavaScriptEnabled")
     public HeatMapView(Context context) {
         super(context);
         getSettings().setJavaScriptEnabled(true);
@@ -50,13 +49,13 @@ public class HeatMapView extends WebView {
     }
 
     public void setupForProvinciaLevel(@NotNull String label, @NotNull MapProjection mapProjection, @NotNull Map<Provincia, Float> data) {
-        //setData(label, mapProjection, data, false);//TODO: make key a String
+        Map<String, Float> map = DataUtils.mapConvertKeys(data, JVectorProvinciaCodes::optJVectorCode);
+        map.remove(null);
+        setData(label, mapProjection, map, false);
     }
 
     private void setData(String label, MapProjection mapProjection, Map<String, Float> data, boolean isRegionLevel) {
-        this.label = label;
         this.mapProjection = mapProjection;
-        this.data = data;
         this.isRegionLevel = isRegionLevel;
         loadUrl("javascript:refreshMap(" +
                 new JSONObject(data) + "," +
