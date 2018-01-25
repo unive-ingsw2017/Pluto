@@ -18,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import mama.pluto.R;
 import mama.pluto.dataAbstraction.DataUtils;
+import mama.pluto.dataAbstraction.EnteSummary;
 import mama.pluto.utils.Consumer;
 import mama.pluto.utils.Function;
 import mama.pluto.utils.MetricsUtils;
@@ -26,11 +27,12 @@ import mama.pluto.utils.StringUtils;
 public class EnteSummaryView extends LinearLayout {
 
     private final TextView nameView;
+    private final BalanceRowView balanceRowView;
     private final LinearLayout hierarcyView;
     private final TextView codiceView;
     private final TextView codiceFiscaleView;
-    private final TextView comparto;
     private final TextView sottoComparto;
+    private final TextView comparto;
     private Ente ente;
     private GeoItem geoItem;
 
@@ -49,20 +51,24 @@ public class EnteSummaryView extends LinearLayout {
         //nameView.setPadding(0, dp8, 0, 0);
         addView(nameView);
 
+        balanceRowView = new BalanceRowView(context);
+        addView(balanceRowView);
+
         codiceView = new TextView(context, null, android.R.attr.textAppearanceSmall);
         addView(codiceView);
 
         codiceFiscaleView = new TextView(context, null, android.R.attr.textAppearanceSmall);
         addView(codiceFiscaleView);
 
+        sottoComparto = new TextView(context, null, android.R.attr.textAppearanceSmall);
+        addView(sottoComparto);
+
         comparto = new TextView(context, null, android.R.attr.textAppearanceSmall);
         addView(comparto);
 
-        sottoComparto = new TextView(context, null, android.R.attr.textAppearanceSmall);
-        addView(sottoComparto);
     }
 
-    public void setEnte(@NotNull Ente ente, @Nullable GeoItem geoItem) {
+    public void setEnte(@NotNull EnteSummary enteSummary, @NotNull Ente ente, @Nullable GeoItem geoItem) {
         this.ente = ente;
         this.geoItem = geoItem != null ? geoItem : DataUtils.optGeoItemOfEnte(ente);
 
@@ -73,6 +79,8 @@ public class EnteSummaryView extends LinearLayout {
         setHtmlText(codiceFiscaleView, R.string.ente_codice_fiscale_x, ente.getCodiceFiscale());
         setHtmlText(comparto, R.string.ente_comparto_x, StringUtils.toNormalCase(ente.getSottocomparto().getComparto().getNome()));
         setHtmlText(sottoComparto, R.string.ente_sottocomparto_x, StringUtils.toNormalCase(ente.getSottocomparto().getNome()));
+
+        balanceRowView.setBalance(enteSummary.getTotalEntrateAmount(), enteSummary.getTotalUsciteAmount());
     }
 
     private void setHtmlText(TextView tv, @StringRes int stringRes, Object... bindings) {

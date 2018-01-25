@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collections;
 import java.util.List;
 
+import mama.pluto.dataAbstraction.AnagraficheImproved;
 import mama.pluto.dataAbstraction.DataUtils;
 import mama.pluto.utils.AbstractEnteSelectorAdapter;
 
@@ -19,7 +20,7 @@ import mama.pluto.utils.AbstractEnteSelectorAdapter;
  */
 public class EnteSelectorView extends AbstractEnteSelectorView<Comune> {
 
-    public EnteSelectorView(@NotNull Context context, @NotNull Anagrafiche anagrafiche, @NotNull Comune comune) {
+    public EnteSelectorView(@NotNull Context context, @NotNull AnagraficheImproved anagrafiche, @NotNull Comune comune) {
         super(context, anagrafiche, comune);
     }
 

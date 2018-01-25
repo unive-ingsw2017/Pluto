@@ -6,15 +6,13 @@ import android.support.transition.TransitionManager;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import mama.pluto.dataAbstraction.EnteSummary;
+import mama.pluto.dataAbstraction.AnagraficheImproved;
 import mama.pluto.utils.AppSection;
 import mama.pluto.utils.BaseActivity;
 import mama.pluto.utils.DataRestrictedState;
@@ -26,7 +24,7 @@ import mama.pluto.view.FullscreenYearSelector;
 public class EntiActivity extends BaseActivity {
 
 
-    private Anagrafiche anagrafiche = null;
+    private AnagraficheImproved anagrafiche = null;
     private FrameLayout mainContainer;
 
     @Override

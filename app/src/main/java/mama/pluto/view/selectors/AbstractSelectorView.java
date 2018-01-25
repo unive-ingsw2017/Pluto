@@ -8,11 +8,10 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
-
 import org.jetbrains.annotations.NotNull;
 
 import mama.pluto.R;
+import mama.pluto.dataAbstraction.AnagraficheImproved;
 import mama.pluto.utils.MetricsUtils;
 
 /**
@@ -20,9 +19,9 @@ import mama.pluto.utils.MetricsUtils;
  */
 public abstract class AbstractSelectorView extends RecyclerView {
     @NotNull
-    protected final Anagrafiche anagrafiche;
+    protected final AnagraficheImproved anagrafiche;
 
-    public AbstractSelectorView(@NotNull Context context, @NonNull Anagrafiche anagrafiche) {
+    public AbstractSelectorView(@NotNull Context context, @NonNull AnagraficheImproved anagrafiche) {
         super(context);
         this.anagrafiche = anagrafiche;
         final int dp32 = MetricsUtils.dpToPixel(getContext(), 32);
@@ -39,7 +38,7 @@ public abstract class AbstractSelectorView extends RecyclerView {
     }
 
     @NonNull
-    public Anagrafiche getAnagrafiche() {
+    public AnagraficheImproved getAnagrafiche() {
         return anagrafiche;
     }
 }

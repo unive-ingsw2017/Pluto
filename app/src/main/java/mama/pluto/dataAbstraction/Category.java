@@ -5,11 +5,9 @@ import com.github.mmauro94.siopeDownloader.datastruct.AutoMap;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
-
 public final class Category {
 
-    public static final Category OTHER = new Category(82, "ALTRI");
+    public static final Category OTHER = new Category(82, "Altro");
 
     private static final AutoMap<Integer, Category> CATEGORIES = new AutoMap<Integer, Category>() {
         @NotNull
@@ -19,86 +17,86 @@ public final class Category {
         }
 
         {
-            add(new Category(1, "SPESE ELETTORALI"));
-            add(new Category(2, "BENI"));
-            add(new Category(3, "FABBRICATI"));
-            add(new Category(4, "PENSIONI"));
-            add(new Category(5, "CONCESSIONE CREDITI"));
-            add(new Category(6, "RICERCA"));
-            add(new Category(7, "UNIVERSITÀ"));
-            add(new Category(8, "TERRENI"));
-            add(new Category(9, "MANUTENZIONE"));
-            add(new Category(10, "INTERESSI"));
-            add(new Category(11, "SANITÀ"));
-            add(new Category(12, "LOTTERIE"));
-            add(new Category(13, "STIPENDI"));
-            add(new Category(14, "SERVIZI"));
-            add(new Category(15, "TITOLI"));
-            add(new Category(16, "ARMI"));
-            add(new Category(17, "INVESTIMENTI"));
-            add(new Category(18, "UTENZE"));
-            add(new Category(19, "RIMBORSI"));
-            add(new Category(20, "INFRASTRUTTURE"));
-            add(new Category(21, "INFORMATICA"));
-            add(new Category(22, "STRADE"));
-            add(new Category(23, "IMPRESE"));
-            add(new Category(24, "AMBIENTE"));
-            add(new Category(25, "CULTURA"));
-            add(new Category(26, "MEZZI"));
-            add(new Category(27, "AGRICOLTURA"));
-            add(new Category(28, "SANITÀ"));
-            add(new Category(29, "ESTERO"));
-            add(new Category(30, "TRIBUTI"));
-            add(new Category(31, "NOLEGGI"));
-            add(new Category(32, "OPERE"));
-            add(new Category(33, "FORMAZIONE"));
-            add(new Category(34, "LUCE & GAS"));
-            add(new Category(35, "LAVORO"));
-            add(new Category(36, "RITENUTE"));
-            add(new Category(37, "TASSE"));
-            add(new Category(38, "MOBILI"));
-            add(new Category(39, "SMALTIMENTO"));
-            add(new Category(40, "MENSA"));
-            add(new Category(41, "PULIZIA"));
-            add(new Category(42, "SERVIZI PUBBLICITARI"));
-            add(new Category(43, "CANCELLERIA"));
-            add(new Category(44, "FAMIGLIE"));
-            add(new Category(45, "REGIONI"));
-            add(new Category(46, "UNIONE EUROPEA"));
-            add(new Category(47, "COMUNICAZIONI"));
-            add(new Category(48, "SPESE LEGALI"));
-            add(new Category(49, "PROVINCE"));
-            add(new Category(50, "COMUNI"));
-            add(new Category(51, "MACCHINARI"));
-            add(new Category(52, "LEASING"));
-            add(new Category(53, "PIGNORAMENTI"));
-            add(new Category(54, "STAMPA"));
-            add(new Category(55, "PRODOTTI CHIMICI"));
-            add(new Category(56, "RISARCIMENTI"));
+            add(new Category(1, "Spese elettorali"));
+            add(new Category(2, "Beni"));
+            add(new Category(3, "Fabbricati"));
+            add(new Category(4, "Pensioni"));
+            add(new Category(5, "Concessione crediti"));
+            add(new Category(6, "Ricerca"));
+            add(new Category(7, "Università"));
+            add(new Category(8, "Terreni"));
+            add(new Category(9, "Manutenzione"));
+            add(new Category(10, "Interessi"));
+            add(new Category(11, "Sanità"));
+            add(new Category(12, "Lotterie"));
+            add(new Category(13, "Stipendi"));
+            add(new Category(14, "Servizi"));
+            add(new Category(15, "Titoli"));
+            add(new Category(16, "Armi"));
+            add(new Category(17, "Investimenti"));
+            add(new Category(18, "Utenze"));
+            add(new Category(19, "Rimborsi"));
+            add(new Category(20, "Infrastrutture"));
+            add(new Category(21, "Informatica"));
+            add(new Category(22, "Strade"));
+            add(new Category(23, "Imprese"));
+            add(new Category(24, "Ambiente"));
+            add(new Category(25, "Cultura"));
+            add(new Category(26, "Messi"));
+            add(new Category(27, "Agricoltura"));
+            add(new Category(28, "Sanità"));
+            add(new Category(29, "Estero"));
+            add(new Category(30, "Tributi"));
+            add(new Category(31, "Noleggi"));
+            add(new Category(32, "Opere"));
+            add(new Category(33, "Formazione"));
+            add(new Category(34, "Luce e gas"));
+            add(new Category(35, "Lavoro"));
+            add(new Category(36, "Ritenute"));
+            add(new Category(37, "Tasse"));
+            add(new Category(38, "Mobili"));
+            add(new Category(39, "Smaltimento"));
+            add(new Category(40, "Mensa"));
+            add(new Category(41, "Pulizia"));
+            add(new Category(42, "Servizi pubblicitari"));
+            add(new Category(43, "Cancelleria"));
+            add(new Category(44, "Famiglie"));
+            add(new Category(45, "Regioni"));
+            add(new Category(46, "Unione Europea"));
+            add(new Category(47, "Comunicazioni"));
+            add(new Category(48, "Spese legali"));
+            add(new Category(49, "Province"));
+            add(new Category(50, "Comuni"));
+            add(new Category(51, "Macchinari"));
+            add(new Category(52, "Leasing"));
+            add(new Category(53, "Pignoramenti"));
+            add(new Category(54, "Stampa"));
+            add(new Category(55, "Prodotti chimici"));
+            add(new Category(56, "Risarcimenti"));
             add(new Category(57, "INPS"));
-            add(new Category(58, "MINISTERI"));
-            add(new Category(59, "CARBURANTI"));
-            add(new Category(60, "PORTUALI"));
-            add(new Category(61, "PIANTE"));
+            add(new Category(58, "Ministeri"));
+            add(new Category(59, "Carburanti"));
+            add(new Category(60, "Portuali"));
+            add(new Category(61, "Piante"));
             add(new Category(62, "IRAP"));
             add(new Category(63, "I.V.A."));
-            add(new Category(64, "GIORNALI E RIVISTE"));
-            add(new Category(65, "GIACIMENTI"));
-            add(new Category(66, "CAUZIONI"));
-            add(new Category(67, "EQUITALIA"));
-            add(new Category(68, "MATERIALI"));
-            add(new Category(69, "ACQUISTI VARI"));
-            add(new Category(70, "COMMISSIONI"));
-            add(new Category(71, "COMPETENZE"));
-            add(new Category(72, "FINANZIARIE"));
-            add(new Category(73, "SPESE"));
-            add(new Category(74, "PAGEMENTI"));
-            add(new Category(75, "TRASFERIMENTI"));
-            add(new Category(76, "PRESTITI"));
-            add(new Category(77, "ARRETRATI"));
-            add(new Category(78, "INDENNIZZI"));
-            add(new Category(79, "ONERI"));
-            add(new Category(81, "PARTECIPAZIONI"));
+            add(new Category(64, "Giornali e riviste"));
+            add(new Category(65, "Giacimenti"));
+            add(new Category(66, "Cauzioni"));
+            add(new Category(67, "Equitalia"));
+            add(new Category(68, "Materiali"));
+            add(new Category(69, "Acquisti vari"));
+            add(new Category(70, "Commissioni"));
+            add(new Category(71, "Competenze"));
+            add(new Category(72, "Finanziarie"));
+            add(new Category(73, "Spese"));
+            add(new Category(74, "Pagamenti"));
+            add(new Category(75, "Trasferimenti"));
+            add(new Category(76, "Prestiti"));
+            add(new Category(77, "Arretrati"));
+            add(new Category(78, "Indennizzi"));
+            add(new Category(79, "Oneri"));
+            add(new Category(81, "Partecipazioni"));
             add(OTHER);
         }
     };
@@ -133,8 +131,12 @@ public final class Category {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Category category = (Category) o;
         return id == category.id;
     }

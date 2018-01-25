@@ -3,13 +3,13 @@ package mama.pluto.view.selectors;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Ente;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.GeoItem;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import mama.pluto.dataAbstraction.AnagraficheImproved;
 import mama.pluto.utils.AbstractSelectorAdapter;
 import mama.pluto.utils.Consumer;
 
@@ -22,7 +22,7 @@ public abstract class AbstractGeoItemSelectorView<P extends GeoItem, G extends G
     @Nullable
     private final P mainGeoItem;
 
-    public AbstractGeoItemSelectorView(@NotNull Context context, @NonNull Anagrafiche anagrafiche, @Nullable P mainGeoItem) {
+    public AbstractGeoItemSelectorView(@NotNull Context context, @NonNull AnagraficheImproved anagrafiche, @Nullable P mainGeoItem) {
         super(context, anagrafiche);
         this.mainGeoItem = mainGeoItem;
 

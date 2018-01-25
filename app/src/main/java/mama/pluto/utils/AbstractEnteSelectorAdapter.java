@@ -7,6 +7,7 @@ import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Ente;
 
 import org.jetbrains.annotations.NotNull;
 
+import mama.pluto.dataAbstraction.AnagraficheImproved;
 import mama.pluto.view.DoubleLineListItem;
 
 /**
@@ -14,7 +15,7 @@ import mama.pluto.view.DoubleLineListItem;
  */
 public abstract class AbstractEnteSelectorAdapter extends AbstractSelectorAdapter<DoubleLineListItem, Ente> {
 
-    public AbstractEnteSelectorAdapter(@NotNull Anagrafiche anagrafiche) {
+    public AbstractEnteSelectorAdapter(@NotNull AnagraficheImproved anagrafiche) {
         super(anagrafiche);
     }
 
@@ -27,7 +28,7 @@ public abstract class AbstractEnteSelectorAdapter extends AbstractSelectorAdapte
     protected void bindView(DoubleLineListItem view, Ente ente) {
         view.setText(
                 StringUtils.toNormalCase(ente.getNome()),
-                StringUtils.toNormalCase(ente.getSottocomparto().getComparto().getNome()) + " - " + StringUtils.toNormalCase(ente.getSottocomparto().getNome())
+                StringUtils.toNormalCase(ente.getSottocomparto().getNome()) + " (" + StringUtils.toNormalCase(ente.getSottocomparto().getComparto().getNome()) + ")"
         );
     }
 

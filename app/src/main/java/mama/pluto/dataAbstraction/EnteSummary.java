@@ -63,14 +63,14 @@ public final class EnteSummary {
     }
 
     @NotNull
-    public static EnteSummary getInstance(@NotNull Context context, @NotNull Ente ente) {
+    public static EnteSummary getInstance(@NotNull Context context, AnagraficheImproved anagraficheImproved, @NotNull Ente ente) {
         try (Cursor cursor = Database.getInstance(context).getReadableDatabase().rawQuery(
                 "SELECT  o.tipo, cg.category, SUM(o.amount)" +
                         "FROM Operazione o " +
-                        "INNER JOIN CodiceGestionale cg ON o.codiceGestionale_codice = cg.codice AND codiceGestionale_tipo = cg.tipo " +
+                        "INNER JOIN CodiceGestionale cg ON o.codiceGestionale = cg.id " +
                         "WHERE ente=? " +
                         "GROUP BY o.tipo, cg.category",
-                new String[]{ente.getCodice()})) {
+                new Long[]{anagraficheImproved.getIdEnte(ente)})) {
 
             final Map<Category, Long> entrateMap = new HashMap<>(cursor.getCount() / 2);
             final Map<Category, Long> usciteMap = new HashMap<>(cursor.getCount() / 2);

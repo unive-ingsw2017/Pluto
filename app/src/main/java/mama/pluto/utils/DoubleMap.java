@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.Map;
 
 public class DoubleMap<K1, K2> implements Iterable<Pair<K1, K2>> {
@@ -22,6 +21,29 @@ public class DoubleMap<K1, K2> implements Iterable<Pair<K1, K2>> {
         this.k2s = new HashMap<>(initialCapacity);
     }
 
+    private DoubleMap(Map<K1, K2> k1s, Map<K2, K1> k2s) {
+        this.k1s = k1s;
+        this.k2s = k2s;
+    }
+
+
+    public static <K1, K2> DoubleMap<K1, K2> getInstanceFromMap(Map<K1, K2> fromMap) {
+        Map<K1, K2> k1s = new HashMap<>(fromMap);
+        Map<K2, K1> k2s = new HashMap<>(fromMap.size());
+        for (Map.Entry<K1, K2> k1K2Entry : fromMap.entrySet()) {
+            k2s.put(k1K2Entry.getValue(), k1K2Entry.getKey());
+        }
+        return new DoubleMap<>(k1s, k2s);
+    }
+
+    public static <K1, K2> DoubleMap<K1, K2> getInstanceFromReversedMap(Map<K2, K1> fromMap) {
+        Map<K1, K2> k1s = new HashMap<>(fromMap.size());
+        Map<K2, K1> k2s = new HashMap<>(fromMap);
+        for (Map.Entry<K2, K1> k1K2Entry : fromMap.entrySet()) {
+            k1s.put(k1K2Entry.getValue(), k1K2Entry.getKey());
+        }
+        return new DoubleMap<>(k1s, k2s);
+    }
 
     public boolean put(final K1 k1, final K2 k2) {
         if (k1s.containsKey(k1) || k2s.containsKey(k2)) {

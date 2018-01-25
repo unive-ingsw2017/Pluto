@@ -2,27 +2,28 @@ package mama.pluto.view;
 
 import android.content.Context;
 import android.os.Build;
-import android.support.transition.Fade;
-import android.support.transition.TransitionManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
-import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Comune;
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Ente;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.GeoItem;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Provincia;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Regione;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import mama.pluto.R;
+import mama.pluto.dataAbstraction.AnagraficheImproved;
 import mama.pluto.utils.EntiSearchAdapter;
 import mama.pluto.utils.MetricsUtils;
+import mama.pluto.utils.StringUtils;
 import mama.pluto.view.selectors.HierarchySelectorView;
 
 /**
@@ -32,14 +33,17 @@ import mama.pluto.view.selectors.HierarchySelectorView;
 public class EntiMainView extends BaseLayoutView {
 
     @NotNull
-    private final Anagrafiche anagrafiche;
+    private final AnagraficheImproved anagrafiche;
     private final MaterialSearchView searchView;
     private final FrameLayout content;
     private final HierarchySelectorView hierarchySelectorView;
     private final RecyclerView searchResults;
     private final EntiSearchAdapter searchAdapter;
+    private final EnteView enteView;
+    private final MenuItem searchMenuItem;
+    private Ente selectedEnte;
 
-    public EntiMainView(@NotNull Context context, @NotNull Anagrafiche anagrafiche) {
+    public EntiMainView(@NotNull Context context, @NotNull AnagraficheImproved anagrafiche) {
         super(context);
         this.anagrafiche = anagrafiche;
         toolbar.inflateMenu(R.menu.enti_main_menu);
@@ -47,7 +51,8 @@ public class EntiMainView extends BaseLayoutView {
         searchView = new MaterialSearchView(getContext());
         searchView.setHint(context.getString(R.string.cerca));
         toolbarWrapper.addView(searchView, Toolbar.LayoutParams.MATCH_PARENT, Toolbar.LayoutParams.WRAP_CONTENT);
-        searchView.setMenuItem(toolbar.getMenu().findItem(R.id.app_bar_search));
+        searchMenuItem = toolbar.getMenu().findItem(R.id.app_bar_search);
+        searchView.setMenuItem(searchMenuItem);
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -82,7 +87,7 @@ public class EntiMainView extends BaseLayoutView {
             hierarchySelectorView.setElevation(MetricsUtils.dpToPixel(getContext(), 4f));
         }
         hierarchySelectorView.setOnSelectedGeoItemChanges(geoItem -> recomputeToolbarText());
-        hierarchySelectorView.setOnEnteSelected(ente -> Toast.makeText(getContext(), ente.getNome(), Toast.LENGTH_SHORT).show());
+        hierarchySelectorView.setOnEnteSelected(this::setSelectedEnte);
         content.addView(hierarchySelectorView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 
 
@@ -90,15 +95,29 @@ public class EntiMainView extends BaseLayoutView {
         searchResults.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
         content.addView(searchResults, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         searchAdapter = new EntiSearchAdapter(anagrafiche);
+        searchAdapter.setOnEnteSelected(this::setSelectedEnte);
         searchResults.setAdapter(searchAdapter);
+
+        enteView = new EnteView(context, anagrafiche);
+        content.addView(enteView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 
 
         recomputeToolbarText();
         setContent(hierarchySelectorView);
     }
 
+    private void setSelectedEnte(@Nullable Ente ente) {
+        selectedEnte = ente;
+        if (ente != null) {
+            enteView.setEnte(ente, null);
+            setContent(enteView);
+        } else {
+            setContent(hierarchySelectorView);
+        }
+        recomputeToolbarText();
+    }
+
     private void setContent(@NotNull View v) {
-        TransitionManager.beginDelayedTransition(content, new Fade());
         for (int i = 0; i < content.getChildCount(); i++) {
             View view = content.getChildAt(i);
             view.setVisibility(view == v ? View.VISIBLE : View.GONE);
@@ -106,17 +125,23 @@ public class EntiMainView extends BaseLayoutView {
     }
 
     private void recomputeToolbarText() {
-        final GeoItem selectedGeoItem = hierarchySelectorView.getSelectedGeoItem();
-        if (selectedGeoItem == null) {
-            toolbar.setTitle(R.string.seleziona_un_regione);
-        } else if (selectedGeoItem instanceof Regione) {
-            toolbar.setTitle(R.string.seleziona_una_provincia);
-        } else if (selectedGeoItem instanceof Provincia) {
-            toolbar.setTitle(R.string.seleziona_un_comune);
-        } else if (selectedGeoItem instanceof Comune) {
-            toolbar.setTitle(R.string.seleziona_un_ente);
+        if (selectedEnte != null) {
+            searchMenuItem.setVisible(false);
+            toolbar.setTitle(StringUtils.toNormalCase(selectedEnte.getNome()));
         } else {
-            throw new IllegalStateException();
+            searchMenuItem.setVisible(true);
+            final GeoItem selectedGeoItem = hierarchySelectorView.getSelectedGeoItem();
+            if (selectedGeoItem == null) {
+                toolbar.setTitle(R.string.seleziona_un_regione);
+            } else if (selectedGeoItem instanceof Regione) {
+                toolbar.setTitle(R.string.seleziona_una_provincia);
+            } else if (selectedGeoItem instanceof Provincia) {
+                toolbar.setTitle(R.string.seleziona_un_comune);
+            } else if (selectedGeoItem instanceof Comune) {
+                toolbar.setTitle(R.string.seleziona_un_ente);
+            } else {
+                throw new IllegalStateException();
+            }
         }
     }
 
@@ -129,7 +154,10 @@ public class EntiMainView extends BaseLayoutView {
     }
 
     public boolean onBackPressed() {
-        if (searchView.isSearchOpen()) {
+        if (selectedEnte != null) {
+            setSelectedEnte(null);
+            return true;
+        } else if (searchView.isSearchOpen()) {
             searchView.closeSearch();
             return true;
         } else {

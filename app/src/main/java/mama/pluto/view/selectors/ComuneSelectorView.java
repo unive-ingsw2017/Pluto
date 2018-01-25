@@ -2,7 +2,6 @@ package mama.pluto.view.selectors;
 
 import android.content.Context;
 
-import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Comune;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Ente;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Provincia;
@@ -13,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import mama.pluto.dataAbstraction.AnagraficheImproved;
 import mama.pluto.dataAbstraction.DataUtils;
 import mama.pluto.utils.AbstractSelectorAdapter;
 import mama.pluto.utils.StringUtils;
@@ -23,7 +23,7 @@ import mama.pluto.view.SingleLineListItem;
  */
 public class ComuneSelectorView extends AbstractGeoItemSelectorView<Provincia, Comune> {
 
-    public ComuneSelectorView(@NotNull Context context, @NotNull Anagrafiche anagrafiche, @NotNull Provincia provincia) {
+    public ComuneSelectorView(@NotNull Context context, @NotNull AnagraficheImproved anagrafiche, @NotNull Provincia provincia) {
         super(context, anagrafiche, provincia);
     }
 

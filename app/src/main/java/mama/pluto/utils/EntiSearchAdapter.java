@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Ente;
 
 import org.jetbrains.annotations.NotNull;
@@ -15,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 import mama.pluto.R;
+import mama.pluto.dataAbstraction.AnagraficheImproved;
 import mama.pluto.dataAbstraction.DataUtils;
 import mama.pluto.view.DoubleLineListItem;
 
@@ -23,12 +23,13 @@ public class EntiSearchAdapter extends RecyclerView.Adapter<BaseViewHolder<View>
     private final static int VIEW_TYPE_ENTE = 1;
     private final static int VIEW_TYPE_EMPTY = 2;
 
-    private final Anagrafiche anagrafiche;
+    private final AnagraficheImproved anagrafiche;
     private RecyclerView recyclerView;
     private String searchQuery;
     private List<Ente> searchResults;
+    private Consumer<Ente> onEnteSelected;
 
-    public EntiSearchAdapter(Anagrafiche anagrafiche) {
+    public EntiSearchAdapter(AnagraficheImproved anagrafiche) {
         this.anagrafiche = anagrafiche;
     }
 
@@ -42,6 +43,10 @@ public class EntiSearchAdapter extends RecyclerView.Adapter<BaseViewHolder<View>
     public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
         this.recyclerView = null;
+    }
+
+    public void setOnEnteSelected(Consumer<Ente> onEnteSelected) {
+        this.onEnteSelected = onEnteSelected;
     }
 
     @NotNull
@@ -95,8 +100,13 @@ public class EntiSearchAdapter extends RecyclerView.Adapter<BaseViewHolder<View>
                 Ente ente = searchResults.get(position);
                 ((DoubleLineListItem) holder.itemView).setText(
                         StringUtils.toNormalCase(ente.getNome()),
-                        StringUtils.toNormalCase(ente.getSottocomparto().getComparto().getNome()) + " - " + StringUtils.toNormalCase(ente.getSottocomparto().getNome())
+                        StringUtils.toNormalCase(ente.getSottocomparto().getNome()) + " (" + StringUtils.toNormalCase(ente.getSottocomparto().getComparto().getNome()) + ")"
                 );
+                holder.itemView.setOnClickListener(view -> {
+                    if (onEnteSelected != null) {
+                        onEnteSelected.consume(ente);
+                    }
+                });
                 break;
             default:
                 throw new IllegalStateException();

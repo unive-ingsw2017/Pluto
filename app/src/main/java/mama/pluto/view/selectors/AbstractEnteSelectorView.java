@@ -10,6 +10,7 @@ import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.GeoItem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import mama.pluto.dataAbstraction.AnagraficheImproved;
 import mama.pluto.utils.AbstractEnteSelectorAdapter;
 import mama.pluto.utils.Consumer;
 
@@ -22,7 +23,7 @@ public abstract class AbstractEnteSelectorView<G extends GeoItem> extends Abstra
     @Nullable
     private final G mainGeoItem;
 
-    public AbstractEnteSelectorView(@NotNull Context context, @NonNull Anagrafiche anagrafiche, @Nullable G mainGeoItem) {
+    public AbstractEnteSelectorView(@NotNull Context context, @NonNull AnagraficheImproved anagrafiche, @Nullable G mainGeoItem) {
         super(context, anagrafiche);
         this.mainGeoItem = mainGeoItem;
 

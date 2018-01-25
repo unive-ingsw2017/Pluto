@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.util.Arrays;
 
+import mama.pluto.dataAbstraction.AnagraficheImproved;
 import mama.pluto.database.Database;
 
 public class InitialDataLoader extends AsyncTask<Void, Progress, Exception> {
@@ -27,7 +28,7 @@ public class InitialDataLoader extends AsyncTask<Void, Progress, Exception> {
     private final int yearToDownload;
 
     @Nullable
-    private Anagrafiche anagrafiche;
+    private AnagraficheImproved anagrafiche;
     private final float[] progresses = new float[4];
 
     private static final int[] progressesWeights = new int[4];
@@ -54,7 +55,7 @@ public class InitialDataLoader extends AsyncTask<Void, Progress, Exception> {
     }
 
     @NotNull
-    public Anagrafiche getAnagrafiche() {
+    public AnagraficheImproved getAnagrafiche() {
         if (anagrafiche == null) {
             throw new IllegalStateException("Anagrafiche not loaded yet");
         }
@@ -71,8 +72,8 @@ public class InitialDataLoader extends AsyncTask<Void, Progress, Exception> {
                 db.truncateOperazioni();
             }
             if (anagraficheToDownload) {
-                anagrafiche = new Anagrafiche.Downloader().setOnProgressListener(p -> progress(0, p, R.string.downloading_anagrafiche)).download();
-                db.saveAnagrafiche(anagrafiche, p -> progress(1, p, R.string.saving_anagrafiche));
+                Anagrafiche anagrafiche = new Anagrafiche.Downloader().setOnProgressListener(p -> progress(0, p, R.string.downloading_anagrafiche)).download();
+                this.anagrafiche = db.saveAnagrafiche(anagrafiche, p -> progress(1, p, R.string.saving_anagrafiche));
 
                 preferences.edit().putBoolean(SharedPreferencesConsts.ANAGRAFICHE_DOWNLOADED, true).apply();
             } else {
@@ -81,8 +82,9 @@ public class InitialDataLoader extends AsyncTask<Void, Progress, Exception> {
             if (operazioniToDownload) {
                 final File tempFile = new File(context.getCacheDir(), "temp.zip");
                 tempFile.deleteOnExit();
-                downloadOperazioni(db, new Entrata.Downloader(yearToDownload, anagrafiche), tempFile, 2, R.string.downloading_entrate);
-                downloadOperazioni(db, new Uscita.Downloader(yearToDownload, anagrafiche), tempFile, 3, R.string.downloading_uscite);
+                assert anagrafiche != null;
+                downloadOperazioni(db, new Entrata.Downloader(yearToDownload, anagrafiche.getAnagrafiche()), tempFile, 2, R.string.downloading_entrate);
+                downloadOperazioni(db, new Uscita.Downloader(yearToDownload, anagrafiche.getAnagrafiche()), tempFile, 3, R.string.downloading_uscite);
                 preferences.edit().putInt(SharedPreferencesConsts.OPERAZIONI_DOWNLOADED, yearToDownload).apply();
             }
         } catch (Exception e) {
@@ -96,7 +98,7 @@ public class InitialDataLoader extends AsyncTask<Void, Progress, Exception> {
         OperazioneIteratorBuffer<?, ?> iteratorBuffer = new OperazioneIteratorBuffer<>(downloader, p -> progress(progressIndex, p, stringMessage))
                 .setTmpFile(tempFile)
                 .start();
-        db.saveOperazioni(iteratorBuffer);
+        db.saveOperazioni(iteratorBuffer, anagrafiche);
         iteratorBuffer.throwIfTerminatedUnsuccessfully();
     }
 

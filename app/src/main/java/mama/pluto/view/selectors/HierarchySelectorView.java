@@ -3,7 +3,6 @@ package mama.pluto.view.selectors;
 import android.content.Context;
 import android.widget.FrameLayout;
 
-import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Comune;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Ente;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.GeoItem;
@@ -14,6 +13,7 @@ import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.RipartizioneGe
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import mama.pluto.dataAbstraction.AnagraficheImproved;
 import mama.pluto.utils.Consumer;
 
 /**
@@ -23,7 +23,7 @@ import mama.pluto.utils.Consumer;
 public class HierarchySelectorView extends FrameLayout {
     private final static boolean ENABLE_SKIPPING = true;
     @NotNull
-    private final Anagrafiche anagrafiche;
+    private final AnagraficheImproved anagrafiche;
     @Nullable
     private Consumer<@Nullable GeoItem> onSelectedGeoItemChanges;
     @Nullable
@@ -31,7 +31,7 @@ public class HierarchySelectorView extends FrameLayout {
     @Nullable
     private GeoItem selectedGeoItem = null;
 
-    public HierarchySelectorView(Context context, @NotNull Anagrafiche anagrafiche) {
+    public HierarchySelectorView(Context context, @NotNull AnagraficheImproved anagrafiche) {
         super(context);
         this.anagrafiche = anagrafiche;
         setSelectedGeoItem(null);

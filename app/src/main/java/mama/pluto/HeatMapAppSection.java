@@ -5,19 +5,18 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.view.View;
 
-import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
-
 import org.jetbrains.annotations.NotNull;
 
+import mama.pluto.dataAbstraction.AnagraficheImproved;
 import mama.pluto.utils.AppSection;
 import mama.pluto.utils.BaseActivity;
 import mama.pluto.view.HeatMapMainView;
 
 public class HeatMapAppSection extends AppSection {
     @NotNull
-    private final Anagrafiche anagrafiche;
+    private final AnagraficheImproved anagrafiche;
 
-    public HeatMapAppSection(@NonNull Anagrafiche anagrafiche) {
+    public HeatMapAppSection(@NonNull AnagraficheImproved anagrafiche) {
         this.anagrafiche = anagrafiche;
     }
 

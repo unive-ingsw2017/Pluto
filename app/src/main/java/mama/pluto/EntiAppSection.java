@@ -8,6 +8,7 @@ import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
 
 import org.jetbrains.annotations.NotNull;
 
+import mama.pluto.dataAbstraction.AnagraficheImproved;
 import mama.pluto.utils.AppSection;
 import mama.pluto.utils.BaseActivity;
 import mama.pluto.view.EntiMainView;
@@ -18,9 +19,9 @@ import mama.pluto.view.EntiMainView;
 
 public class EntiAppSection extends AppSection<EntiMainView> {
     @NotNull
-    private final Anagrafiche anagrafiche;
+    private final AnagraficheImproved anagrafiche;
 
-    public EntiAppSection(@NonNull Anagrafiche anagrafiche) {
+    public EntiAppSection(@NonNull AnagraficheImproved anagrafiche) {
         this.anagrafiche = anagrafiche;
     }
 

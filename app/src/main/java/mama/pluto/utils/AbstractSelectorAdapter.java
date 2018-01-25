@@ -7,14 +7,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Ente;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.GeoItem;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import mama.pluto.dataAbstraction.AnagraficheImproved;
 import mama.pluto.dataAbstraction.DataUtils;
+import mama.pluto.dataAbstraction.EnteSummary;
 import mama.pluto.view.EnteSummaryView;
 import mama.pluto.view.SubHeaderView;
 
@@ -28,7 +29,7 @@ public abstract class AbstractSelectorAdapter<V extends View, T> extends Recycle
     private final static int VIEW_TYPE_DIVIDER = 1;
     private final static int VIEW_TYPE_ITEM = 2;
     @NotNull
-    private final Anagrafiche anagrafiche;
+    private final AnagraficheImproved anagrafiche;
 
     @Nullable
     private RecyclerView recyclerView;
@@ -40,12 +41,12 @@ public abstract class AbstractSelectorAdapter<V extends View, T> extends Recycle
     private GeoItem mainGeoItem = null;
     private boolean showHeader;
 
-    protected AbstractSelectorAdapter(@NonNull Anagrafiche anagrafiche) {
+    protected AbstractSelectorAdapter(@NonNull AnagraficheImproved anagrafiche) {
         this.anagrafiche = anagrafiche;
     }
 
     @NonNull
-    public Anagrafiche getAnagrafiche() {
+    public AnagraficheImproved getAnagrafiche() {
         return anagrafiche;
     }
 
@@ -169,7 +170,8 @@ public abstract class AbstractSelectorAdapter<V extends View, T> extends Recycle
         if (mainGeoItem == null) {
             throw new IllegalStateException();
         }
-        ((EnteSummaryView) mainEnteView).setEnte(DataUtils.getEnteOfGeoItem(anagrafiche, mainGeoItem), mainGeoItem);
+        Ente ente = DataUtils.getEnteOfGeoItem(anagrafiche, mainGeoItem);
+        ((EnteSummaryView) mainEnteView).setEnte(EnteSummary.getInstance(getContext(), anagrafiche, ente), ente, mainGeoItem);
     }
 
     @Override
