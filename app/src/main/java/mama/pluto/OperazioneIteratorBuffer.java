@@ -5,7 +5,7 @@ import android.util.Log;
 
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.CodiceGestionale;
 import com.github.mmauro94.siopeDownloader.datastruct.operazioni.Operazione;
-import com.github.mmauro94.siopeDownloader.utils.AutoClosableIterable;
+import com.github.mmauro94.siopeDownloader.utils.ClosableIterator;
 import com.github.mmauro94.siopeDownloader.utils.OnProgressListener;
 
 import org.jetbrains.annotations.NotNull;
@@ -62,8 +62,7 @@ public class OperazioneIteratorBuffer<CG extends CodiceGestionale, T extends Ope
             lastTotalDownloaded = totalDownloaded;
             publishProgress();
         });
-        AutoClosableIterable<T> downloader = this.downloader.download(tmpFile);
-        final Iterator<T> it = downloader.iterator();
+        ClosableIterator<T> it = this.downloader.download(tmpFile);
         Thread t = new Thread() {
             @Override
             public void run() {
@@ -82,7 +81,7 @@ public class OperazioneIteratorBuffer<CG extends CodiceGestionale, T extends Ope
                         throw new IllegalStateException(e);
                     }
                     try {
-                        downloader.close();
+                        it.close();
                     } catch (IOException ignored) {
                     }
                 }
