@@ -34,16 +34,16 @@ public class EntiComparator {
         List<ComparedItem> res = new ArrayList<>();
         for (Category category : categorySet) {
             long entrate2 = 0, entrate1 = 0, uscite1 = 0, uscite2 = 0;
-            if(entrate1Map.containsKey(category)){
+            if (entrate1Map.containsKey(category)) {
                 entrate1 = entrate1Map.get(category);
             }
-            if(uscite1Map.containsKey(category)){
+            if (uscite1Map.containsKey(category)) {
                 uscite1 = uscite1Map.get(category);
             }
-            if(entrate2Map.containsKey(category)){
+            if (entrate2Map.containsKey(category)) {
                 entrate2 = entrate2Map.get(category);
             }
-            if(uscite2Map.containsKey(category)){
+            if (uscite2Map.containsKey(category)) {
                 uscite2 = uscite2Map.get(category);
             }
             res.add(new ComparedItem(category, entrate1, uscite1, entrate2, uscite2));
@@ -98,7 +98,7 @@ public class EntiComparator {
 
         @Override
         public int compareTo(@NonNull ComparedItem comparedItem) {
-           return Long.compare(Math.abs(comparedItem.getFirstBalance() - comparedItem.getSecondBalance()), Math.abs(this.getFirstBalance() - this.getSecondBalance()));
+            return Long.compare(Math.abs(comparedItem.getFirstBalance() - comparedItem.getSecondBalance()), Math.abs(this.getFirstBalance() - this.getSecondBalance()));
         }
 
         @Override
