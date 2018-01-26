@@ -50,8 +50,8 @@ public class JVectorProvinciaCodes {
             put("IT-PV", new String[]{"000698769"}); //Pavia
             put("IT-CR", new String[]{"000700222"}); //Cremona
             put("IT-MN", new String[]{"000699440"}); //Mantova
-            put("IT-BZ", new String[]{}); //Bolzano - Bozen
-            put("IT-TN", new String[]{}); //Trento
+            put("IT-BZ", new String[]{"000075817"}); //Bolzano - Bozen
+            put("IT-TN", new String[]{"000066532"}); //Trento
             put("IT-VR", new String[]{"000123395"}); //Verona
             put("IT-VI", new String[]{"000095150"}); //Vicenza
             put("IT-BL", new String[]{"000751189"}); //Belluno
@@ -121,7 +121,7 @@ public class JVectorProvinciaCodes {
             put("IT-SR", new String[]{"000699877"}); //Siracusa
             put("IT-SS", new String[]{"000043006"}); //Sassari
             put("IT-NU", new String[]{"000026630"}); //Nuoro
-            put("IT-CA", new String[]{"000097836"}); //Cagliari
+            put("IT-CA", new String[]{"000097836", "800000768"}); //Cagliari
             put("IT-PN", new String[]{"000018949"}); //Pordenone
             put("IT-IS", new String[]{"000713363"}); //Isernia
             put("IT-OR", new String[]{"000701896"}); //Oristano
@@ -133,8 +133,8 @@ public class JVectorProvinciaCodes {
             put("IT-KR", new String[]{"000738809"}); //Crotone
             put("IT-VV", new String[]{"000762140"}); //Vibo Valentia
             put("IT-VB", new String[]{"011151637"}); //Verbano-Cusio-Ossola
-            put("IT-OT", new String[]{"000000020928499"}); //Olbia-Tempio
-            put("IT-OG", new String[]{"000000020918910"}); //Ogliastra
+            put("IT-OT", new String[]{"000000020928499", "000043006"}); //Olbia-Tempio
+            put("IT-OG", new String[]{"000000020918910", "000026630"}); //Ogliastra
             put("IT-VS", new String[]{"025616978"}); //Medio Campidano
             put("IT-CI", new String[]{"025501372"}); //Carbonia-Iglesias
             put("IT-MB", new String[]{"025617022"}); //MONZA - BRIANZA
