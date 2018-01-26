@@ -11,6 +11,7 @@ import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Ente;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.GeoItem;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Provincia;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Regione;
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Sottocomparto;
 import com.github.mmauro94.siopeDownloader.datastruct.operazioni.Entrata;
 import com.github.mmauro94.siopeDownloader.datastruct.operazioni.Operazione;
 import com.github.mmauro94.siopeDownloader.datastruct.operazioni.Uscita;
@@ -28,6 +29,7 @@ import java.util.Map;
 import io.requery.android.database.sqlite.SQLiteDatabase;
 import mama.pluto.database.Database;
 import mama.pluto.utils.Function;
+import mama.pluto.utils.Pair;
 
 public final class DataUtils {
     private DataUtils() {
@@ -233,5 +235,38 @@ public final class DataUtils {
             }
         }
         return ret;
+    }
+
+    public static List<Ente> getEntiRankPerCategory(@NotNull Category category,
+                                                    @NotNull Sottocomparto sottoComparto,
+                                                    @NotNull Context context,
+                                                    @NotNull AnagraficheExtended anagrafiche,
+                                                    boolean desc) {
+        List<Pair<Ente, Long>> entiAmounts = new ArrayList<>();
+        for (Ente e : anagrafiche.getEnti()) {
+            if (e.getSottocomparto().equals(sottoComparto)) {
+                List<Operazione<?>> operazioni = loadAllOperazioni(context, anagrafiche, e, category, false);
+                long amount = 0;
+                for (Operazione<?> operazione : operazioni) {
+                    if (operazione instanceof Entrata) {
+                        amount += operazione.getAmount();
+                    } else {
+                        amount -= operazione.getAmount();
+                    }
+                }
+                entiAmounts.add(new Pair(e, amount));
+            }
+        }
+        if(desc){
+            Collections.sort(entiAmounts, (p1, p2) -> Long.compare(p2.getSecond(), p1.getSecond()));
+        }
+        else{
+            Collections.sort(entiAmounts, (p1, p2) -> Long.compare(p1.getSecond(), p2.getSecond()));
+        }
+        List<Ente> result = new ArrayList<>();
+        for (Pair<Ente, Long> entiAmount : entiAmounts) {
+            result.add(entiAmount.getFirst());
+        }
+        return result;
     }
 }
