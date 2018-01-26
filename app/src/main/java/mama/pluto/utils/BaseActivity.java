@@ -1,5 +1,6 @@
 package mama.pluto.utils;
 
+import android.content.Intent;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import mama.pluto.AboutActivity;
 import mama.pluto.R;
 
 /**
@@ -70,11 +72,15 @@ public abstract class BaseActivity extends AppCompatActivity {
         selectAppSection(defaultAppSection);
 
         navigationView.setNavigationItemSelectedListener(menuItem -> {
-            AppSection appSection = appSections.get(menuItem.getItemId());
-            if (appSection != null) {
-                selectAppSection(appSection);
+            if (menuItem.getItemId() == R.id.about_us) {
+                startActivity(new Intent(this, AboutActivity.class));
+            } else {
+                AppSection appSection = appSections.get(menuItem.getItemId());
+                if (appSection != null) {
+                    selectAppSection(appSection);
+                }
+                drawerLayout.closeDrawers();
             }
-            drawerLayout.closeDrawers();
             return true;
         });
         return navigationView;

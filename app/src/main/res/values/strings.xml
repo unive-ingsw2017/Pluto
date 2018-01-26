@@ -53,4 +53,10 @@
     <string name="compare_with_x">Confronta con %s</string>
     <string name="comparison">Confronto</string>
     <string name="vs">vs.</string>
+    <string name="app_version">1.0.0</string>
+    <string name="app_description">
+        MAMA è l\'acronimo degli sviluppatori dell\'applicazione Pluto: Mauro, Andrea, Marco e Alberto\n\n
+        L\'applicazione è nato come progetto informatico durante il corso di Ingegneria del Software presso l\'Unversità degli Studi Ca\' Foscari di Venezia, a.a. 2017/18\n\n
+        L\'app utilizza gli open data presenti nel sito siope.it, riguardanti i bilanci degli enti pubblici italiani e permette all\'utente finale una facile comparazione di uscite ed entrate fra le varie regioni, provincie e comuni italiani.\n\n
+    </string>
 </resources>
