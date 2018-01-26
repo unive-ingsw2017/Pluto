@@ -135,8 +135,8 @@ public class JVectorProvinciaCodes {
             put("IT-VB", new String[]{"011151637"}); //Verbano-Cusio-Ossola
             put("IT-OT", new String[]{"000000020928499", "000043006"}); //Olbia-Tempio
             put("IT-OG", new String[]{"000000020918910", "000026630"}); //Ogliastra
-            put("IT-VS", new String[]{"025616978"}); //Medio Campidano
-            put("IT-CI", new String[]{"025501372"}); //Carbonia-Iglesias
+            put("IT-VS", new String[]{"025616978", "030861184"}); //Medio Campidano
+            put("IT-CI", new String[]{"025501372", "030861184"}); //Carbonia-Iglesias
             put("IT-MB", new String[]{"025617022"}); //MONZA - BRIANZA
             put("IT-FM", new String[]{"000000020997795"}); //FERMO
             put("IT-BT", new String[]{"000000020997797"}); //Barletta Andria e Trani
