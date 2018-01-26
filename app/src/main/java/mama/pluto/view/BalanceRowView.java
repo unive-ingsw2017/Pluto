@@ -1,10 +1,9 @@
 package mama.pluto.view;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import android.graphics.Color;
 import android.view.Gravity;
 import android.widget.LinearLayout;
-import android.widget.Space;
 import android.widget.TextView;
 
 import mama.pluto.R;
@@ -13,47 +12,72 @@ import mama.pluto.utils.MetricsUtils;
 
 public class BalanceRowView extends LinearLayout {
 
-    private final TextView in, out;
+    private final TextView inView;
+    private final TextView outView;
+    private final TextView equalsView;
+    private final TextView totalView;
 
     public BalanceRowView(Context context) {
         super(context);
-        in = createBalanceView();
-        in.setTextColor(EuroFormattingUtils.POSITIVE_COLOR);
-        in.setGravity(Gravity.END);
-        in.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_trending_up_green_16dp, 0);
-        addView(in, new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
+        int dp2 = MetricsUtils.dpToPixel(context, 2);
 
+        inView = new TextView(context);
+        inView.setTextColor(EuroFormattingUtils.POSITIVE_COLOR);
+        addView(inView);
 
-        addView(new Space(context), MetricsUtils.dpToPixel(context, 16), LayoutParams.WRAP_CONTENT);
+        outView = new TextView(context);
+        outView.setTextColor(EuroFormattingUtils.NEGATIVE_COLOR);
+        addView(outView);
 
+        equalsView = new TextView(context);
+        equalsView.setTextColor(Color.BLACK);
+        equalsView.setText("=");
+        equalsView.setPadding(dp2, 0, dp2, 0);
+        addView(equalsView);
 
-        out = createBalanceView();
-        out.setTextColor(EuroFormattingUtils.NEGATIVE_COLOR);
-        out.setGravity(Gravity.START);
-        out.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_trending_down_red_16dp, 0, 0, 0);
-        addView(out, new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
+        totalView = new TextView(context);
+        totalView.setGravity(Gravity.START);
+        addView(totalView);
     }
 
     public void setBalance(Long in, Long out) {
+        if (in != null && in == 0) {
+            in = null;
+        }
+        if (out != null && out == 0) {
+            out = null;
+        }
+        long total = 0;
         if (in != null) {
-            this.in.setText(EuroFormattingUtils.formatEuroCentString(in, false, true));
-        } else {
-            this.in.setText("-");
+            total += in;
         }
         if (out != null) {
-            this.out.setText(EuroFormattingUtils.formatEuroCentString(out, false, true));
-        } else {
-            this.out.setText("-");
+            total -= out;
         }
-    }
+        EuroFormattingUtils.Base base = EuroFormattingUtils.Base.getBase(in, out, total);
 
-    @NonNull
-    private TextView createBalanceView() {
-        int dp4 = MetricsUtils.dpToPixel(getContext(), 4);
-        int dp8 = MetricsUtils.dpToPixel(getContext(), 8);
-        TextView ret = new TextView(getContext());
-        ret.setCompoundDrawablePadding(dp4);
-        ret.setPadding(dp8, dp8, dp8, dp8);
-        return ret;
+        if (in != null && out != null) {
+            this.inView.setVisibility(VISIBLE);
+            this.outView.setVisibility(VISIBLE);
+            this.equalsView.setVisibility(VISIBLE);
+            this.inView.setText(base.format(in, false));
+            this.outView.setText(base.format(-out, false));
+        } else {
+            this.inView.setVisibility(GONE);
+            this.outView.setVisibility(GONE);
+            this.equalsView.setVisibility(GONE);
+        }
+
+        this.totalView.setText(base.format(total, false) + " " + base.getUnitOfMeasure());
+        if (total > 0) {
+            this.totalView.setTextColor(EuroFormattingUtils.POSITIVE_COLOR);
+            this.totalView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_trending_up_green_16dp, 0);
+        } else if (total == 0) {
+            this.totalView.setTextColor(EuroFormattingUtils.NEUTRAL_COLOR);
+            this.totalView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+        } else {
+            this.totalView.setTextColor(EuroFormattingUtils.NEGATIVE_COLOR);
+            this.totalView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_trending_down_red_16dp, 0);
+        }
     }
 }

@@ -1,7 +1,5 @@
 package mama.pluto.utils;
 
-import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Regione;
-
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
@@ -16,9 +14,9 @@ public class EuroFormattingUtils {
     private final static NumberFormat CURRENCY_FORMAT_NO_SYMBOL = new DecimalFormat("#,##0.00");
 
     public enum Base {
-        MILIARDI_EURO("miliardi", 1_000_000_000),
-        MILIONI_EURO("milioni", 1_000_000),
-        MILA_EURO("mila", 1_000),
+        MILIARDI_EURO("miliardi €", 1_000_000_000),
+        MILIONI_EURO("milioni €", 1_000_000),
+        MILA_EURO("mila €", 1_000),
         EURO("€", 1);
         private final String unitOfMeasure;
         private final long magnitude;
@@ -95,6 +93,7 @@ public class EuroFormattingUtils {
     }
 
     public static final int POSITIVE_COLOR = 0xff43A047;
+    public static final int NEUTRAL_COLOR = 0xffdddddd;
     public static final int NEGATIVE_COLOR = 0xffBF360C;
 
     @NotNull

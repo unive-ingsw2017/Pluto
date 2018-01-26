@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.StringRes;
 import android.text.Html;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -20,13 +21,13 @@ import mama.pluto.R;
 import mama.pluto.dataAbstraction.DataUtils;
 import mama.pluto.dataAbstraction.EnteSummary;
 import mama.pluto.utils.Consumer;
-import mama.pluto.utils.Function;
 import mama.pluto.utils.MetricsUtils;
 import mama.pluto.utils.StringUtils;
 
 public class EnteSummaryView extends LinearLayout {
 
     private final TextView nameView;
+    private final TextView secondaryNameView;
     private final BalanceRowView balanceRowView;
     private final LinearLayout hierarcyView;
     private final TextView codiceView;
@@ -48,11 +49,21 @@ public class EnteSummaryView extends LinearLayout {
         addView(hierarcyView);
 
         nameView = new TextView(context, null, android.R.attr.textAppearanceLarge);
-        //nameView.setPadding(0, dp8, 0, 0);
         addView(nameView);
 
+        secondaryNameView = new TextView(context, null, android.R.attr.textAppearanceMedium);
+        addView(secondaryNameView);
+
+        LinearLayout ll = new LinearLayout(context);
+        ll.setGravity(Gravity.CENTER_VERTICAL);
+        addView(ll);
+
+        TextView tv = new TextView(context);
+        tv.setText(Html.fromHtml(getResources().getString(R.string.bilancio_)));
+        tv.append(" ");
+        ll.addView(tv);
         balanceRowView = new BalanceRowView(context);
-        addView(balanceRowView);
+        ll.addView(balanceRowView);
 
         codiceView = new TextView(context, null, android.R.attr.textAppearanceSmall);
         addView(codiceView);
@@ -72,7 +83,14 @@ public class EnteSummaryView extends LinearLayout {
         this.ente = ente;
         this.geoItem = geoItem != null ? geoItem : DataUtils.optGeoItemOfEnte(ente);
 
-        nameView.setText(StringUtils.toNormalCase(get(GeoItem::getNome, Ente::getNome)));
+        if (geoItem == null) {
+            nameView.setText(StringUtils.toNormalCase(ente.getNome()));
+            secondaryNameView.setVisibility(GONE);
+        } else {
+            nameView.setText(StringUtils.toNormalCase(geoItem.getNome()));
+            secondaryNameView.setText(StringUtils.toNormalCase(ente.getNome()));
+            secondaryNameView.setVisibility(VISIBLE);
+        }
         computeHierarcy();
 
         setHtmlText(codiceView, R.string.ente_codice_x, ente.getCodice());
@@ -107,14 +125,6 @@ public class EnteSummaryView extends LinearLayout {
         ret.setEllipsize(TextUtils.TruncateAt.END);
         ret.setText(StringUtils.toNormalCase(name));
         return ret;
-    }
-
-    private <T> T get(Function<GeoItem, T> a, Function<Ente, T> b) {
-        if (geoItem != null) {
-            return a.apply(geoItem);
-        } else {
-            return b.apply(ente);
-        }
     }
 
     public void addExpandButton(String text, Consumer<Ente> onExpandPressed) {

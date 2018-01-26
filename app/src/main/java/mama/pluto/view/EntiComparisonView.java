@@ -116,6 +116,7 @@ public class EntiComparisonView extends RecyclerView {
         @NonNull
         private TextView createTextView() {
             TextView ret = new TextView(getContext(), null, android.R.attr.textAppearanceMedium);
+            ret.setBackgroundResource(R.drawable.item_background);
             ret.setTextColor(Color.BLACK);
             ret.setGravity(Gravity.CENTER);
             return ret;

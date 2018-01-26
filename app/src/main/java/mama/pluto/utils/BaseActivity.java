@@ -80,7 +80,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         return navigationView;
     }
 
-    private void selectAppSection(AppSection appSection) {
+    protected void selectAppSection(AppSection appSection) {
         content.removeAllViews();
         final View view = appSection.getView(this);
         if (view.getParent() instanceof ViewGroup) {
@@ -103,9 +103,17 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (selectedAppSection == null || !selectedAppSection.onBackPressed()) {
+        if (!sectionGoBack()) {
             super.onBackPressed();
         }
+    }
+
+    protected boolean sectionGoBack() {
+        return selectedAppSection != null && selectedAppSection.onBackPressed();
+    }
+
+    public AppSection getSelectedAppSection() {
+        return selectedAppSection;
     }
 
     public void setupToolbar(@NotNull Toolbar toolbar) {

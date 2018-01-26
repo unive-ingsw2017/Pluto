@@ -27,10 +27,7 @@ public class CategoryBalanceView extends CollapsableCardView {
     @NotNull
     private final AnagraficheExtended anagrafiche;
     private final TextView categoryNameView;
-    private final TextView inView;
-    private final TextView outView;
-    private final TextView equalsView;
-    private final TextView totalView;
+    private final BalanceRowView balanceRowView;
     @Nullable
     private EnteSummary enteSummary;
     @Nullable
@@ -41,6 +38,7 @@ public class CategoryBalanceView extends CollapsableCardView {
         this.anagrafiche = anagrafiche;
         int dp2 = MetricsUtils.dpToPixel(context, 2);
         int dp8 = MetricsUtils.dpToPixel(context, 8);
+        int dp16 = MetricsUtils.dpToPixel(context, 16);
         header.setOnClickListener(view -> toggle(true));
         header.setGravity(Gravity.CENTER_VERTICAL);
 
@@ -52,26 +50,13 @@ public class CategoryBalanceView extends CollapsableCardView {
 
         header.addView(new Space(getContext()), new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
 
-        inView = new TextView(context);
-        inView.setTextColor(EuroFormattingUtils.POSITIVE_COLOR);
-        inView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_trending_up_green_16dp, 0);
-        header.addView(inView);
 
-        outView = new TextView(context);
-        outView.setTextColor(EuroFormattingUtils.NEGATIVE_COLOR);
-        outView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_trending_down_red_16dp, 0);
-        header.addView(outView);
+        balanceRowView = new BalanceRowView(getContext());
+        balanceRowView.setTranslationY(-MetricsUtils.dpToPixel(getContext(), 8));
+        balanceRowView.setOnClickListener(view -> toggle(true));
+        balanceRowView.setPadding(dp16, 0, dp16, 0);
+        content.addView(balanceRowView);
 
-        equalsView = new TextView(context);
-        equalsView.setTextColor(Color.BLACK);
-        equalsView.setText("=");
-        equalsView.setPadding(dp2, 0, dp2, 0);
-        header.addView(equalsView);
-
-        totalView = new TextView(context);
-        totalView.setGravity(Gravity.START);
-        totalView.setMinWidth(MetricsUtils.dpToPixel(context, 104));
-        header.addView(totalView);
     }
 
     public void setCategory(@NotNull EnteSummary enteSummary, @NotNull Category category) {
@@ -80,40 +65,12 @@ public class CategoryBalanceView extends CollapsableCardView {
         }
         this.enteSummary = enteSummary;
         this.category = category;
+        categoryNameView.setText(category.getName());
         Long in = enteSummary.getEntrateMap().get(category);
         Long out = enteSummary.getUsciteMap().get(category);
-
-        categoryNameView.setText(category.getName());
-        long total = 0;
-        if (in != null) {
-            total += in;
-        }
-        if (out != null) {
-            total -= out;
-        }
-        EuroFormattingUtils.Base base = EuroFormattingUtils.Base.getBase(in, out, total);
-
-        if (in != null && out != null) {
-            this.inView.setVisibility(VISIBLE);
-            this.outView.setVisibility(VISIBLE);
-            this.equalsView.setVisibility(VISIBLE);
-            this.inView.setText(base.format(in, false));
-            this.outView.setText(base.format(-out, false));
-        } else {
-            this.inView.setVisibility(GONE);
-            this.outView.setVisibility(GONE);
-            this.equalsView.setVisibility(GONE);
-        }
-
-        this.totalView.setText(base.format(total, false) + " " + base.getUnitOfMeasure());
-        if (total >= 0) {
-            this.totalView.setTextColor(EuroFormattingUtils.POSITIVE_COLOR);
-            this.totalView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_trending_up_green_16dp, 0);
-        } else {
-            this.totalView.setTextColor(EuroFormattingUtils.NEGATIVE_COLOR);
-            this.totalView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_trending_down_red_16dp, 0);
-        }
+        balanceRowView.setBalance(in, out);
     }
+
 
     @Override
     protected View createExpandedView() {

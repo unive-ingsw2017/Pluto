@@ -1,7 +1,6 @@
 package mama.pluto.view;
 
 import android.content.Context;
-import android.os.Build;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -87,9 +86,6 @@ public class EntiMainView extends BaseLayoutView {
         hierarchySelectorView = new HierarchySelectorView(getContext(), anagrafiche);
         hierarchySelectorView.setGlobalHeaderCreator(new HierarchySelectorView.TutorialHeaderCreator());
         hierarchySelectorView.setHeaderCreator(new HierarchySelectorView.SummaryHeaderCreator());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            hierarchySelectorView.setElevation(MetricsUtils.dpToPixel(getContext(), 4f));
-        }
         hierarchySelectorView.setOnSelectedGeoItemChanges(geoItem -> recomputeToolbarText());
         hierarchySelectorView.setOnEnteSelected(this::setSelectedEnte);
         content.addView(hierarchySelectorView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
@@ -143,6 +139,7 @@ public class EntiMainView extends BaseLayoutView {
     }
 
     private void recomputeContent() {
+        searchView.closeSearch();
         if (selectedEnte != null && comparingEnte != null) {
             setContent(entiComparisonView);
         } else if (selectedEnte != null) {
