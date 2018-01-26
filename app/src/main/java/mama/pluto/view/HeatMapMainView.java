@@ -59,7 +59,7 @@ public class HeatMapMainView extends BaseLayoutView {
         heatMapView = new HeatMapView(context, anagrafiche);
         addView(heatMapView, BaseLayoutView.LayoutParams.MATCH_PARENT, BaseLayoutView.LayoutParams.MATCH_PARENT);
 
-        post(() -> set(HeatMapMainView.this::dataRegione));
+        set(HeatMapMainView.this::dataRegione);
     }
 
     @NotNull
@@ -80,12 +80,20 @@ public class HeatMapMainView extends BaseLayoutView {
         new AsyncTask<Void, Void, HeatMapView.Data<?, ?>>() {
             @Override
             protected HeatMapView.Data<?, ?> doInBackground(Void... voids) {
-                return dataProducer.produce();
+                final HeatMapView.Data<?, ?> ret = dataProducer.produce();
+                try {
+                    heatMapView.waitPageLoaded();
+                } catch (InterruptedException e) {
+                    return null;
+                }
+                return ret;
             }
 
             @Override
             protected void onPostExecute(HeatMapView.Data<?, ?> data) {
-                heatMapView.setData(data);
+                if (data != null) {
+                    heatMapView.setData(data);
+                }
                 pb.dismiss();
             }
         }.execute();

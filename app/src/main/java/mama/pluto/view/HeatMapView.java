@@ -9,6 +9,7 @@ import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -27,6 +28,8 @@ import org.json.JSONObject;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import mama.pluto.R;
 import mama.pluto.dataAbstraction.AnagraficheExtended;
@@ -123,6 +126,7 @@ public class HeatMapView extends FrameLayout {
     private final TextView baselineTV;
 
     private Data<?, ?> data;
+    private final AtomicBoolean pageLoaded = new AtomicBoolean(false);
 
     @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface"})
     public HeatMapView(Context context, @NotNull AnagraficheExtended anagrafiche) {
@@ -145,6 +149,15 @@ public class HeatMapView extends FrameLayout {
         }, "regClick");
         wv.setWebChromeClient(new WebChromeClient());
         wv.loadUrl("file:///android_asset/map.html");
+        wv.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                synchronized (pageLoaded) {
+                    pageLoaded.set(true);
+                    pageLoaded.notify();
+                }
+            }
+        });
         addView(wv, FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
 
         baslineLL = new LinearLayout(getContext());
@@ -196,12 +209,23 @@ public class HeatMapView extends FrameLayout {
         } catch (JSONException e) {
             throw new IllegalStateException(e);
         }
+        if (!pageLoaded.get()) {
+            throw new IllegalStateException("Page not loaded yet");
+        }
         wv.loadUrl("javascript:refreshMap(" +
                 new JSONObject(data.data) + "," +
                 JSONObject.quote(getMapCode()) + "," +
                 centerStr + "," +
                 new JSONArray(data.missingCodes) +
                 ")");
+    }
+
+    public void waitPageLoaded() throws InterruptedException {
+        synchronized (pageLoaded) {
+            while (!pageLoaded.get()) {
+                pageLoaded.wait();
+            }
+        }
     }
 
     @NonNull
