@@ -58,7 +58,7 @@ public class HeatMapView extends FrameLayout {
         }
     }
 
-    private static class Data<X, N extends Number> {
+    public static class Data<X, N extends Number> {
         @NotNull
         private final MapProjection mapProjection;
         private final boolean isRegionLevel;
@@ -176,15 +176,15 @@ public class HeatMapView extends FrameLayout {
         baslineLL.addView(resetBaselineButton, lp);
     }
 
-    public <N extends Number> void setupForRegioneLevel(@NotNull MapProjection mapProjection, @NotNull Map<Regione, N> data, @NotNull final BiFunction<Regione, N, String> labels) {
-        setData(Data.create(mapProjection, true, data, JVectorRegioneCodes::getJVectorCode, labels, anagrafiche.getRegioni()));
+    public <N extends Number> Data<Regione, N> dataForRegioneLevel(@NotNull MapProjection mapProjection, @NotNull Map<Regione, N> data, @NotNull final BiFunction<Regione, N, String> labels) {
+        return Data.create(mapProjection, true, data, JVectorRegioneCodes::getJVectorCode, labels, anagrafiche.getRegioni());
     }
 
-    public <N extends Number> void setupForProvinciaLevel(@NotNull MapProjection mapProjection, @NotNull Map<String, N> data, @NotNull final BiFunction<String, N, String> labels) {
-        setData(Data.create(mapProjection, false, data, x -> x, labels, JVectorProvinciaCodes.allCodes()));
+    public <N extends Number> Data<String, N> dataForProvinciaLevel(@NotNull MapProjection mapProjection, @NotNull Map<String, N> data, @NotNull final BiFunction<String, N, String> labels) {
+        return Data.create(mapProjection, false, data, x -> x, labels, JVectorProvinciaCodes.allCodes());
     }
 
-    private void setData(@NotNull Data<?, ?> data) {
+    public void setData(@NotNull Data<?, ?> data) {
         this.data = data;
         apply();
     }
