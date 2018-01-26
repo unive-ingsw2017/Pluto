@@ -13,11 +13,8 @@ import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.GeoItem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import mama.pluto.R;
 import mama.pluto.dataAbstraction.AnagraficheExtended;
 import mama.pluto.dataAbstraction.DataUtils;
-import mama.pluto.dataAbstraction.EnteSummary;
-import mama.pluto.view.EnteSummaryView;
 import mama.pluto.view.SubHeaderView;
 
 /**
@@ -40,10 +37,21 @@ public abstract class AbstractSelectorAdapter<V extends View, T> extends Recycle
     private Consumer<Ente> onEnteSelected;
     @Nullable
     private GeoItem mainGeoItem = null;
-    private boolean showHeader;
+    @Nullable
+    private HeaderCreator<?> headerCreator;
 
     protected AbstractSelectorAdapter(@NonNull AnagraficheExtended anagrafiche) {
         this.anagrafiche = anagrafiche;
+    }
+
+    public void setHeaderCreator(HeaderCreator<?> headerCreator) {
+        this.headerCreator = headerCreator;
+        notifyDataSetChanged();
+    }
+
+    @Nullable
+    public HeaderCreator<?> getHeaderCreator() {
+        return headerCreator;
     }
 
     @NonNull
@@ -53,13 +61,9 @@ public abstract class AbstractSelectorAdapter<V extends View, T> extends Recycle
 
     public void setMainGeoItem(@Nullable GeoItem mainGeoItem) {
         this.mainGeoItem = mainGeoItem;
-        setShowHeader(true);
-    }
-
-    public void setShowHeader(boolean showHeader) {
-        this.showHeader = showHeader;
         notifyDataSetChanged();
     }
+
 
     @NotNull
     private Context getContext() {
@@ -76,7 +80,7 @@ public abstract class AbstractSelectorAdapter<V extends View, T> extends Recycle
 
     @Override
     public final int getItemCount() {
-        int ret = (showHeader ? 1 : 0);
+        int ret = (headerCreator != null ? 1 : 0);
         String previousDivider = null;
         for (int i = 0; i < getItemCount2(); i++) {
             ret++;
@@ -99,7 +103,7 @@ public abstract class AbstractSelectorAdapter<V extends View, T> extends Recycle
 
     @Override
     public int getItemViewType(int position) {
-        if (showHeader) {
+        if (headerCreator != null) {
             position--;
         }
         if (position == -1) {
@@ -150,15 +154,8 @@ public abstract class AbstractSelectorAdapter<V extends View, T> extends Recycle
     }
 
     protected View createHeaderView(@NotNull Context context) {
-        ensureRecyclerView();
-        assert recyclerView != null;
-
-        EnteSummaryView ret = new EnteSummaryView(recyclerView.getContext());
-        if (onEnteSelected != null) {
-            ret.addExpandButton(getContext().getString(R.string.view_all_ente_details), this::onEnteSelected);
-        }
-        ret.setBackgroundColor(0x10000000);
-        return ret;
+        assert headerCreator != null;
+        return headerCreator.createView(context, this::onEnteSelected);
     }
 
     protected void onEnteSelected(@NotNull Ente e) {
@@ -168,11 +165,10 @@ public abstract class AbstractSelectorAdapter<V extends View, T> extends Recycle
     }
 
     protected void bindHeaderView(@NotNull View mainEnteView, @Nullable GeoItem mainGeoItem) {
-        if (mainGeoItem == null) {
-            throw new IllegalStateException();
-        }
-        Ente ente = DataUtils.getEnteOfGeoItem(anagrafiche, mainGeoItem);
-        ((EnteSummaryView) mainEnteView).setEnte(EnteSummary.getInstance(getContext(), anagrafiche, ente), ente, mainGeoItem);
+        Ente ente = mainGeoItem == null ? null : DataUtils.getEnteOfGeoItem(anagrafiche, mainGeoItem);
+        assert headerCreator != null;
+        //noinspection unchecked
+        ((HeaderCreator) headerCreator).bind(mainEnteView, anagrafiche, ente, mainGeoItem);
     }
 
     @Override
@@ -192,7 +188,7 @@ public abstract class AbstractSelectorAdapter<V extends View, T> extends Recycle
         if (holder.getItemViewType() == VIEW_TYPE_HEADER) {
             bindHeaderView(holder.getView(), mainGeoItem);
         }
-        if (showHeader) {
+        if (headerCreator != null) {
             position--;
         }
         String previousDivider = null;
@@ -234,4 +230,9 @@ public abstract class AbstractSelectorAdapter<V extends View, T> extends Recycle
 
     protected abstract void bindView(V view, T item);
 
+    public interface HeaderCreator<V extends View> {
+        V createView(@NotNull Context context, @NotNull Consumer<Ente> onEnteSelected);
+
+        void bind(@NotNull V view, @NotNull AnagraficheExtended anagrafiche, @Nullable Ente ente, @Nullable GeoItem geoItem);
+    }
 }

@@ -40,8 +40,10 @@ public class EntiMainView extends BaseLayoutView {
     private final RecyclerView searchResults;
     private final EntiSearchAdapter searchAdapter;
     private final EnteView enteView;
+    private final EnteComparatorView enteComparatorView;
     private final MenuItem searchMenuItem;
     private Ente selectedEnte;
+    private Ente comparingEnte;
 
     public EntiMainView(@NotNull Context context, @NotNull AnagraficheExtended anagrafiche) {
         super(context);
@@ -83,7 +85,8 @@ public class EntiMainView extends BaseLayoutView {
 
 
         hierarchySelectorView = new HierarchySelectorView(getContext(), anagrafiche);
-        hierarchySelectorView.setShowTutorial(true);
+        hierarchySelectorView.setGlobalHeaderCreator(new HierarchySelectorView.TutorialHeaderCreator());
+        hierarchySelectorView.setHeaderCreator(new HierarchySelectorView.SummaryHeaderCreator());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             hierarchySelectorView.setElevation(MetricsUtils.dpToPixel(getContext(), 4f));
         }
@@ -100,21 +103,35 @@ public class EntiMainView extends BaseLayoutView {
         searchResults.setAdapter(searchAdapter);
 
         enteView = new EnteView(context, anagrafiche);
+        enteView.setOnEnteSelectedForComparison(this::setComparingEnte);
         content.addView(enteView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 
+        enteComparatorView = new EnteComparatorView(context, anagrafiche);
+        content.addView(enteComparatorView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 
+        recomputeContent();
         recomputeToolbarText();
-        setContent(hierarchySelectorView);
     }
 
     private void setSelectedEnte(@Nullable Ente ente) {
         selectedEnte = ente;
         if (ente != null) {
             enteView.setEnte(ente, null);
-            setContent(enteView);
         } else {
-            setContent(hierarchySelectorView);
+            comparingEnte = null;
         }
+        recomputeContent();
+        recomputeToolbarText();
+    }
+
+    public void setComparingEnte(Ente comparingEnte) {
+        this.comparingEnte = comparingEnte;
+        if (comparingEnte != null && selectedEnte != null) {
+            enteComparatorView.setEnti(selectedEnte, comparingEnte);
+        } else {
+            setSelectedEnte(selectedEnte);
+        }
+        recomputeContent();
         recomputeToolbarText();
     }
 
@@ -125,8 +142,21 @@ public class EntiMainView extends BaseLayoutView {
         }
     }
 
+    private void recomputeContent() {
+        if (selectedEnte != null && comparingEnte != null) {
+            setContent(enteComparatorView);
+        } else if (selectedEnte != null) {
+            setContent(enteView);
+        } else {
+            setContent(hierarchySelectorView);
+        }
+    }
+
     private void recomputeToolbarText() {
-        if (selectedEnte != null) {
+        if (selectedEnte != null && comparingEnte != null) {
+            searchMenuItem.setVisible(false);
+            toolbar.setTitle(R.string.comparison);
+        } else if (selectedEnte != null) {
             searchMenuItem.setVisible(false);
             toolbar.setTitle(StringUtils.toNormalCase(selectedEnte.getNome()));
         } else {
@@ -155,7 +185,10 @@ public class EntiMainView extends BaseLayoutView {
     }
 
     public boolean onBackPressed() {
-        if (selectedEnte != null) {
+        if (comparingEnte != null) {
+            setComparingEnte(null);
+            return true;
+        } else if (selectedEnte != null) {
             setSelectedEnte(null);
             return true;
         } else if (searchView.isSearchOpen()) {

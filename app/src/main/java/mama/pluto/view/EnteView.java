@@ -6,7 +6,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Ente;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.GeoItem;
@@ -25,6 +24,7 @@ import mama.pluto.dataAbstraction.AnagraficheExtended;
 import mama.pluto.dataAbstraction.Category;
 import mama.pluto.dataAbstraction.EnteSummary;
 import mama.pluto.utils.BaseViewHolder;
+import mama.pluto.utils.Consumer;
 
 
 public class EnteView extends RecyclerView {
@@ -36,6 +36,7 @@ public class EnteView extends RecyclerView {
     private GeoItem geoItem;
     private EnteSummary enteSummary;
     private List<Category> categoriesList;
+    private Consumer<Ente> onEnteSelectedForComparison;
 
     public EnteView(@NotNull Context context, @NonNull AnagraficheExtended anagrafiche) {
         super(context);
@@ -43,6 +44,10 @@ public class EnteView extends RecyclerView {
         this.anagrafiche = anagrafiche;
         myAdapter = new MyAdapter();
         setAdapter(myAdapter);
+    }
+
+    public void setOnEnteSelectedForComparison(Consumer<Ente> onEnteSelectedForComparison) {
+        this.onEnteSelectedForComparison = onEnteSelectedForComparison;
     }
 
     public void setEnte(@NotNull Ente ente, @Nullable GeoItem geoItem) {
@@ -68,10 +73,6 @@ public class EnteView extends RecyclerView {
         myAdapter.notifyDataSetChanged();
     }
 
-    public void compare(@NotNull Ente ente2) {
-        Toast.makeText(getContext(), "Compare con " + ente2.getNome(), Toast.LENGTH_SHORT).show();//TODO
-    }
-
     private class MyAdapter extends Adapter {
 
         public static final int VIEW_TYPE_SUMMARY = 0;
@@ -89,7 +90,7 @@ public class EnteView extends RecyclerView {
                 case VIEW_TYPE_SUMMARY:
                     EnteSummaryView sv = new EnteSummaryView(getContext());
                     sv.addExpandButton(getResources().getString(R.string.compare), ente ->
-                            new EnteSelectorDialog(getContext(), anagrafiche, EnteView.this::compare)
+                            new EnteSelectorDialog(getContext(), anagrafiche, onEnteSelectedForComparison)
                                     .setTitle(R.string.choose_ente_to_compare)
                                     .show()
                     );

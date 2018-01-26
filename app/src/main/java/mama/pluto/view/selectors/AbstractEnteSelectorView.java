@@ -10,38 +10,34 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import mama.pluto.dataAbstraction.AnagraficheExtended;
-import mama.pluto.utils.AbstractEnteSelectorAdapter;
+import mama.pluto.utils.AbstractSelectorAdapter;
 import mama.pluto.utils.Consumer;
 
 /**
  * Created by MMarco on 16/11/2017.
  */
-public abstract class AbstractEnteSelectorView<G extends GeoItem> extends AbstractSelectorView {
-    @NotNull
-    protected final AbstractEnteSelectorAdapter adapter;
-    @Nullable
-    private final G mainGeoItem;
+public abstract class AbstractEnteSelectorView<G extends GeoItem> extends AbstractSelectorView<G> {
 
     public AbstractEnteSelectorView(@NotNull Context context, @NonNull AnagraficheExtended anagrafiche, @Nullable G mainGeoItem) {
-        super(context, anagrafiche);
-        this.mainGeoItem = mainGeoItem;
-
-        adapter = createAdapter();
-        setAdapter(adapter);
-        if (mainGeoItem != null) {
-            adapter.setMainGeoItem(mainGeoItem);
-        }
+        super(context, mainGeoItem, anagrafiche);
     }
 
-    @Nullable
-    public G getMainGeoItem() {
-        return mainGeoItem;
+
+    public void setHeaderCreator(AbstractSelectorAdapter.HeaderCreator<?> headerCreator) {
+        getAdapter().setHeaderCreator(headerCreator);
     }
 
     public void setOnEnteSelected(@Nullable Consumer<Ente> onGeoItemSelected) {
-        adapter.setOnItemSelected(onGeoItemSelected);
-        adapter.setOnEnteSelected(onGeoItemSelected);
+        getAdapter().setOnItemSelected(onGeoItemSelected);
+        getAdapter().setOnEnteSelected(onGeoItemSelected);
     }
 
-    protected abstract AbstractEnteSelectorAdapter createAdapter();
+    @Override
+    public AbstractSelectorAdapter<?, ? extends Ente> getAdapter() {
+        //noinspection unchecked
+        return (AbstractSelectorAdapter<?, ? extends Ente>) super.getAdapter();
+    }
+
+    @Override
+    protected abstract AbstractSelectorAdapter<?, ? extends Ente> createAdapter();
 }

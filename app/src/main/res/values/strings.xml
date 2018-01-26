@@ -44,5 +44,7 @@
     <string name="disclaimer_zero_amount_hidden">NB: transazioni di 0€ sono state nascoste</string>
     <string name="compare">Confronta</string>
     <string name="choose_ente_to_compare">Scegli ente da confrontare</string>
-    <string name="balance">Bilancio</string>
+    <string name="compare_with_x">Confronta con %s</string>
+    <string name="comparison">Confronto</string>
+    <string name="x_vs_y">%1$s\nvs\n%2$s</string>
 </resources>
