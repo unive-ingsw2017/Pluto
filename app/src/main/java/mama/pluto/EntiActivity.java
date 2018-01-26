@@ -101,7 +101,7 @@ public class EntiActivity extends BaseActivity {
         }
         if (entiAppSection == null) {
             entiAppSection = new EntiAppSection(anagrafiche);
-            categorieDiBilancioAppSection = new CategorieDiBilancioAppSection();
+            categorieDiBilancioAppSection = new CategorieDiBilancioAppSection(anagrafiche);
             heatMapAppSection = new HeatMapAppSection(anagrafiche);
         }
     }
@@ -129,5 +129,16 @@ public class EntiActivity extends BaseActivity {
         errorView.setErrorMessage(error.getLocalizedMessage());
         errorView.setOnRetryListener(this::loadAnagrafiche);
         setContentView(errorView);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!sectionGoBack()) {
+            if (getSelectedAppSection() != entiAppSection) {
+                selectAppSection(entiAppSection);
+            } else {
+                super.onBackPressed();
+            }
+        }
     }
 }

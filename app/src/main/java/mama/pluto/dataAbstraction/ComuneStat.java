@@ -1,9 +1,7 @@
 package mama.pluto.dataAbstraction;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 
-import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Anagrafiche;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Comune;
 import com.github.mmauro94.siopeDownloader.utils.ReaderUtils;
 
@@ -45,7 +43,7 @@ public final class ComuneStat {
             this.name = name;
         }
 
-        @NonNull
+        @NotNull
         @Contract(pure = true)
         public String getName() {
             return name;
@@ -72,7 +70,7 @@ public final class ComuneStat {
             this.name = name;
         }
 
-        @NonNull
+        @NotNull
         @Contract(pure = true)
         public String getName() {
             return name;
@@ -104,7 +102,7 @@ public final class ComuneStat {
             this.name = name;
         }
 
-        @NonNull
+        @NotNull
         @Contract(pure = true)
         public String getName() {
             return name;
@@ -133,7 +131,7 @@ public final class ComuneStat {
             this.name = name;
         }
 
-        @NonNull
+        @NotNull
         @Contract(pure = true)
         public String getName() {
             return name;
@@ -178,7 +176,7 @@ public final class ComuneStat {
             this.name = name;
         }
 
-        @NonNull
+        @NotNull
         @Contract(pure = true)
         public String getName() {
             return name;
@@ -285,7 +283,7 @@ public final class ComuneStat {
     }
 
     @Contract(pure = true)
-    @NonNull
+    @NotNull
     public ZonaAltimetrica getZonaAltimetrica() {
         return zonaAltimetrica;
     }
@@ -310,13 +308,13 @@ public final class ComuneStat {
     }
 
     @Contract(pure = true)
-    @NonNull
+    @NotNull
     public GradoUrbanizzazione getGradoUrbanizzazione() {
         return gradoUrbanizzazione;
     }
 
     @Contract(pure = true)
-    @NonNull
+    @NotNull
     public IndiceMontanità getIndiceMontanità() {
         return indiceMontanità;
     }
@@ -343,7 +341,7 @@ public final class ComuneStat {
         return longitude;
     }
 
-    @NonNull
+    @NotNull
     private static ComuneStat parse(@NotNull CSVRecord record) {
         return new ComuneStat(
                 Integer.parseInt(record.get(1)),

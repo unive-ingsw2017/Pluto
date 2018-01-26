@@ -2,7 +2,6 @@ package mama.pluto.dataAbstraction;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.support.annotation.NonNull;
 
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Ente;
 
@@ -10,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -30,17 +28,17 @@ public final class EnteSummary {
         this.usciteMap = usciteMap;
     }
 
-    @NonNull
+    @NotNull
     public Ente getEnte() {
         return ente;
     }
 
-    @NonNull
+    @NotNull
     public Map<Category, Long> getEntrateMap() {
         return Collections.unmodifiableMap(entrateMap);
     }
 
-    @NonNull
+    @NotNull
     public Map<Category, Long> getUsciteMap() {
         return Collections.unmodifiableMap(usciteMap);
     }

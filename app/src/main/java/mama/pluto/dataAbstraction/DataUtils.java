@@ -23,13 +23,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import io.requery.android.database.sqlite.SQLiteDatabase;
 import mama.pluto.database.Database;
 import mama.pluto.utils.Function;
 import mama.pluto.utils.Pair;
+import mama.pluto.utils.Triple;
 
 public final class DataUtils {
     private DataUtils() {
@@ -237,36 +240,74 @@ public final class DataUtils {
         return ret;
     }
 
-    public static List<Ente> getEntiRankPerCategory(@NotNull Category category,
-                                                    @NotNull Sottocomparto sottoComparto,
-                                                    @NotNull Context context,
-                                                    @NotNull AnagraficheExtended anagrafiche,
-                                                    boolean desc) {
-        List<Pair<Ente, Long>> entiAmounts = new ArrayList<>();
-        for (Ente e : anagrafiche.getEnti()) {
-            if (e.getSottocomparto().equals(sottoComparto)) {
-                List<Operazione<?>> operazioni = loadAllOperazioni(context, anagrafiche, e, category, false);
-                long amount = 0;
-                for (Operazione<?> operazione : operazioni) {
-                    if (operazione instanceof Entrata) {
-                        amount += operazione.getAmount();
-                    } else {
-                        amount -= operazione.getAmount();
-                    }
-                }
-                entiAmounts.add(new Pair(e, amount));
+    public static Map<Ente, Pair<Long, Long>> loadBalances(@NotNull Context context, @NotNull AnagraficheExtended anagrafiche, @NotNull Sottocomparto sottoComparto, @NotNull Category category) {
+        final Map<Ente, Pair<Long, Long>> ret = new HashMap<>();
+
+        SQLiteDatabase db = Database.getInstance(context).getReadableDatabase();
+        try (Cursor c = db.rawQuery("SELECT ente, SUM(CASE o.tipo WHEN ? THEN o.amount ELSE 0 END) as entrate, SUM(CASE o.tipo WHEN ? THEN o.amount ELSE 0 END) as uscite " +
+                "FROM Operazione o " +
+                "INNER JOIN CodiceGestionale cg ON o.codiceGestionale = cg.id " +
+                "INNER JOIN ente e ON o.ente = e.id " +
+                "WHERE cg.category=? and e.sottocomparto=? " +
+                "GROUP BY ente", new Object[]{Database.TIPO_OPERAZIONE_ENTRATA, Database.TIPO_OPERAZIONE_USCITA, category.getId(), sottoComparto.getCodice()})) {
+            while (c.moveToNext()) {
+                long idEnte = c.getLong(0);
+                long entrate = c.getLong(1);
+                long uscite = c.getLong(2);
+                ret.put(anagrafiche.getEnteById(idEnte), new Pair<>(entrate, uscite));
             }
         }
-        if(desc){
-            Collections.sort(entiAmounts, (p1, p2) -> Long.compare(p2.getSecond(), p1.getSecond()));
+        return ret;
+    }
+
+    public static List<CodiceGestionale> extractCodiciGestionaliByAmount(List<Operazione<?>> operazioni) {
+        Map<CodiceGestionale, Long> totalAmount = new HashMap<>();
+        for (Operazione<?> operazione : operazioni) {
+            if (!totalAmount.containsKey(operazione.getCodiceGestionale())) {
+                totalAmount.put(operazione.getCodiceGestionale(), 0L);
+            }
+            totalAmount.put(operazione.getCodiceGestionale(), totalAmount.get(operazione.getCodiceGestionale()) + operazione.getAmount());
         }
-        else{
-            Collections.sort(entiAmounts, (p1, p2) -> Long.compare(p1.getSecond(), p2.getSecond()));
+        List<CodiceGestionale> ret = new ArrayList<>(totalAmount.keySet());
+        Collections.sort(ret, (o1, o2) -> -totalAmount.get(o1).compareTo(totalAmount.get(o2)));
+        return ret;
+    }
+
+    public static Map<Short, Set<Operazione<?>>> groupMovementsByMonth(List<Operazione<?>> operazioni, CodiceGestionale codiceGestionale) {
+        Map<Short, Set<Operazione<?>>> ret = new HashMap<>(12);
+        for (short i = 1; i <= 12; i++) {
+            ret.put(i, new HashSet<>());
         }
-        List<Ente> result = new ArrayList<>();
-        for (Pair<Ente, Long> entiAmount : entiAmounts) {
-            result.add(entiAmount.getFirst());
+        for (Operazione<?> operazione : operazioni) {
+            if (operazione.getCodiceGestionale().equals(codiceGestionale)) {
+                ret.get(((short) operazione.getMonth())).add(operazione);
+            }
         }
-        return result;
+        return ret;
+    }
+
+    public static long getBalance(Iterable<Operazione<?>> operazioni) {
+        long ret = 0;
+        for (Operazione<?> operazione : operazioni) {
+            if (operazione instanceof Entrata) {
+                ret += operazione.getAmount();
+            } else {
+                ret -= operazione.getAmount();
+            }
+        }
+        return ret;
+    }
+
+
+    public static List<Triple<Ente, Long, Long>> getEntiRankPerCategory(@NotNull Category category, @NotNull Sottocomparto sottoComparto, @NotNull Context context, @NotNull AnagraficheExtended anagrafiche, boolean desc) {
+        Map<Ente, Pair<Long, Long>> balances = loadBalances(context, anagrafiche, sottoComparto, category);
+        List<Triple<Ente, Long, Long>> ret = new ArrayList<>();
+        for (Map.Entry<Ente, Pair<Long, Long>> entry : balances.entrySet()) {
+            ret.add(new Triple<>(entry.getKey(), entry.getValue().getFirst(), entry.getValue().getSecond()));
+        }
+
+        Collections.sort(ret, (o1, o2) -> (desc ? -1 : 1) * Long.compare(o1.getSecond() - o1.getThird(), o2.getSecond() - o2.getThird()));
+
+        return ret;
     }
 }

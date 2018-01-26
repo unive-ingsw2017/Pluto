@@ -2,18 +2,25 @@ package mama.pluto;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.view.View;
 
 import org.jetbrains.annotations.NotNull;
 
+import mama.pluto.dataAbstraction.AnagraficheExtended;
 import mama.pluto.utils.AppSection;
 import mama.pluto.utils.BaseActivity;
+import mama.pluto.view.CategoriesMainView;
 
 /**
  * Created by MMarco on 05/12/2017.
  */
 
-public class CategorieDiBilancioAppSection extends AppSection {
+public class CategorieDiBilancioAppSection extends AppSection<CategoriesMainView> {
+    @NotNull
+    private final AnagraficheExtended anagrafiche;
+
+    public CategorieDiBilancioAppSection(AnagraficheExtended anagrafiche) {
+        this.anagrafiche = anagrafiche;
+    }
 
     @Override
     public String getTitle(Context context) {
@@ -26,7 +33,14 @@ public class CategorieDiBilancioAppSection extends AppSection {
     }
 
     @Override
-    protected View createView(@NotNull BaseActivity baseActivity) {
-        return new View(baseActivity);
+    protected CategoriesMainView createView(@NotNull BaseActivity baseActivity) {
+        CategoriesMainView ret = new CategoriesMainView(baseActivity, anagrafiche);
+        baseActivity.setupToolbar(ret.getToolbar());
+        return ret;
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        return getCurrentView() != null && getCurrentView().onBackPressed();
     }
 }

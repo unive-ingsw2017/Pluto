@@ -37,6 +37,7 @@
     <string name="spese_x">&lt;b>Uscite:&lt;/b> %s</string>
     <string name="entrate_x">&lt;b>Entrate:&lt;/b> %s</string>
     <string name="bilancio_x">&lt;b>Bilancio:&lt;/b> %s</string>
+    <string name="bilancio_">&lt;b>Bilancio:&lt;/b></string>
     <string name="spese">Uscite</string>
     <string name="entrate">Entrate</string>
     <string name="bilancio">Bilancio</string>
@@ -44,8 +45,7 @@
     <string name="view_all_movements_short">Vedi movimenti</string>
     <string name="italia">Italia</string>
     <string name="view_all_ente_details">Più dettagli</string>
-    <string name="main_tutorial">Per iniziare, seleziona un ente di tuo interesse.\nSe preferisci, puoi cercarloTODODOODOD</string>
-    <string name="disclaimer_zero_amount_hidden">NB: transazioni di 0€ sono state nascoste</string>
+    <string name="main_tutorial">Per iniziare, seleziona un ente di tuo interesse.\nSe preferisci, puoi cercarlo.</string>
     <string name="compare">Confronta</string>
     <string name="choose_ente_to_compare">Scegli ente da confrontare</string>
     <string name="reset">Reset</string>
@@ -59,4 +59,12 @@
         L\'applicazione è nato come progetto informatico durante il corso di Ingegneria del Software presso l\'Unversità degli Studi Ca\' Foscari di Venezia, a.a. 2017/18\n\n
         L\'app utilizza gli open data presenti nel sito siope.it, riguardanti i bilanci degli enti pubblici italiani e permette all\'utente finale una facile comparazione di uscite ed entrate fra le varie regioni, provincie e comuni italiani.\n\n
     </string>
+    <string name="total">Totale</string>
+    <string name="_regioni">regioni</string>
+    <string name="_province">province</string>
+    <string name="_comuni">comuni</string>
+    <string name="_ordered_by">ordinati per</string>
+    <string name="_ordered_female_by">ordinate per</string>
+    <string name="_high_balance">entrate</string>
+    <string name="_low_balance">uscite</string>
 </resources>

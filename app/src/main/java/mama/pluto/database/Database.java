@@ -14,7 +14,6 @@ import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.CodiceGestiona
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Comparto;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Comune;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Ente;
-import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.GeoItem;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Provincia;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Regione;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.RipartizioneGeografica;
@@ -31,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +51,7 @@ import mama.pluto.utils.StringUtils;
 public class Database extends SQLiteOpenHelper {
 
     public static final String NAME = "pluto.db";
-    public static final int VERSION = 1;
+    public static final int VERSION = 2;
     public static final String TIPO_CODICE_GESTIONALE_ENTRATA = "ENTRATA";
     public static final String TIPO_CODICE_GESTIONALE_USCITA = "USCITA";
     public static final int TIPO_OPERAZIONE_ENTRATA = 0;
@@ -126,6 +124,7 @@ public class Database extends SQLiteOpenHelper {
                 "CONSTRAINT codice_tipo UNIQUE(codice,tipo)" +
                 ")");
         db.execSQL("CREATE INDEX codiceGestionale_comparto ON CodiceGestionale(comparto)");
+        db.execSQL("CREATE INDEX codiceGestionale_category ON CodiceGestionale(category)");
 
         //DATI
         db.execSQL("CREATE TABLE Operazione (" +
@@ -142,8 +141,10 @@ public class Database extends SQLiteOpenHelper {
 
 
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        if (oldVersion < 2) {
+            db.execSQL("CREATE INDEX codiceGestionale_category ON CodiceGestionale(category)");
+        }
     }
 
     @Nullable

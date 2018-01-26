@@ -1,7 +1,6 @@
 package mama.pluto.dataAbstraction;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Ente;
 
@@ -139,7 +138,7 @@ public class EntiComparator {
         }
 
         @Override
-        public int compareTo(@NonNull CategoryComparison categoryComparison) {
+        public int compareTo(@NotNull CategoryComparison categoryComparison) {
             return Long.compare(Math.abs(categoryComparison.getFirstBalance() - categoryComparison.getSecondBalance()), Math.abs(this.getFirstBalance() - this.getSecondBalance()));
         }
 

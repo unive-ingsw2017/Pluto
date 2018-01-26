@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="_hierarcy_evels">
+        <item>@string/_regioni</item>
+        <item>@string/_province</item>
+        <item>@string/_comuni</item>
+    </string-array>
+    <string-array name="_balance">
+        <item>@string/_high_balance</item>
+        <item>@string/_low_balance</item>
+    </string-array>
+</resources>

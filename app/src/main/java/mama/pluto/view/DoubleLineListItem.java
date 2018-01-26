@@ -52,7 +52,9 @@ public class DoubleLineListItem extends LinearLayout {
         addView(secondLineView);
     }
 
-    public void setText(CharSequence firstLine, CharSequence secondLine) {
+    public void setText(@Nullable CharSequence firstLine, @Nullable CharSequence secondLine) {
+        firstLineView.setVisibility(firstLine == null ? GONE : VISIBLE);
+        secondLineView.setVisibility(secondLine == null ? GONE : VISIBLE);
         firstLineView.setText(firstLine);
         secondLineView.setText(secondLine);
     }

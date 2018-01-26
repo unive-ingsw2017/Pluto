@@ -17,11 +17,12 @@ import mama.pluto.R;
 import mama.pluto.dataAbstraction.AnagraficheExtended;
 import mama.pluto.utils.AbstractSelectorAdapter;
 import mama.pluto.utils.MetricsUtils;
+import mama.pluto.view.BaseRecyclerView;
 
 /**
  * Created by MMarco on 16/11/2017.
  */
-public abstract class AbstractSelectorView<G extends GeoItem> extends RecyclerView {
+public abstract class AbstractSelectorView<G extends GeoItem> extends BaseRecyclerView {
     @Nullable
     private final G mainGeoItem;
 
@@ -33,17 +34,6 @@ public abstract class AbstractSelectorView<G extends GeoItem> extends RecyclerVi
         super(context);
         this.mainGeoItem = mainGeoItem;
         this.anagrafiche = anagrafiche;
-        final int dp32 = MetricsUtils.dpToPixel(getContext(), 32);
-        setPadding(0, 0, 0, dp32);
-        setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL);
-        dividerItemDecoration.setDrawable(getResources().getDrawable(R.drawable.divider));
-        addItemDecoration(dividerItemDecoration);
-        setClipToPadding(false);
-        setBackgroundColor(Color.WHITE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            setElevation(MetricsUtils.dpToPixel(getContext(), 4f));//TODO: spostare
-        }
         adapter = createAdapter();
         adapter.setMainGeoItem(mainGeoItem);
         setAdapter(adapter);
