@@ -27,21 +27,33 @@
 <div id="map" style="width: 100%; height: 100%"></div>
 <script>
 		var mapObject = null;
-	    function refreshMap(data, labels, map) {
+	    function refreshMap(data, labels, map, center) {
 	        if(mapObject != null) {
 	            mapObject.remove();
+	        }
+	        max = null;
+	        for(var k in data) {
+	            v = Math.abs(center - data[k]);
+	            if(max === null || v>max) {
+	                max = v;
+	            }
 	        }
             $('#map').vectorMap({
                 map: map,
                 series: {
                     regions: [{
                         values: data,
-                        scale: ['#F44336', '#4CAF50'],
-                        normalizeFunction: 'linear'
+                        scale: ['#F44336', '#FFFFFF', '#4CAF50'],
+                        normalizeFunction: function(x) {
+                            isPositive = x-center > 0 ? 1 : -1;
+                            return Math.pow(Math.abs(x-center), 0.5) * isPositive + center;
+                        },
+                        min: center-max,
+                        max: center+max
                     }]
                 },
                 onRegionTipShow: function(e, el, code){
-                    el.html(el.html() + ' (' + labels[code] + ')');
+                    e.preventDefault();
                 },
                 onRegionClick: function(e, code) {
                     regClick.onClick(code);

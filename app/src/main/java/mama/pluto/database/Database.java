@@ -44,6 +44,7 @@ import mama.pluto.dataAbstraction.CategoryUtils;
 import mama.pluto.dataAbstraction.DataUtils;
 import mama.pluto.utils.BiConsumer;
 import mama.pluto.utils.Function;
+import mama.pluto.utils.Pair;
 
 public class Database extends SQLiteOpenHelper {
 
@@ -573,28 +574,28 @@ public class Database extends SQLiteOpenHelper {
     }
 
     @NotNull
-    public Map<Regione, Long> getRegioneBalances(@NotNull AnagraficheExtended a) {
+    public Map<Regione, Pair<Long, Long>> getRegioneBalances(@NotNull AnagraficheExtended a) {
         return getBalances(a, DataUtils.SOTTOCOMPARTO_REGIONE, gi -> (Regione) gi);
     }
 
     @NotNull
-    public Map<Provincia, Long> getProvinciaBalances(@NotNull AnagraficheExtended a) {
+    public Map<Provincia, Pair<Long, Long>> getProvinciaBalances(@NotNull AnagraficheExtended a) {
         return getBalances(a, DataUtils.SOTTOCOMPARTO_PROVINCIA, gi -> (Provincia) gi);
     }
 
     @NotNull
-    private <T extends GeoItem> Map<T, Long> getBalances(@NotNull AnagraficheExtended a, @NotNull String tipoSottocomparto, @NotNull Function<GeoItem, T> caster) {
+    private <T extends GeoItem> Map<T, Pair<Long, Long>> getBalances(@NotNull AnagraficheExtended a, @NotNull String tipoSottocomparto, @NotNull Function<GeoItem, T> caster) {
         try (Cursor cursor = getReadableDatabase().rawQuery(
-                "SELECT e.codice, SUM(CASE o.tipo WHEN NULL THEN 0 WHEN ? THEN -o.amount ELSE o.amount END) AS tot " +
+                "SELECT e.codice, SUM(CASE o.tipo WHEN ? THEN o.amount ELSE 0 END) AS entrate, SUM(CASE o.tipo WHEN ? THEN o.amount ELSE 0 END) AS uscite " +
                         "FROM Ente e " +
                         "LEFT OUTER JOIN Operazione o ON e.id = o.ente " +
                         "WHERE e.sottocomparto=? " +
-                        "GROUP BY e.codice " +
-                        "HAVING tot <> 0", new Object[]{TIPO_OPERAZIONE_USCITA, tipoSottocomparto})) {
-            final Map<T, Long> map = new HashMap<>();
+                        "GROUP BY e.id " +
+                        "HAVING entrate <> 0 OR uscite <> 0", new Object[]{TIPO_OPERAZIONE_ENTRATA, TIPO_OPERAZIONE_USCITA, tipoSottocomparto})) {
+            final Map<T, Pair<Long, Long>> map = new HashMap<>();
             while (cursor.moveToNext()) {
                 GeoItem gi = DataUtils.getGeoItemOfEnte(a.getEnti().get(cursor.getString(0)));
-                map.put(caster.apply(gi), cursor.getLong(1));
+                map.put(caster.apply(gi), new Pair<>(cursor.getLong(1), cursor.getLong(2)));
             }
             return map;
         }

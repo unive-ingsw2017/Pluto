@@ -5,16 +5,17 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.GeoItem;
-import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Regione;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
+import java.text.DecimalFormat;
+import java.util.Map;
 
 import mama.pluto.R;
 import mama.pluto.dataAbstraction.AnagraficheExtended;
+import mama.pluto.dataAbstraction.DataUtils;
 import mama.pluto.database.Database;
-import mama.pluto.utils.EuroFormattingUtils;
+import mama.pluto.utils.Pair;
 
 public class HeatMapMainView extends BaseLayoutView {
 
@@ -29,10 +30,10 @@ public class HeatMapMainView extends BaseLayoutView {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.detail_level_regione:
-                        heatMapView.setupForRegioneLevel(HeatMapView.MapProjection.MERCATOR, Database.getInstance(context).getRegioneBalances(anagrafiche), HeatMapMainView::geoItemLabel);
+                        heatMapView.setupForRegioneLevel(HeatMapView.MapProjection.MERCATOR, balanceRatio(Database.getInstance(context).getRegioneBalances(anagrafiche)), HeatMapMainView::balanceRatioLabel);
                         break;
                     case R.id.detail_level_provincia:
-                        heatMapView.setupForProvinciaLevel(HeatMapView.MapProjection.MERCATOR, Database.getInstance(context).getProvinciaBalances(anagrafiche), HeatMapMainView::geoItemLabel);
+                        heatMapView.setupForProvinciaLevel(HeatMapView.MapProjection.MERCATOR, balanceRatio(Database.getInstance(context).getProvinciaBalances(anagrafiche)), HeatMapMainView::balanceRatioLabel);
                         break;
                     default:
                         throw new IllegalStateException();
@@ -47,8 +48,15 @@ public class HeatMapMainView extends BaseLayoutView {
         //heatMapView.setupForProvinciaLevel("Base", HeatMapView.MapProjection.MERCATOR, new HashMap<>());
     }
 
+    public final static DecimalFormat PERCENT_FORMAT = new DecimalFormat("0.00%");
+
     @NotNull
-    public static String geoItemLabel(@NotNull GeoItem geoItem, long balance) {
-        return EuroFormattingUtils.formatEuroCentString(balance, true, true);
+    public static String balanceRatioLabel(@NotNull GeoItem geoItem, float ratio) {
+        return PERCENT_FORMAT.format(ratio);
+    }
+
+    @NotNull
+    public static <X> Map<X, Float> balanceRatio(@NotNull Map<X, Pair<Long, Long>> map) {
+        return DataUtils.mapConvertValues(map, x -> x.getFirst() / (float) x.getSecond());
     }
 }

@@ -45,4 +45,6 @@
     <string name="compare">Confronta</string>
     <string name="choose_ente_to_compare">Scegli ente da confrontare</string>
     <string name="balance">Bilancio</string>
+    <string name="reset">Reset</string>
+    <string name="baseline">Baseline: %s</string>
 </resources>
