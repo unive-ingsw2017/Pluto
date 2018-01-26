@@ -1,5 +1,9 @@
 package mama.pluto.utils;
 
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Regione;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -46,9 +50,8 @@ public class EuroFormattingUtils {
             if (euroCent == null) {
                 return EURO;
             }
-            long euro = Math.abs(euroCent / 100);
             for (Base base : values()) {
-                if (base.looksGreat(euro)) {
+                if (base.looksGreat(euroCent)) {
                     return base;
                 }
             }
@@ -94,6 +97,7 @@ public class EuroFormattingUtils {
     public static final int POSITIVE_COLOR = 0xff43A047;
     public static final int NEGATIVE_COLOR = 0xffBF360C;
 
+    @NotNull
     public static String formatEuroCentString(long balance, boolean approximate, boolean showSymbol) {
         return (approximate ? Base.getBase(balance) : Base.EURO).format(balance, showSymbol);
     }

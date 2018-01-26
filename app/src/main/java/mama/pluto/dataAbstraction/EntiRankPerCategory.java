@@ -14,7 +14,7 @@ import java.util.List;
 
 public class EntiRankPerCategory {
 
-    Category category;
+   /* Category category;
     Sottocomparto sottoComparto;
 
     public EntiRankPerCategory(@NotNull Category category, @NotNull Sottocomparto sottoComparto) {
@@ -40,7 +40,7 @@ public class EntiRankPerCategory {
 
                 return es1.getEntrateMap().get(category) - es2.getEntrateMap().get(category);
             }
-        });
+        });*/
 
     }
 

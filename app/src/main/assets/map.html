@@ -27,7 +27,7 @@
 <div id="map" style="width: 100%; height: 100%"></div>
 <script>
 		var mapObject = null;
-	    function refreshMap(data, label, map) {
+	    function refreshMap(data, labels, map) {
 	        if(mapObject != null) {
 	            mapObject.remove();
 	        }
@@ -38,10 +38,13 @@
                         values: data,
                         scale: ['#F44336', '#4CAF50'],
                         normalizeFunction: 'linear'
-                        }]
+                    }]
                 },
                 onRegionTipShow: function(e, el, code){
-                    el.html(el.html()+' ('+label+' - '+data[code]+')');
+                    el.html(el.html() + ' (' + labels[code] + ')');
+                },
+                onRegionClick: function(e, code) {
+                    regClick.onClick(code);
                 }
             });
 			mapObject = $('#map').vectorMap('get', 'mapObject');

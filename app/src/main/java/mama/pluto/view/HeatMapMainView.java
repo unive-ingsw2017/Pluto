@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.GeoItem;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Regione;
 
 import org.jetbrains.annotations.NotNull;
@@ -13,6 +14,7 @@ import java.util.HashMap;
 import mama.pluto.R;
 import mama.pluto.dataAbstraction.AnagraficheExtended;
 import mama.pluto.database.Database;
+import mama.pluto.utils.EuroFormattingUtils;
 
 public class HeatMapMainView extends BaseLayoutView {
 
@@ -27,16 +29,10 @@ public class HeatMapMainView extends BaseLayoutView {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.detail_level_regione:
-                        heatMapView.setupForRegioneLevel("SpeseR", HeatMapView.MapProjection.MERCATOR, new HashMap<Regione, Float>() {
-                            {
-                                for (Regione regione : anagrafiche.getRegioni()) {
-                                    put(regione, (float) Math.random());
-                                }
-                            }
-                        });
+                        heatMapView.setupForRegioneLevel(HeatMapView.MapProjection.MERCATOR, Database.getInstance(context).getRegioneBalances(anagrafiche), HeatMapMainView::geoItemLabel);
                         break;
                     case R.id.detail_level_provincia:
-                        heatMapView.setupForProvinciaLevel("SpeseP", HeatMapView.MapProjection.MERCATOR, Database.getInstance(context).getProvinciaBalances(anagrafiche));
+                        heatMapView.setupForProvinciaLevel(HeatMapView.MapProjection.MERCATOR, Database.getInstance(context).getProvinciaBalances(anagrafiche), HeatMapMainView::geoItemLabel);
                         break;
                     default:
                         throw new IllegalStateException();
@@ -49,5 +45,10 @@ public class HeatMapMainView extends BaseLayoutView {
         addView(heatMapView, BaseLayoutView.LayoutParams.MATCH_PARENT, BaseLayoutView.LayoutParams.MATCH_PARENT);
 
         //heatMapView.setupForProvinciaLevel("Base", HeatMapView.MapProjection.MERCATOR, new HashMap<>());
+    }
+
+    @NotNull
+    public static String geoItemLabel(@NotNull GeoItem geoItem, long balance) {
+        return EuroFormattingUtils.formatEuroCentString(balance, true, true);
     }
 }

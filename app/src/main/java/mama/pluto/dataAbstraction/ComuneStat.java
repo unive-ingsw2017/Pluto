@@ -379,22 +379,11 @@ public final class ComuneStat {
                     final int provCode = stat.getIstatCode() / 1000;
                     final int comuneCode = stat.getIstatCode() % 1000;
 
-                    try {
-                        final Comune comune = anagrafiche.getComuni().get(new Comune.ComuneId(comuneCode, anagrafiche.getProvincie().get(provCode)));
-                        if(MAP.containsK1(comune)) {
-                            throw new IllegalArgumentException("comune doppio " +comune.getNome());
-                        }
-                        MAP.put(comune, stat);
-                    } catch (IllegalStateException ex) {
-                        System.err.println("CAZZO: " + stat.getIstatCode());
+                    final Comune comune = anagrafiche.getComuni().get(new Comune.ComuneId(comuneCode, anagrafiche.getProvincie().get(provCode)));
+                    if (MAP.containsK1(comune)) {
+                        throw new IllegalArgumentException("comune doppio " + comune.getNome());
                     }
-                }
-                System.out.println(anagrafiche.getComuni().size());
-                System.out.println(MAP.size());
-                for (Comune comune : anagrafiche.getComuni()) {
-                    if(!MAP.containsK1(comune)) {
-                        throw new IllegalStateException("comune missing " +comune.getNome());
-                    }
+                    MAP.put(comune, stat);
                 }
 
                 MAP_LOADED.set(true);
@@ -402,7 +391,7 @@ public final class ComuneStat {
         }
     }
 
-    @NotNull
+    @Nullable
     public static ComuneStat getInstance(@NotNull Context context, @NotNull AnagraficheExtended anagrafiche, @NotNull Comune comune) {
         ensureMapLoaded(context, anagrafiche);
         return MAP.getK2(comune);

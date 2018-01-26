@@ -585,11 +585,12 @@ public class Database extends SQLiteOpenHelper {
     @NotNull
     private <T extends GeoItem> Map<T, Long> getBalances(@NotNull AnagraficheExtended a, @NotNull String tipoSottocomparto, @NotNull Function<GeoItem, T> caster) {
         try (Cursor cursor = getReadableDatabase().rawQuery(
-                "SELECT ente, SUM(CASE o.tipo WHEN ? THEN -o.amount ELSE o.amount END) " +
-                        "FROM Operazione o " +
-                        "INNER JOIN Ente e ON e.codice = o.ente " +
+                "SELECT e.codice, SUM(CASE o.tipo WHEN NULL THEN 0 WHEN ? THEN -o.amount ELSE o.amount END) AS tot " +
+                        "FROM Ente e " +
+                        "LEFT OUTER JOIN Operazione o ON e.id = o.ente " +
                         "WHERE e.sottocomparto=? " +
-                        "GROUP BY o.ente", new Object[]{TIPO_OPERAZIONE_USCITA, tipoSottocomparto})) {
+                        "GROUP BY e.codice " +
+                        "HAVING tot <> 0", new Object[]{TIPO_OPERAZIONE_USCITA, tipoSottocomparto})) {
             final Map<T, Long> map = new HashMap<>();
             while (cursor.moveToNext()) {
                 GeoItem gi = DataUtils.getGeoItemOfEnte(a.getEnti().get(cursor.getString(0)));
