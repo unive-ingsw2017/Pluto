@@ -21,12 +21,10 @@ public final class Category {
             add(new Category(2, "Beni"));
             add(new Category(3, "Fabbricati"));
             add(new Category(4, "Pensioni"));
-            add(new Category(5, "Concessione crediti"));
             add(new Category(6, "Ricerca"));
             add(new Category(7, "Università"));
             add(new Category(8, "Terreni"));
             add(new Category(9, "Manutenzione"));
-            add(new Category(10, "Interessi"));
             add(new Category(11, "Sanità"));
             add(new Category(12, "Lotterie"));
             add(new Category(13, "Stipendi"));
@@ -51,7 +49,6 @@ public final class Category {
             add(new Category(32, "Opere"));
             add(new Category(33, "Formazione"));
             add(new Category(34, "Luce e gas"));
-            add(new Category(35, "Lavoro"));
             add(new Category(36, "Ritenute"));
             add(new Category(37, "Tasse"));
             add(new Category(38, "Mobili"));
@@ -68,12 +65,9 @@ public final class Category {
             add(new Category(49, "Province"));
             add(new Category(50, "Comuni"));
             add(new Category(51, "Macchinari"));
-            add(new Category(52, "Leasing"));
-            add(new Category(53, "Pignoramenti"));
+            add(new Category(53, "Interessi e Pignoramenti"));
             add(new Category(54, "Stampa"));
             add(new Category(55, "Prodotti chimici"));
-            add(new Category(56, "Risarcimenti"));
-            add(new Category(57, "INPS"));
             add(new Category(58, "Ministeri"));
             add(new Category(59, "Carburanti"));
             add(new Category(60, "Portuali"));
@@ -85,13 +79,10 @@ public final class Category {
             add(new Category(66, "Cauzioni"));
             add(new Category(67, "Equitalia"));
             add(new Category(68, "Materiali"));
-            add(new Category(69, "Acquisti vari"));
             add(new Category(70, "Commissioni"));
             add(new Category(71, "Competenze"));
-            add(new Category(72, "Finanziarie"));
             add(new Category(73, "Spese"));
             add(new Category(74, "Pagamenti"));
-            add(new Category(75, "Trasferimenti"));
             add(new Category(76, "Prestiti"));
             add(new Category(77, "Arretrati"));
             add(new Category(78, "Indennizzi"));
