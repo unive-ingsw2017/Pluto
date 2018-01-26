@@ -66,8 +66,6 @@ public class EntiActivity extends BaseActivity {
             protected void onPostExecute(Exception e) {
                 if (e == null) {
                     anagrafiche = getAnagrafiche();
-                    ComuneStat stat = ComuneStat.getInstance(EntiActivity.this, anagrafiche, anagrafiche.getComuni().get(new Comune.ComuneId(27, anagrafiche.getProvincie().get(20))));
-                    System.out.println(stat.getSuperficie());
                     setupContentView();
                 } else {
                     setupErrorView(e);

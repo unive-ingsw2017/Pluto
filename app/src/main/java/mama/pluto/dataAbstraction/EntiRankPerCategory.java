@@ -1,17 +1,5 @@
 package mama.pluto.dataAbstraction;
 
-import android.content.Context;
-
-import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Ente;
-import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Sottocomparto;
-
-import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 public class EntiRankPerCategory {
 
    /* Category category;
@@ -42,6 +30,6 @@ public class EntiRankPerCategory {
             }
         });*/
 
-    }
+}
 
 

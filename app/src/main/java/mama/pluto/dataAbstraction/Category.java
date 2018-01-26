@@ -42,7 +42,7 @@ public final class Category {
             add(new Category(23, "Imprese"));
             add(new Category(24, "Ambiente"));
             add(new Category(25, "Cultura"));
-            add(new Category(26, "Messi"));
+            add(new Category(26, "Mezzi"));
             add(new Category(27, "Agricoltura"));
             add(new Category(28, "Sanità"));
             add(new Category(29, "Estero"));

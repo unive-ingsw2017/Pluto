@@ -24,7 +24,7 @@ import mama.pluto.view.SingleLineListItem;
 public class ComuneSelectorView extends AbstractGeoItemSelectorView<Provincia, Comune> {
 
     public ComuneSelectorView(@NotNull Context context, @NotNull AnagraficheExtended anagrafiche, @NotNull Provincia provincia) {
-        super(context, anagrafiche, provincia);
+        super(context, provincia, anagrafiche);
     }
 
     @Override

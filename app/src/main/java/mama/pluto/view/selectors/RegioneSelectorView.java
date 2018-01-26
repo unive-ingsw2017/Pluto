@@ -1,14 +1,12 @@
 package mama.pluto.view.selectors;
 
 import android.content.Context;
-import android.view.View;
 
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.GeoItem;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Regione;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.RipartizioneGeografica;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,7 +15,6 @@ import mama.pluto.dataAbstraction.AnagraficheExtended;
 import mama.pluto.utils.AbstractSelectorAdapter;
 import mama.pluto.utils.StringUtils;
 import mama.pluto.view.SingleLineListItem;
-import mama.pluto.view.TutorialView;
 
 /**
  * Created by MMarco on 16/11/2017.
@@ -25,11 +22,7 @@ import mama.pluto.view.TutorialView;
 public class RegioneSelectorView extends AbstractGeoItemSelectorView<GeoItem, Regione> {
 
     public RegioneSelectorView(@NotNull Context context, @NotNull AnagraficheExtended anagrafiche) {
-        super(context, anagrafiche, null);
-    }
-
-    public void setShowTutorial(boolean showTutorial) {
-        adapter.setShowHeader(showTutorial);
+        super(context, null, anagrafiche);
     }
 
     @Override
@@ -46,15 +39,6 @@ public class RegioneSelectorView extends AbstractGeoItemSelectorView<GeoItem, Re
                 }
         );
         return new AbstractSelectorAdapter<SingleLineListItem, Regione>(anagrafiche) {
-
-            @Override
-            protected View createHeaderView(@NotNull Context context) {
-                return new TutorialView(context);
-            }
-
-            @Override
-            protected void bindHeaderView(@NotNull View mainEnteView, @Nullable GeoItem mainGeoItem) {
-            }
 
             @Override
             protected Regione getItem(int position) {

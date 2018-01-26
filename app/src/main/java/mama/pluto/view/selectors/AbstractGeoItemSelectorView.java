@@ -16,34 +16,24 @@ import mama.pluto.utils.Consumer;
 /**
  * Created by MMarco on 16/11/2017.
  */
-public abstract class AbstractGeoItemSelectorView<P extends GeoItem, G extends GeoItem> extends AbstractSelectorView {
-    @NotNull
-    protected final AbstractSelectorAdapter<?, ? extends G> adapter;
-    @Nullable
-    private final P mainGeoItem;
+public abstract class AbstractGeoItemSelectorView<P extends GeoItem, G extends GeoItem> extends AbstractSelectorView<P> {
 
-    public AbstractGeoItemSelectorView(@NotNull Context context, @NonNull AnagraficheExtended anagrafiche, @Nullable P mainGeoItem) {
-        super(context, anagrafiche);
-        this.mainGeoItem = mainGeoItem;
-
-        adapter = createAdapter();
-        setAdapter(adapter);
-        if (mainGeoItem != null) {
-            adapter.setMainGeoItem(mainGeoItem);
-        }
-    }
-
-    @Nullable
-    public P getMainGeoItem() {
-        return mainGeoItem;
+    public AbstractGeoItemSelectorView(@NotNull Context context, @Nullable P mainGeoItem, @NonNull AnagraficheExtended anagrafiche) {
+        super(context, mainGeoItem, anagrafiche);
     }
 
     public void setOnGeoItemSelected(@Nullable Consumer<? super G> onGeoItemSelected) {
-        adapter.setOnItemSelected(onGeoItemSelected);
+        getAdapter().setOnItemSelected(onGeoItemSelected);
     }
 
     public void setOnEnteSelected(@Nullable Consumer<Ente> onEnteSelected) {
-        adapter.setOnEnteSelected(onEnteSelected);
+        getAdapter().setOnEnteSelected(onEnteSelected);
+    }
+
+    @Override
+    public AbstractSelectorAdapter<?, ? extends G> getAdapter() {
+        //noinspection unchecked
+        return (AbstractSelectorAdapter<?, ? extends G>) super.getAdapter();
     }
 
     protected abstract AbstractSelectorAdapter<?, ? extends G> createAdapter();

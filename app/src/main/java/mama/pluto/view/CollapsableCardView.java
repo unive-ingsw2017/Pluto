@@ -36,6 +36,7 @@ public abstract class CollapsableCardView extends CardView {
 
         header = new LinearLayout(context);
         header.setPadding(dp16, dp16, dp16, dp16);
+        header.setMinimumHeight(dp48);
         h.addView(header, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
 
         expandIcon = new ImageButton(context, null, android.R.attr.borderlessButtonStyle);
@@ -83,9 +84,7 @@ public abstract class CollapsableCardView extends CardView {
         } else {
             expandIcon.setRotation(0);
         }
-        while (content.getChildCount() > 1) {
-            content.removeViewAt(1);
-        }
+        content.removeViewAt(content.getChildCount() - 1);
     }
 
     protected abstract View createExpandedView();
