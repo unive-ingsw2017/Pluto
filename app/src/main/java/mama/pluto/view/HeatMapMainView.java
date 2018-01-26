@@ -59,8 +59,7 @@ public class HeatMapMainView extends BaseLayoutView {
         heatMapView = new HeatMapView(context, anagrafiche);
         addView(heatMapView, BaseLayoutView.LayoutParams.MATCH_PARENT, BaseLayoutView.LayoutParams.MATCH_PARENT);
 
-        set(HeatMapMainView.this::dataRegione);
-        //heatMapView.setupForProvinciaLevel("Base", HeatMapView.MapProjection.MERCATOR, new HashMap<>());
+        post(() -> set(HeatMapMainView.this::dataRegione));
     }
 
     @NotNull
@@ -76,9 +75,9 @@ public class HeatMapMainView extends BaseLayoutView {
     @SuppressLint("StaticFieldLeak")
     public void set(@NotNull Producer<HeatMapView.Data<?, ?>> dataProducer) {
         ProgressDialog pb = new ProgressDialog(getContext());
-        pb.setTitle(R.string.loading___);
+        pb.setMessage(getContext().getString(R.string.loading___));
         pb.show();
-        new AsyncTask<Void, Void, HeatMapView.Data<?,?>>() {
+        new AsyncTask<Void, Void, HeatMapView.Data<?, ?>>() {
             @Override
             protected HeatMapView.Data<?, ?> doInBackground(Void... voids) {
                 return dataProducer.produce();
