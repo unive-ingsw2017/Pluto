@@ -45,7 +45,7 @@
     <string name="view_all_movements_short">Vedi movimenti</string>
     <string name="italia">Italia</string>
     <string name="view_all_ente_details">Più dettagli</string>
-    <string name="main_tutorial">Per iniziare, seleziona un ente di tuo interesse.\nSe preferisci, puoi cercarloTODODOODOD</string>
+    <string name="main_tutorial">Per iniziare, seleziona un ente di tuo interesse.\nSe preferisci, puoi cercarlo.</string>
     <string name="compare">Confronta</string>
     <string name="choose_ente_to_compare">Scegli ente da confrontare</string>
     <string name="reset">Reset</string>
