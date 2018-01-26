@@ -16,13 +16,23 @@ import java.util.Set;
 
 public class EntiComparator {
     @NotNull
-    private final EnteSummary ente1;
+    private final EnteSummary enteSummary1;
     @NotNull
-    private final EnteSummary ente2;
+    private final EnteSummary enteSummary2;
 
-    public EntiComparator(@NotNull EnteSummary ente1, @NotNull EnteSummary ente2) {
-        this.ente1 = ente1;
-        this.ente2 = ente2;
+    public EntiComparator(@NotNull EnteSummary enteSummary1, @NotNull EnteSummary enteSummary2) {
+        this.enteSummary1 = enteSummary1;
+        this.enteSummary2 = enteSummary2;
+    }
+
+    @NotNull
+    public EnteSummary getEnteSummary1() {
+        return enteSummary1;
+    }
+
+    @NotNull
+    public EnteSummary getEnteSummary2() {
+        return enteSummary2;
     }
 
     @NotNull
@@ -42,18 +52,18 @@ public class EntiComparator {
         return allCategories;
     }
 
-    private List<ComparedItem> sortedCategories;
+    private List<CategoryComparison> sortedCategories;
 
     @NotNull
-    public List<ComparedItem> getSortedCategories() {
+    public List<CategoryComparison> getSortedCategories() {
         if (sortedCategories == null) {
-            Set<Category> categorySet = getCategories(this.ente1);
-            Map<Category, Long> entrate1Map = ente1.getEntrateMap();
-            Map<Category, Long> entrate2Map = ente2.getEntrateMap();
-            Map<Category, Long> uscite1Map = ente1.getUsciteMap();
-            Map<Category, Long> uscite2Map = ente2.getUsciteMap();
-            categorySet.addAll(getCategories(this.ente2));
-            List<ComparedItem> res = new ArrayList<>();
+            Set<Category> categorySet = getCategories(this.enteSummary1);
+            Map<Category, Long> entrate1Map = enteSummary1.getEntrateMap();
+            Map<Category, Long> entrate2Map = enteSummary2.getEntrateMap();
+            Map<Category, Long> uscite1Map = enteSummary1.getUsciteMap();
+            Map<Category, Long> uscite2Map = enteSummary2.getUsciteMap();
+            categorySet.addAll(getCategories(this.enteSummary2));
+            List<CategoryComparison> res = new ArrayList<>();
             for (Category category : categorySet) {
                 long entrate2 = 0, entrate1 = 0, uscite1 = 0, uscite2 = 0;
                 if (entrate1Map.containsKey(category)) {
@@ -68,7 +78,7 @@ public class EntiComparator {
                 if (uscite2Map.containsKey(category)) {
                     uscite2 = uscite2Map.get(category);
                 }
-                res.add(new ComparedItem(category, entrate1, uscite1, entrate2, uscite2));
+                res.add(new CategoryComparison(this, category, entrate1, uscite1, entrate2, uscite2));
             }
             Collections.sort(res);
             sortedCategories = res;
@@ -76,7 +86,8 @@ public class EntiComparator {
         return sortedCategories;
     }
 
-    public class ComparedItem implements Comparable<ComparedItem> {
+    public static class CategoryComparison implements Comparable<CategoryComparison> {
+        private final EntiComparator entiComparator;
         @NotNull
         private final Category category;
         private final long firstEntrate;
@@ -85,12 +96,17 @@ public class EntiComparator {
         private final long secondUscite;
 
 
-        private ComparedItem(@NotNull Category category, long firstEntrate, long firstUscite, long secondEntrate, long secondUscite) {
+        private CategoryComparison(EntiComparator entiComparator, @NotNull Category category, long firstEntrate, long firstUscite, long secondEntrate, long secondUscite) {
+            this.entiComparator = entiComparator;
             this.category = category;
             this.firstEntrate = firstEntrate;
             this.firstUscite = firstUscite;
             this.secondEntrate = secondEntrate;
             this.secondUscite = secondUscite;
+        }
+
+        public EntiComparator getEntiComparator() {
+            return entiComparator;
         }
 
         public long getFirstBalance() {
@@ -123,13 +139,13 @@ public class EntiComparator {
         }
 
         @Override
-        public int compareTo(@NonNull ComparedItem comparedItem) {
-            return Long.compare(Math.abs(comparedItem.getFirstBalance() - comparedItem.getSecondBalance()), Math.abs(this.getFirstBalance() - this.getSecondBalance()));
+        public int compareTo(@NonNull CategoryComparison categoryComparison) {
+            return Long.compare(Math.abs(categoryComparison.getFirstBalance() - categoryComparison.getSecondBalance()), Math.abs(this.getFirstBalance() - this.getSecondBalance()));
         }
 
         @Override
         public String toString() {
-            return "ComparedItem{" +
+            return "CategoryComparison{" +
                     "category=" + category +
                     ", firstEntrate=" + firstEntrate +
                     ", firstUscite=" + firstUscite +

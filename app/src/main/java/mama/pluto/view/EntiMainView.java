@@ -40,7 +40,7 @@ public class EntiMainView extends BaseLayoutView {
     private final RecyclerView searchResults;
     private final EntiSearchAdapter searchAdapter;
     private final EnteView enteView;
-    private final EnteComparatorView enteComparatorView;
+    private final EntiComparisonView entiComparisonView;
     private final MenuItem searchMenuItem;
     private Ente selectedEnte;
     private Ente comparingEnte;
@@ -106,8 +106,8 @@ public class EntiMainView extends BaseLayoutView {
         enteView.setOnEnteSelectedForComparison(this::setComparingEnte);
         content.addView(enteView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 
-        enteComparatorView = new EnteComparatorView(context, anagrafiche);
-        content.addView(enteComparatorView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        entiComparisonView = new EntiComparisonView(context, anagrafiche);
+        content.addView(entiComparisonView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 
         recomputeContent();
         recomputeToolbarText();
@@ -127,7 +127,7 @@ public class EntiMainView extends BaseLayoutView {
     public void setComparingEnte(Ente comparingEnte) {
         this.comparingEnte = comparingEnte;
         if (comparingEnte != null && selectedEnte != null) {
-            enteComparatorView.setEnti(selectedEnte, comparingEnte);
+            entiComparisonView.setEnti(selectedEnte, comparingEnte);
         } else {
             setSelectedEnte(selectedEnte);
         }
@@ -144,7 +144,7 @@ public class EntiMainView extends BaseLayoutView {
 
     private void recomputeContent() {
         if (selectedEnte != null && comparingEnte != null) {
-            setContent(enteComparatorView);
+            setContent(entiComparisonView);
         } else if (selectedEnte != null) {
             setContent(enteView);
         } else {
