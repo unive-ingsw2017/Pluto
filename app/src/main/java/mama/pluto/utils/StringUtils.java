@@ -1,7 +1,9 @@
 package mama.pluto.utils;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 public final class StringUtils {
@@ -55,4 +57,13 @@ public final class StringUtils {
         return sb.toString();
     }
 
+    @NotNull
+    @Contract(pure = true)
+    public static String repeat(@NotNull String s, int i) {
+        final StringBuilder ret = new StringBuilder(s.length() * i);
+        while (i-- > 0) {
+            ret.append(s);
+        }
+        return ret.toString();
+    }
 }

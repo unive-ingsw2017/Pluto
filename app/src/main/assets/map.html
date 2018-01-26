@@ -27,7 +27,7 @@
 <div id="map" style="width: 100%; height: 100%"></div>
 <script>
 		var mapObject = null;
-	    function refreshMap(data, labels, map, center) {
+	    function refreshMap(data, map, center, missingCodes) {
 	        if(mapObject != null) {
 	            mapObject.remove();
 	        }
@@ -38,19 +38,29 @@
 	                max = v;
 	            }
 	        }
+	        missingObject = {};
+	        for(var code in missingCodes) {
+	            missingObject[missingCodes[code]] = 1;
+	        }
             $('#map').vectorMap({
                 map: map,
                 series: {
-                    regions: [{
-                        values: data,
-                        scale: ['#F44336', '#FFFFFF', '#4CAF50'],
-                        normalizeFunction: function(x) {
-                            isPositive = x-center > 0 ? 1 : -1;
-                            return Math.pow(Math.abs(x-center), 0.5) * isPositive + center;
+                    regions: [
+                        {
+                            values: data,
+                            scale: ['#F44336', '#FFFFFF', '#4CAF50'],
+                            normalizeFunction: function(x) {
+                                isPositive = x-center > 0 ? 1 : -1;
+                                return Math.pow(Math.abs(x-center), 0.5) * isPositive + center;
+                            },
+                            min: center-max,
+                            max: center+max
                         },
-                        min: center-max,
-                        max: center+max
-                    }]
+                        {
+                            values: missingObject,
+                            scale: ['#BDBDBD']
+                        }
+                    ]
                 },
                 onRegionTipShow: function(e, el, code){
                     e.preventDefault();

@@ -4,9 +4,11 @@ import android.content.Context;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Ente;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.GeoItem;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.text.DecimalFormat;
 import java.util.Map;
@@ -14,8 +16,10 @@ import java.util.Map;
 import mama.pluto.R;
 import mama.pluto.dataAbstraction.AnagraficheExtended;
 import mama.pluto.dataAbstraction.DataUtils;
+import mama.pluto.dataAbstraction.JVectorProvinciaCodes;
 import mama.pluto.database.Database;
 import mama.pluto.utils.Pair;
+import mama.pluto.utils.StringUtils;
 
 public class HeatMapMainView extends BaseLayoutView {
 
@@ -30,10 +34,10 @@ public class HeatMapMainView extends BaseLayoutView {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.detail_level_regione:
-                        heatMapView.setupForRegioneLevel(HeatMapView.MapProjection.MERCATOR, balanceRatio(Database.getInstance(context).getRegioneBalances(anagrafiche)), HeatMapMainView::balanceRatioLabel);
+                        heatMapView.setupForRegioneLevel(HeatMapView.MapProjection.MERCATOR, balanceRatio(Database.getInstance(context).getRegioneBalances(anagrafiche)), HeatMapMainView::balanceRatioLabelGeoItem);
                         break;
                     case R.id.detail_level_provincia:
-                        heatMapView.setupForProvinciaLevel(HeatMapView.MapProjection.MERCATOR, balanceRatio(Database.getInstance(context).getProvinciaBalances(anagrafiche)), HeatMapMainView::balanceRatioLabel);
+                        heatMapView.setupForProvinciaLevel(HeatMapView.MapProjection.MERCATOR, balanceRatio(JVectorProvinciaCodes.getProvinciaBalances(getContext(), anagrafiche)), HeatMapMainView::balanceRatioLabelStr);
                         break;
                     default:
                         throw new IllegalStateException();
@@ -42,7 +46,7 @@ public class HeatMapMainView extends BaseLayoutView {
             }
         });
 
-        heatMapView = new HeatMapView(context);
+        heatMapView = new HeatMapView(context, anagrafiche);
         addView(heatMapView, BaseLayoutView.LayoutParams.MATCH_PARENT, BaseLayoutView.LayoutParams.MATCH_PARENT);
 
         //heatMapView.setupForProvinciaLevel("Base", HeatMapView.MapProjection.MERCATOR, new HashMap<>());
@@ -51,8 +55,13 @@ public class HeatMapMainView extends BaseLayoutView {
     public final static DecimalFormat PERCENT_FORMAT = new DecimalFormat("0.00%");
 
     @NotNull
-    public static String balanceRatioLabel(@NotNull GeoItem geoItem, float ratio) {
-        return PERCENT_FORMAT.format(ratio);
+    public static String balanceRatioLabelGeoItem(@NotNull GeoItem geoItem, float ratio) {
+        return balanceRatioLabelStr(geoItem.getNome(), ratio);
+    }
+
+    @NotNull
+    private static String balanceRatioLabelStr(@NotNull String str, float ratio) {
+        return str + " (" + PERCENT_FORMAT.format(ratio) + ")";
     }
 
     @NotNull

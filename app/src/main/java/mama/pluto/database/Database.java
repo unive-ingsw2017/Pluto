@@ -31,9 +31,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import io.requery.android.database.sqlite.SQLiteBindableLong;
 import io.requery.android.database.sqlite.SQLiteDatabase;
@@ -42,9 +44,11 @@ import io.requery.android.database.sqlite.SQLiteStatement;
 import mama.pluto.dataAbstraction.AnagraficheExtended;
 import mama.pluto.dataAbstraction.CategoryUtils;
 import mama.pluto.dataAbstraction.DataUtils;
+import mama.pluto.dataAbstraction.JVectorProvinciaCodes;
 import mama.pluto.utils.BiConsumer;
 import mama.pluto.utils.Function;
 import mama.pluto.utils.Pair;
+import mama.pluto.utils.StringUtils;
 
 public class Database extends SQLiteOpenHelper {
 
@@ -573,29 +577,49 @@ public class Database extends SQLiteOpenHelper {
         return builder.build(new Anagrafiche(comparti, sottocomparti, ripartizioneGeografiche, regioni, provincie, comuni, enti, codiciGestionaliEntrate, codiciGestionaliUscite));
     }
 
+
+    @NotNull
+    public Map<Ente, Pair<Long, Long>> getProvinciaBalances(@NotNull AnagraficheExtended a) {
+        final Set<Ente> enti = JVectorProvinciaCodes.allEnti(a);
+        Object[] bindings = new Object[enti.size() + 2];
+
+        bindings[0] = TIPO_OPERAZIONE_ENTRATA;
+        bindings[1] = TIPO_OPERAZIONE_USCITA;
+        int i = 2;
+        for (Ente ente : enti) {
+            bindings[i++] = ente.getCodice();
+        }
+        try (Cursor cursor = getReadableDatabase().rawQuery("SELECT e.id, SUM(CASE o.tipo WHEN ? THEN o.amount ELSE 0 END) AS entrate, SUM(CASE o.tipo WHEN ? THEN o.amount ELSE 0 END) AS uscite " +
+                "FROM Ente e " +
+                "LEFT OUTER JOIN Operazione o ON e.id = o.ente " +
+                "WHERE e.codice IN (?" + StringUtils.repeat(",?", enti.size() - 1) + ")" +
+                "GROUP BY e.id " +
+                "HAVING entrate <> 0 AND uscite <> 0", bindings)) {
+
+
+            final Map<Ente, Pair<Long, Long>> ret = new HashMap<>(cursor.getCount());
+            while (cursor.moveToNext()) {
+                final Ente ente = a.getEnteById(cursor.getInt(0));
+
+                ret.put(ente, new Pair<>(cursor.getLong(1), cursor.getLong(2)));
+            }
+            return ret;
+        }
+    }
+
     @NotNull
     public Map<Regione, Pair<Long, Long>> getRegioneBalances(@NotNull AnagraficheExtended a) {
-        return getBalances(a, DataUtils.SOTTOCOMPARTO_REGIONE, gi -> (Regione) gi);
-    }
-
-    @NotNull
-    public Map<Provincia, Pair<Long, Long>> getProvinciaBalances(@NotNull AnagraficheExtended a) {
-        return getBalances(a, DataUtils.SOTTOCOMPARTO_PROVINCIA, gi -> (Provincia) gi);
-    }
-
-    @NotNull
-    private <T extends GeoItem> Map<T, Pair<Long, Long>> getBalances(@NotNull AnagraficheExtended a, @NotNull String tipoSottocomparto, @NotNull Function<GeoItem, T> caster) {
         try (Cursor cursor = getReadableDatabase().rawQuery(
                 "SELECT e.codice, SUM(CASE o.tipo WHEN ? THEN o.amount ELSE 0 END) AS entrate, SUM(CASE o.tipo WHEN ? THEN o.amount ELSE 0 END) AS uscite " +
                         "FROM Ente e " +
                         "LEFT OUTER JOIN Operazione o ON e.id = o.ente " +
                         "WHERE e.sottocomparto=? " +
                         "GROUP BY e.id " +
-                        "HAVING entrate <> 0 OR uscite <> 0", new Object[]{TIPO_OPERAZIONE_ENTRATA, TIPO_OPERAZIONE_USCITA, tipoSottocomparto})) {
-            final Map<T, Pair<Long, Long>> map = new HashMap<>();
+                        "HAVING entrate <> 0 AND uscite <> 0", new Object[]{TIPO_OPERAZIONE_ENTRATA, TIPO_OPERAZIONE_USCITA, DataUtils.SOTTOCOMPARTO_REGIONE})) {
+            final Map<Regione, Pair<Long, Long>> map = new HashMap<>();
             while (cursor.moveToNext()) {
-                GeoItem gi = DataUtils.getGeoItemOfEnte(a.getEnti().get(cursor.getString(0)));
-                map.put(caster.apply(gi), new Pair<>(cursor.getLong(1), cursor.getLong(2)));
+                Regione gi = (Regione) DataUtils.getGeoItemOfEnte(a.getEnti().get(cursor.getString(0)));
+                map.put(gi, new Pair<>(cursor.getLong(1), cursor.getLong(2)));
             }
             return map;
         }
