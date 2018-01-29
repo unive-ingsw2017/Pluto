@@ -15,8 +15,6 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Ente;
-import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Provincia;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Regione;
 
 import org.jetbrains.annotations.Contract;
@@ -28,7 +26,6 @@ import org.json.JSONObject;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import mama.pluto.R;
@@ -63,6 +60,8 @@ public class HeatMapView extends FrameLayout {
 
     public static class Data<X, N extends Number> {
         @NotNull
+        private final String meaning;
+        @NotNull
         private final MapProjection mapProjection;
         private final boolean isRegionLevel;
         @NotNull
@@ -76,13 +75,19 @@ public class HeatMapView extends FrameLayout {
         @NotNull
         private Number center = 1;
 
-        private Data(@NotNull MapProjection mapProjection, boolean isRegionLevel, @NotNull DoubleMap<X, String> geoItemCodeMap, @NotNull Map<String, N> data, @NotNull Collection<String> missingCodes, @NotNull BiFunction<X, N, String> labelFunction) {
+        private Data(@NonNull String meaning, @NotNull MapProjection mapProjection, boolean isRegionLevel, @NotNull DoubleMap<X, String> geoItemCodeMap, @NotNull Map<String, N> data, @NotNull Collection<String> missingCodes, @NotNull BiFunction<X, N, String> labelFunction) {
+            this.meaning = meaning;
             this.mapProjection = mapProjection;
             this.isRegionLevel = isRegionLevel;
             this.geoItemCodeMap = geoItemCodeMap;
             this.data = data;
             this.missingCodes = missingCodes;
             this.labelFunction = labelFunction;
+        }
+
+        @NonNull
+        public String getMeaning() {
+            return meaning;
         }
 
         @NotNull
@@ -95,7 +100,7 @@ public class HeatMapView extends FrameLayout {
         }
 
         @NonNull
-        public static <X, N extends Number> Data<X, N> create(@NotNull MapProjection mapProjection, boolean isRegionLevel, @NotNull Map<X, N> data, @NotNull Function<X, String> toCodeFunction, @NotNull BiFunction<X, N, String> labelFunction, @NotNull Collection<X> allItems) {
+        public static <X, N extends Number> Data<X, N> create(@NotNull String meaning, @NotNull MapProjection mapProjection, boolean isRegionLevel, @NotNull Map<X, N> data, @NotNull Function<X, String> toCodeFunction, @NotNull BiFunction<X, N, String> labelFunction, @NotNull Collection<X> allItems) {
             final DoubleMap<X, String> geoItemCodeMap = new DoubleMap<>(data.size());
             for (X x : data.keySet()) {
                 final String code = toCodeFunction.apply(x);
@@ -112,7 +117,7 @@ public class HeatMapView extends FrameLayout {
             for (X x : missingItems) {
                 missingCodes.add(toCodeFunction.apply(x));
             }
-            return new Data<>(mapProjection, isRegionLevel, geoItemCodeMap, realData, missingCodes, labelFunction);
+            return new Data<>(meaning, mapProjection, isRegionLevel, geoItemCodeMap, realData, missingCodes, labelFunction);
         }
     }
 
@@ -124,6 +129,8 @@ public class HeatMapView extends FrameLayout {
     private final LinearLayout baslineLL;
     @NotNull
     private final TextView baselineTV;
+    @NotNull
+    private final TextView meaningView;
 
     private Data<?, ?> data;
     private final AtomicBoolean pageLoaded = new AtomicBoolean(false);
@@ -132,6 +139,8 @@ public class HeatMapView extends FrameLayout {
     public HeatMapView(Context context, @NotNull AnagraficheExtended anagrafiche) {
         super(context);
         this.anagrafiche = anagrafiche;
+        final int dp2 = MetricsUtils.dpToPixel(context, 2);
+
         wv = new WebView(getContext());
         wv.getSettings().setJavaScriptEnabled(true);
         wv.addJavascriptInterface(new Object() {
@@ -187,19 +196,28 @@ public class HeatMapView extends FrameLayout {
         final LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         lp.gravity = Gravity.CENTER;
         baslineLL.addView(resetBaselineButton, lp);
+
+
+        meaningView = new TextView(getContext(), null, android.R.attr.textAppearanceSmallInverse);
+        meaningView.setTextColor(Color.WHITE);
+        meaningView.setGravity(Gravity.CENTER);
+        meaningView.setBackgroundColor(0x7f505050);
+        meaningView.setPadding(dp2, dp2, dp2, dp2);
+        addView(meaningView, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.CENTER_HORIZONTAL));
     }
 
-    public <N extends Number> Data<Regione, N> dataForRegioneLevel(@NotNull MapProjection mapProjection, @NotNull Map<Regione, N> data, @NotNull final BiFunction<Regione, N, String> labels) {
-        return Data.create(mapProjection, true, data, JVectorRegioneCodes::getJVectorCode, labels, anagrafiche.getRegioni());
+    public <N extends Number> Data<Regione, N> dataForRegioneLevel(@NotNull String meaning, @NotNull MapProjection mapProjection, @NotNull Map<Regione, N> data, @NotNull final BiFunction<Regione, N, String> labels) {
+        return Data.create(meaning, mapProjection, true, data, JVectorRegioneCodes::getJVectorCode, labels, anagrafiche.getRegioni());
     }
 
-    public <N extends Number> Data<String, N> dataForProvinciaLevel(@NotNull MapProjection mapProjection, @NotNull Map<String, N> data, @NotNull final BiFunction<String, N, String> labels) {
-        return Data.create(mapProjection, false, data, x -> x, labels, JVectorProvinciaCodes.allCodes());
+    public <N extends Number> Data<String, N> dataForProvinciaLevel(@NotNull String meaning, @NotNull MapProjection mapProjection, @NotNull Map<String, N> data, @NotNull final BiFunction<String, N, String> labels) {
+        return Data.create(meaning, mapProjection, false, data, x -> x, labels, JVectorProvinciaCodes.allCodes());
     }
 
     public void setData(@NotNull Data<?, ?> data) {
         this.data = data;
         apply();
+        baslineLL.setVisibility(View.GONE);
     }
 
     private void apply() {
@@ -218,6 +236,7 @@ public class HeatMapView extends FrameLayout {
                 centerStr + "," +
                 new JSONArray(data.missingCodes) +
                 ")");
+        meaningView.setText(data.meaning);
     }
 
     public void waitPageLoaded() throws InterruptedException {

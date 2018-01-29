@@ -6,13 +6,10 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.widget.ProgressBar;
 
-import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Ente;
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.GeoItem;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.text.DecimalFormat;
 import java.util.Map;
@@ -22,7 +19,6 @@ import mama.pluto.dataAbstraction.AnagraficheExtended;
 import mama.pluto.dataAbstraction.DataUtils;
 import mama.pluto.dataAbstraction.JVectorProvinciaCodes;
 import mama.pluto.database.Database;
-import mama.pluto.utils.Function;
 import mama.pluto.utils.Pair;
 import mama.pluto.utils.Producer;
 import mama.pluto.utils.StringUtils;
@@ -64,12 +60,12 @@ public class HeatMapMainView extends BaseLayoutView {
 
     @NotNull
     public HeatMapView.Data<?, ?> dataRegione() {
-        return heatMapView.dataForRegioneLevel(HeatMapView.MapProjection.MERCATOR, balanceRatio(Database.getInstance(getContext()).getRegioneBalances(anagrafiche)), HeatMapMainView::balanceRatioLabelGeoItem);
+        return heatMapView.dataForRegioneLevel(getResources().getString(R.string.heatmap_meaning), HeatMapView.MapProjection.MERCATOR, balanceRatio(Database.getInstance(getContext()).getRegioneBalances(anagrafiche)), HeatMapMainView::balanceRatioLabelGeoItem);
     }
 
     @NotNull
     public HeatMapView.Data<?, ?> dataProvincia() {
-        return heatMapView.dataForProvinciaLevel(HeatMapView.MapProjection.MERCATOR, balanceRatio(JVectorProvinciaCodes.getProvinciaBalances(getContext(), anagrafiche)), HeatMapMainView::balanceRatioLabelStr);
+        return heatMapView.dataForProvinciaLevel(getResources().getString(R.string.heatmap_meaning), HeatMapView.MapProjection.MERCATOR, balanceRatio(JVectorProvinciaCodes.getProvinciaBalances(getContext(), anagrafiche)), HeatMapMainView::balanceRatioLabelStr);
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -103,7 +99,7 @@ public class HeatMapMainView extends BaseLayoutView {
 
     @NotNull
     public static String balanceRatioLabelGeoItem(@NotNull GeoItem geoItem, float ratio) {
-        return balanceRatioLabelStr(geoItem.getNome(), ratio);
+        return balanceRatioLabelStr(StringUtils.toNormalCase(geoItem.getNome()), ratio);
     }
 
     @NotNull

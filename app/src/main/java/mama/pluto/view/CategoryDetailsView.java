@@ -42,6 +42,8 @@ public class CategoryDetailsView extends LinearLayout {
     private Category category;
     private String codiceSottocomparto = DataUtils.SOTTOCOMPARTO_REGIONE;
     private boolean orderByHighBalance = true;
+
+    //Loaded data
     private List<Triple<Ente, Long, Long>> enteList;
     private long iteration = 0;
 
@@ -161,10 +163,11 @@ public class CategoryDetailsView extends LinearLayout {
     private class MyAdapter extends RecyclerView.Adapter {
         private final int VIEW_TYPE_LOADING = 0;
         private final int VIEW_TYPE_ENTE = 1;
+        private final int VIEW_TYPE_EMPTY = 2;
 
         @Override
         public int getItemViewType(int position) {
-            return enteList == null ? VIEW_TYPE_LOADING : VIEW_TYPE_ENTE;
+            return enteList == null ? VIEW_TYPE_LOADING : enteList.isEmpty() ? VIEW_TYPE_EMPTY : VIEW_TYPE_ENTE;
         }
 
         @Override
@@ -180,6 +183,16 @@ public class CategoryDetailsView extends LinearLayout {
                     return BaseViewHolder.getFullInstance(recyclerView, f);
                 case VIEW_TYPE_ENTE:
                     return BaseViewHolder.getFullInstance(recyclerView, new EnteRow(getContext()));
+                case VIEW_TYPE_EMPTY:
+                    int dp16 = MetricsUtils.dpToPixel(getContext(), 16);
+                    TextView emptyView = new TextView(getContext(), null, android.R.attr.textAppearanceMedium);
+                    emptyView.setPadding(dp16, dp16, dp16, dp16);
+                    emptyView.setGravity(Gravity.CENTER);
+                    emptyView.setCompoundDrawablePadding(dp16);
+                    emptyView.setTextColor(0xff666666);
+                    emptyView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_sentiment_dissatisfied_grey_240dp, 0, 0);
+                    emptyView.setText(R.string.no_details_for_category);
+                    return BaseViewHolder.getFullInstance(recyclerView, emptyView);
                 default:
                     throw new IllegalStateException();
             }
@@ -188,13 +201,15 @@ public class CategoryDetailsView extends LinearLayout {
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
             if (enteList != null) {
-                ((EnteRow) holder.itemView).setEnte(enteList.get(position));
+                if (!enteList.isEmpty()) {
+                    ((EnteRow) holder.itemView).setEnte(enteList.get(position));
+                }
             }
         }
 
         @Override
         public int getItemCount() {
-            return enteList == null ? 1 : enteList.size();
+            return enteList == null ? 1 : Math.max(1, enteList.size());
         }
     }
 

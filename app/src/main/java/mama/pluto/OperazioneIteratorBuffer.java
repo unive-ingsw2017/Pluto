@@ -30,7 +30,6 @@ public class OperazioneIteratorBuffer<CG extends CodiceGestionale, T extends Ope
     private float lastDownloadProgress = 0;
     private int lastTotalDownloaded = 0;
     private int totalDownloaded = 0;
-    private long lastPublishedProgress = 0;
     private Exception exception;
 
 
@@ -40,14 +39,10 @@ public class OperazioneIteratorBuffer<CG extends CodiceGestionale, T extends Ope
     }
 
     private void publishProgress() {
-        final long now = System.currentTimeMillis();
-        if (now - lastPublishedProgress >= 16) {
-            if (lastTotalDownloaded == 0) {
-                progressListener.onProgress(0);
-            } else {
-                progressListener.onProgress((lastDownloadProgress / lastTotalDownloaded) * (lastTotalDownloaded - buffer.size()));
-            }
-            lastPublishedProgress = now;
+        if (lastTotalDownloaded == 0) {
+            progressListener.onProgress(0);
+        } else {
+            progressListener.onProgress((lastDownloadProgress / lastTotalDownloaded) * (lastTotalDownloaded - buffer.size()));
         }
     }
 

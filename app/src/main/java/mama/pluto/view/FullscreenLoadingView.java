@@ -3,7 +3,6 @@ package mama.pluto.view;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.os.Build;
 import android.view.Gravity;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
@@ -56,10 +55,6 @@ public class FullscreenLoadingView extends FullscreenView {
         this.percentageView.setText(PERCENTAGE_FORMATTER.format(percentage));
         pb.setIndeterminate(false);
         final int progress = Math.round(percentage * MAX_PROGRESS);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            pb.setProgress(progress, true);
-        } else {
-            pb.setProgress(progress);
-        }
+        pb.setProgress(progress);
     }
 }

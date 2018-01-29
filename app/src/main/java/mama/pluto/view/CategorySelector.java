@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 
 import mama.pluto.dataAbstraction.AnagraficheExtended;
@@ -26,7 +27,13 @@ public class CategorySelector extends BaseRecyclerView {
         this.anagrafiche = anagrafiche;
         setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
 
-        categories = new ArrayList<>(CategoryUtils.all());
+        Collection<Category> all = CategoryUtils.all();
+        categories = new ArrayList<>(all.size());
+        for (Category category : all) {
+            if (!category.isEntiOnly()) {
+                categories.add(category);
+            }
+        }
         Collections.sort(categories, (o1, o2) -> o1.getName().compareToIgnoreCase(o2.getName()));
 
         setAdapter(new MyAdapter());

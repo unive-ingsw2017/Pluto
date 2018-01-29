@@ -22,11 +22,12 @@
     <string name="warning">Attenzione!</string>
     <string name="detail_level_regione">Livello dettagli regionale</string>
     <string name="detail_level_provincia">Livello dettagli provinciale</string>
-    <string name="downloading_anagrafiche">Scaricando anagrafiche…</string>
-    <string name="saving_anagrafiche">Salvando anagrafiche…</string>
-    <string name="loading_anagrafiche">Caricando anagrafiche…</string>
-    <string name="downloading_entrate">Scaricando entrate…</string>
-    <string name="downloading_uscite">Scaricando uscite…</string>
+    <string name="downloading_anagrafiche">Scarico anagrafiche…</string>
+    <string name="saving_anagrafiche">Salvo anagrafiche…</string>
+    <string name="loading_anagrafiche">Carico anagrafiche…</string>
+    <string name="loading_geoitem_stats">Carico statistiche geografiche…</string>
+    <string name="downloading_entrate">Scarico entrate…</string>
+    <string name="downloading_uscite">Scarico uscite…</string>
     <string name="which_year_to_download">Per quale anno vuoi scaricare i dati?</string>
     <string name="year_current_warning">%d (i dati potrebbero essere incompleti)</string>
     <string name="no_enti_match_search_query">Nessun ente trovato per \'%s\'</string>
@@ -34,13 +35,19 @@
     <string name="ente_codice_fiscale_x">&lt;b>Codice fiscale ente:&lt;/b> %s</string>
     <string name="ente_sottocomparto_x">&lt;b>Sottocomparto:&lt;/b> %s</string>
     <string name="ente_comparto_x">&lt;b>Comparto:&lt;/b> %s</string>
+    <string name="population_x">&lt;b>Popolazione:&lt;/b> %s</string>
+    <string name="surface_x">&lt;b>Superficie:&lt;/b> %skm²</string>
     <string name="spese_x">&lt;b>Uscite:&lt;/b> %s</string>
     <string name="entrate_x">&lt;b>Entrate:&lt;/b> %s</string>
     <string name="bilancio_x">&lt;b>Bilancio:&lt;/b> %s</string>
+    <string name="bilancio_pro_capite_x">&lt;b>Bilancio pro-capite:&lt;/b> %s/persona</string>
+    <string name="bilancio_per_km2_x">&lt;b>Bilancio relativo alla superficie:&lt;/b> %s/km²</string>
     <string name="bilancio_">&lt;b>Bilancio:&lt;/b></string>
     <string name="spese">Uscite</string>
     <string name="entrate">Entrate</string>
     <string name="bilancio">Bilancio</string>
+    <string name="bilancio_pro_capite">Bilancio pro capite</string>
+    <string name="bilancio_per_superficie">Bilancio/sup.</string>
     <string name="view_all_movements">Visualizza tutti i movimenti</string>
     <string name="view_all_movements_short">Vedi movimenti</string>
     <string name="italia">Italia</string>
@@ -66,4 +73,6 @@
     <string name="_ordered_female_by">ordinate per</string>
     <string name="_high_balance">entrate</string>
     <string name="_low_balance">uscite</string>
+    <string name="heatmap_meaning">Rapporto entrate/uscite</string>
+    <string name="no_details_for_category">Nessuna informazione riguardo le spese.\nProva a cambiare livello di dettaglio (regione/provincia/comune) o categoria di bilancio</string>
 </resources>

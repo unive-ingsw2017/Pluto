@@ -3,6 +3,7 @@ package mama.pluto.dataAbstraction;
 import android.content.Context;
 
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Comune;
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.GeoItem;
 import com.github.mmauro94.siopeDownloader.utils.ReaderUtils;
 
 import org.apache.commons.csv.CSVFormat;
@@ -14,9 +15,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import mama.pluto.utils.Consumer;
 import mama.pluto.utils.DoubleMap;
 
 public final class ComuneStat {
@@ -363,16 +367,28 @@ public final class ComuneStat {
         );
     }
 
-    private static void ensureMapLoaded(@NotNull Context context, @NotNull AnagraficheExtended anagrafiche) {
+    public static void ensureLoaded(@NotNull Context context, @NotNull AnagraficheExtended anagrafiche) {
+        ensureLoaded(context, anagrafiche, null);
+    }
+
+    public static void ensureLoaded(@NotNull Context context, @NotNull AnagraficheExtended anagrafiche, @Nullable Consumer<Float> approximateProgressListener) {
         synchronized (MAP_LOADED) {
             if (!MAP_LOADED.get()) {
-                final List<CSVRecord> records;
+                if (approximateProgressListener != null) {
+                    approximateProgressListener.consume(0f);
+                }
+                final Iterator<CSVRecord> records;
                 try {
-                    records = CSVParser.parse(ReaderUtils.readAll(new InputStreamReader(context.getAssets().open("ancitel_comuni.csv"))), CSV_FORMAT).getRecords();
+                    records = CSVParser.parse(ReaderUtils.readAll(new InputStreamReader(context.getAssets().open("ancitel_comuni.csv"))), CSV_FORMAT).iterator();
                 } catch (IOException e) {
                     throw new IllegalStateException("Error reading asset", e);
                 }
-                for (CSVRecord record : records) {
+                int parsed = 0;
+                while (records.hasNext()) {
+                    if (approximateProgressListener != null) {
+                        approximateProgressListener.consume(Math.min(1, parsed / (float) anagrafiche.getComuni().size()));
+                    }
+                    CSVRecord record = records.next();
                     final ComuneStat stat = ComuneStat.parse(record);
                     final int provCode = stat.getIstatCode() / 1000;
                     final int comuneCode = stat.getIstatCode() % 1000;
@@ -382,6 +398,7 @@ public final class ComuneStat {
                         throw new IllegalArgumentException("comune doppio " + comune.getNome());
                     }
                     MAP.put(comune, stat);
+                    parsed++;
                 }
 
                 MAP_LOADED.set(true);
@@ -389,9 +406,43 @@ public final class ComuneStat {
         }
     }
 
+    public static long getAllPopulation(@NotNull Set<ComuneStat> stats) {
+        long sum = 0;
+        for (ComuneStat stat : stats) {
+            sum += stat.getPopolazioneTotale();
+        }
+        return sum;
+    }
+
+    public static float getAllSuperficie(@NotNull Set<ComuneStat> stats) {
+        float sum = 0;
+        for (ComuneStat stat : stats) {
+            sum += stat.getSuperficie();
+        }
+        return sum;
+    }
+
     @Nullable
     public static ComuneStat getInstance(@NotNull Context context, @NotNull AnagraficheExtended anagrafiche, @NotNull Comune comune) {
-        ensureMapLoaded(context, anagrafiche);
+        ensureLoaded(context, anagrafiche);
         return MAP.getK2(comune);
+    }
+
+    @NotNull
+    public static Set<ComuneStat> getInstance(@NotNull Context context, @NotNull AnagraficheExtended anagrafiche, @NotNull GeoItem geoItem) {
+        return getInstance(context, anagrafiche, DataUtils.getAllComuni(geoItem));
+    }
+
+    @NotNull
+    public static Set<ComuneStat> getInstance(@NotNull Context context, @NotNull AnagraficheExtended anagrafiche, @NotNull Set<Comune> comuni) {
+        ensureLoaded(context, anagrafiche);
+        Set<ComuneStat> ret = new HashSet<>();
+        for (Comune comune : comuni) {
+            ComuneStat s = MAP.getK2(comune);
+            if (s != null) {
+                ret.add(s);
+            }
+        }
+        return ret;
     }
 }

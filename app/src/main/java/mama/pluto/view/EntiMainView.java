@@ -85,7 +85,7 @@ public class EntiMainView extends BaseLayoutView {
 
         hierarchySelectorView = new HierarchySelectorView(getContext(), anagrafiche);
         hierarchySelectorView.setGlobalHeaderCreator(new HierarchySelectorView.TutorialHeaderCreator());
-        hierarchySelectorView.setHeaderCreator(new HierarchySelectorView.SummaryHeaderCreator());
+        hierarchySelectorView.setHeaderCreator(new HierarchySelectorView.SummaryHeaderCreator(anagrafiche));
         hierarchySelectorView.setOnSelectedGeoItemChanges(geoItem -> recomputeToolbarText());
         hierarchySelectorView.setOnEnteSelected(this::setSelectedEnte);
         content.addView(hierarchySelectorView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);

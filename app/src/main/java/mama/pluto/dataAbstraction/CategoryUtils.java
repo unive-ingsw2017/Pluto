@@ -1,7 +1,6 @@
 package mama.pluto.dataAbstraction;
 
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.CodiceGestionale;
-import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Sottocomparto;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -9,6 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class CategoryUtils {
@@ -23,20 +23,20 @@ public final class CategoryUtils {
             put(Category.getInstance(1), new String[]{"ELETTORALI", "REFERENDUM"});
             put(Category.getInstance(2), new String[]{"BENI"});
             put(Category.getInstance(3), new String[]{"FABBRICATI"});
-            put(Category.getInstance(4), new String[]{"PENSIONI","INPS"});
+            put(Category.getInstance(4), new String[]{"PENSIONI", "INPS"});
             put(Category.getInstance(6), new String[]{"RICERCA", "BREVETTI"});
             put(Category.getInstance(7), new String[]{"UNIVERSIT", "STUDIO", "SCUO", "DOTTORATO", "DOCENTI"});
             put(Category.getInstance(8), new String[]{"TERRENI"});
             put(Category.getInstance(9), new String[]{"MANUT"});
-            put(Category.getInstance(11), new String[]{"SANIT"});
+            put(Category.getInstance(11), new String[]{"SANIT", "OSPEDA", "CLINIC", "MEDIC", "ISTITUTI", "FARMAC", "PSICHIATRIA"});
             put(Category.getInstance(12), new String[]{"VINCITE", "PREMI PER", "LOTTO"});
-            put(Category.getInstance(13), new String[]{"STIPENDIALI", "STRAORDINARI", "TFR","LAVORO", "STUDI", "CONSULENZ", "COLLABORA", "PERIZIE", "INCARICHI"});
+            put(Category.getInstance(13), new String[]{"STIPENDIALI", "STRAORDINARI", "TFR", "LAVORO", "STUDI", "CONSULENZ", "COLLABORA", "PERIZIE", "INCARICHI"});
             put(Category.getInstance(14), new String[]{"SERVIZI"});
             put(Category.getInstance(15), new String[]{"TITOLI"});
             put(Category.getInstance(16), new String[]{"ARMI"});
             put(Category.getInstance(17), new String[]{"INVESTIMENTI"});
             put(Category.getInstance(18), new String[]{"UTENZE"});
-            put(Category.getInstance(19), new String[]{"RIMBORS","RISARCIMENT"});
+            put(Category.getInstance(19), new String[]{"RIMBORS", "RISARCIMENT"});
             put(Category.getInstance(20), new String[]{"INFRASTRUTTURE", "IMPIANTI", "CIMITERI"});
             put(Category.getInstance(21), new String[]{"SOFTWARE", "SERVER", "HARD", "INFORMATICO"});
             put(Category.getInstance(22), new String[]{"VIE", "STRADE"});
@@ -45,7 +45,6 @@ public final class CategoryUtils {
             put(Category.getInstance(25), new String[]{"CULTURA", "TEATRI"});
             put(Category.getInstance(26), new String[]{"MEZZI"});
             put(Category.getInstance(27), new String[]{"AGRICOLTURA"});
-            put(Category.getInstance(28), new String[]{"OSPEDA", "SANITA", "CLINIC", "MEDIC", "ISTITUTI", "FARMAC", "PSICHIATRIA"});
             put(Category.getInstance(29), new String[]{"ESTERO"});
             put(Category.getInstance(30), new String[]{"TRIBUT", "IMPOST"});
             put(Category.getInstance(31), new String[]{"NOLEGGI"});
@@ -68,7 +67,7 @@ public final class CategoryUtils {
             put(Category.getInstance(49), new String[]{"PROVIN"});
             put(Category.getInstance(50), new String[]{"COMUNI"});
             put(Category.getInstance(51), new String[]{"MACCHINARI"});
-            put(Category.getInstance(53), new String[]{"PIGNORAMENTI","INTERESSI"});
+            put(Category.getInstance(53), new String[]{"PIGNORAMENTI", "INTERESSI"});
             put(Category.getInstance(54), new String[]{"PUBBLICAZIONI", "STAMPA"});
             put(Category.getInstance(55), new String[]{"PRODOTTI CHIMICI"});
             put(Category.getInstance(58), new String[]{"MINISTERI"});
@@ -84,9 +83,9 @@ public final class CategoryUtils {
             put(Category.getInstance(68), new String[]{"MATERIAL"});
             put(Category.getInstance(70), new String[]{"COMMISSIONI"});
             put(Category.getInstance(71), new String[]{"COMPETENZE"});
-            put(Category.getInstance(73), new String[]{"SPESE","TRASFERIMENTI"});
+            put(Category.getInstance(73), new String[]{"SPESE", "TRASFERIMENTI"});
             put(Category.getInstance(74), new String[]{"VERSAMENTI", "PAGAMENTI"});
-            put(Category.getInstance(76), new String[]{"PRESTITI","LEASING","FINANZIARIE","CONCESSIONE CREDITI"});
+            put(Category.getInstance(76), new String[]{"PRESTITI", "LEASING", "FINANZIARIE", "CONCESSIONE CREDITI"});
             put(Category.getInstance(77), new String[]{"ARRETRATI"});
             put(Category.getInstance(78), new String[]{"INDENNI"});
             put(Category.getInstance(79), new String[]{"ONERI"});

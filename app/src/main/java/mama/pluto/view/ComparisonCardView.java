@@ -3,6 +3,7 @@ package mama.pluto.view;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.res.ResourcesCompat;
 import android.view.Gravity;
 import android.view.View;
@@ -12,11 +13,16 @@ import android.widget.Space;
 import android.widget.TextView;
 
 import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.Ente;
+import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.GeoItem;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Set;
+
 import mama.pluto.R;
 import mama.pluto.dataAbstraction.AnagraficheExtended;
+import mama.pluto.dataAbstraction.ComuneStat;
+import mama.pluto.dataAbstraction.DataUtils;
 import mama.pluto.dataAbstraction.EntiComparator;
 import mama.pluto.utils.EuroFormattingUtils;
 import mama.pluto.utils.MetricsUtils;
@@ -97,6 +103,24 @@ public class ComparisonCardView extends CollapsableCardView {
         addRowSpesa(ll, getContext().getString(R.string.entrate), categoryComparison.getFirstEntrate(), categoryComparison.getSecondEntrate());
         addRowSpesa(ll, getContext().getString(R.string.bilancio), categoryComparison.getFirstBalance(), categoryComparison.getSecondBalance());
 
+        GeoItem g1 = DataUtils.optGeoItemOfEnte(categoryComparison.getEntiComparator().getEnteSummary1().getEnte());
+        GeoItem g2 = DataUtils.optGeoItemOfEnte(categoryComparison.getEntiComparator().getEnteSummary2().getEnte());
+        if (g1 != null && g2 != null) {
+            Set<ComuneStat> s1 = ComuneStat.getInstance(getContext(), anagrafiche, g1);
+            Set<ComuneStat> s2 = ComuneStat.getInstance(getContext(), anagrafiche, g2);
+            if (!s1.isEmpty() && !s2.isEmpty()) {
+                addRowSpesa(ll, getContext().getString(R.string.bilancio_pro_capite),
+                        Math.round(categoryComparison.getFirstBalance() / (float) ComuneStat.getAllPopulation(s1)),
+                        Math.round(categoryComparison.getSecondBalance() / (float) ComuneStat.getAllPopulation(s1))
+                );
+                addRowSpesa(ll, getContext().getString(R.string.bilancio_per_superficie),
+                        Math.round(categoryComparison.getFirstBalance() / ComuneStat.getAllSuperficie(s1)),
+                        Math.round(categoryComparison.getSecondBalance() / ComuneStat.getAllSuperficie(s1)),
+                        "/km²"
+                );
+            }
+        }
+
         Button b1 = new Button(getContext(), null, android.R.attr.borderlessButtonStyle);
         b1.setText(R.string.view_all_movements_short);
         b1.setOnClickListener(v -> openMovementsDialog(categoryComparison.getEntiComparator().getEnteSummary1().getEnte()));
@@ -115,9 +139,17 @@ public class ComparisonCardView extends CollapsableCardView {
     }
 
     private void addRowSpesa(LinearLayout ll, CharSequence text, long first, long second) {
+        addRowSpesa(ll, text, first, second, null);
+    }
+
+    private void addRowSpesa(LinearLayout ll, CharSequence text, long first, long second, @Nullable String unitOfMeasure) {
         EuroFormattingUtils.Base base = EuroFormattingUtils.Base.getBase(first, second);
-        CharSequence firstCS = base.format(first, true);
-        CharSequence secondCS = base.format(second, true);
+        String firstCS = base.format(first, true);
+        String secondCS = base.format(second, true);
+        if (unitOfMeasure != null) {
+            firstCS += unitOfMeasure;
+            secondCS += unitOfMeasure;
+        }
         addRow(ll, text, firstCS, secondCS);
     }
 

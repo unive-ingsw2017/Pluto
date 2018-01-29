@@ -17,7 +17,11 @@ import com.github.mmauro94.siopeDownloader.datastruct.anagrafiche.RipartizioneGe
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Set;
+
 import mama.pluto.R;
+import mama.pluto.dataAbstraction.AnagraficheExtended;
+import mama.pluto.dataAbstraction.ComuneStat;
 import mama.pluto.dataAbstraction.DataUtils;
 import mama.pluto.dataAbstraction.EnteSummary;
 import mama.pluto.utils.Consumer;
@@ -25,7 +29,8 @@ import mama.pluto.utils.MetricsUtils;
 import mama.pluto.utils.StringUtils;
 
 public class EnteSummaryView extends LinearLayout {
-
+    @NotNull
+    private final AnagraficheExtended anagrafiche;
     private final TextView nameView;
     private final TextView secondaryNameView;
     private final BalanceRowView balanceRowView;
@@ -34,11 +39,14 @@ public class EnteSummaryView extends LinearLayout {
     private final TextView codiceFiscaleView;
     private final TextView sottoComparto;
     private final TextView comparto;
+    private final TextView population;
+    private final TextView surface;
     private Ente ente;
     private GeoItem geoItem;
 
-    public EnteSummaryView(Context context) {
+    public EnteSummaryView(@NotNull Context context, @NotNull AnagraficheExtended anagrafiche) {
         super(context);
+        this.anagrafiche = anagrafiche;
         setOrientation(VERTICAL);
 
         int dp8 = MetricsUtils.dpToPixel(context, 8);
@@ -77,11 +85,18 @@ public class EnteSummaryView extends LinearLayout {
         comparto = new TextView(context, null, android.R.attr.textAppearanceSmall);
         addView(comparto);
 
+        population = new TextView(context, null, android.R.attr.textAppearanceSmall);
+        addView(population);
+
+        surface = new TextView(context, null, android.R.attr.textAppearanceSmall);
+        addView(surface);
+
     }
 
     public void setEnte(@NotNull EnteSummary enteSummary, @NotNull Ente ente, @Nullable GeoItem geoItem) {
         this.ente = ente;
-        this.geoItem = geoItem != null ? geoItem : DataUtils.optGeoItemOfEnte(ente);
+        geoItem = geoItem != null ? geoItem : DataUtils.optGeoItemOfEnte(ente);
+        this.geoItem = geoItem;
 
         if (geoItem == null) {
             nameView.setText(StringUtils.toNormalCase(ente.getNome()));
@@ -90,6 +105,17 @@ public class EnteSummaryView extends LinearLayout {
             nameView.setText(StringUtils.toNormalCase(geoItem.getNome()));
             secondaryNameView.setText(StringUtils.toNormalCase(ente.getNome()));
             secondaryNameView.setVisibility(VISIBLE);
+        }
+        Set<ComuneStat> stats = geoItem == null ? null : ComuneStat.getInstance(getContext(), anagrafiche, geoItem);
+        if (stats == null || stats.isEmpty()) {
+            surface.setVisibility(GONE);
+            population.setVisibility(GONE);
+        } else {
+            surface.setVisibility(VISIBLE);
+            population.setVisibility(VISIBLE);
+            setHtmlText(population, R.string.population_x, ComuneStat.getAllPopulation(stats));
+            float allSuperficie = ComuneStat.getAllSuperficie(stats);
+            setHtmlText(surface, R.string.surface_x, allSuperficie > 100 ? (int) allSuperficie : allSuperficie);
         }
         computeHierarcy();
 

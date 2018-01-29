@@ -310,4 +310,21 @@ public final class DataUtils {
 
         return ret;
     }
+
+    public static Set<Comune> getAllComuni(@NotNull GeoItem geoItem) {
+        Set<Comune> ret = new HashSet<>();
+        addComuni(ret, geoItem);
+        return ret;
+    }
+
+    private static void addComuni(@NotNull Set<Comune> ret, @NotNull GeoItem geoItem) {
+        if (geoItem instanceof Comune) {
+            ret.add(((Comune) geoItem));
+        }
+        if (geoItem.getChildren() != null) {
+            for (GeoItem item : geoItem.getChildren()) {
+                addComuni(ret, item);
+            }
+        }
+    }
 }

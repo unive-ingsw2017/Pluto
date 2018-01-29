@@ -51,7 +51,7 @@ import mama.pluto.utils.StringUtils;
 public class Database extends SQLiteOpenHelper {
 
     public static final String NAME = "pluto.db";
-    public static final int VERSION = 2;
+    public static final int VERSION = 3;
     public static final String TIPO_CODICE_GESTIONALE_ENTRATA = "ENTRATA";
     public static final String TIPO_CODICE_GESTIONALE_USCITA = "USCITA";
     public static final int TIPO_OPERAZIONE_ENTRATA = 0;
@@ -144,6 +144,9 @@ public class Database extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion < 2) {
             db.execSQL("CREATE INDEX codiceGestionale_category ON CodiceGestionale(category)");
+        }
+        if (oldVersion < 3) {
+            db.execSQL("UPDATE CodiceGestionale SET category = 11 WHERE category = 28");
         }
     }
 

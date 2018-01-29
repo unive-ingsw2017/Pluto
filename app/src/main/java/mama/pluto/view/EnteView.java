@@ -88,7 +88,7 @@ public class EnteView extends RecyclerView {
             View view;
             switch (viewType) {
                 case VIEW_TYPE_SUMMARY:
-                    EnteSummaryView sv = new EnteSummaryView(getContext());
+                    EnteSummaryView sv = new EnteSummaryView(getContext(), anagrafiche);
                     sv.addExpandButton(getResources().getString(R.string.compare), ente ->
                             new EnteSelectorDialog(getContext(), anagrafiche, onEnteSelectedForComparison)
                                     .setTitle(R.string.choose_ente_to_compare)
@@ -97,7 +97,7 @@ public class EnteView extends RecyclerView {
                     view = sv;
                     break;
                 case VIEW_TYPE_CATEGORY:
-                    view = new CategoryBalanceView(getContext(), anagrafiche);
+                    view = new CategoryBalanceCardView(getContext(), anagrafiche);
                     break;
                 default:
                     throw new IllegalStateException();
@@ -113,7 +113,7 @@ public class EnteView extends RecyclerView {
                 ((EnteSummaryView) holder.itemView).setEnte(enteSummary, ente, geoItem);
             } else {
                 Category category = categoriesList.get(position - 1);
-                ((CategoryBalanceView) holder.itemView).setCategory(enteSummary, category);
+                ((CategoryBalanceCardView) holder.itemView).setCategory(enteSummary, category);
             }
         }
 

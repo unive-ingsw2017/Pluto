@@ -18,6 +18,7 @@ import java.io.File;
 import java.util.Arrays;
 
 import mama.pluto.dataAbstraction.AnagraficheExtended;
+import mama.pluto.dataAbstraction.ComuneStat;
 import mama.pluto.database.Database;
 
 public class InitialDataLoader extends AsyncTask<Void, Progress, Exception> {
@@ -29,9 +30,9 @@ public class InitialDataLoader extends AsyncTask<Void, Progress, Exception> {
 
     @Nullable
     private AnagraficheExtended anagrafiche;
-    private final float[] progresses = new float[4];
+    private final float[] progresses = new float[5];
 
-    private static final int[] progressesWeights = new int[4];
+    private static final int[] progressesWeights = new int[5];
 
     public InitialDataLoader(@NotNull Context context, int yearToDownload) {
         this.context = context.getApplicationContext();
@@ -52,6 +53,7 @@ public class InitialDataLoader extends AsyncTask<Void, Progress, Exception> {
             progressesWeights[2] = 100;
             progressesWeights[3] = 100;
         }
+        progressesWeights[4] = 2;
     }
 
     @NotNull
@@ -87,6 +89,7 @@ public class InitialDataLoader extends AsyncTask<Void, Progress, Exception> {
                 downloadOperazioni(db, new Uscita.Downloader(yearToDownload, anagrafiche.getAnagrafiche()), tempFile, 3, R.string.downloading_uscite);
                 preferences.edit().putInt(SharedPreferencesConsts.OPERAZIONI_DOWNLOADED, yearToDownload).apply();
             }
+            ComuneStat.ensureLoaded(context, anagrafiche, p -> progress(4, p, R.string.loading_geoitem_stats));
         } catch (Exception e) {
             e.printStackTrace();
             return e;
@@ -102,15 +105,20 @@ public class InitialDataLoader extends AsyncTask<Void, Progress, Exception> {
         iteratorBuffer.throwIfTerminatedUnsuccessfully();
     }
 
+    private long lastPublished = 0;
+
     private void progress(int index, float progress, @StringRes int res) {
-        progresses[index] = progress;
-        float sum = 0;
-        int weights = 0;
-        for (int i = 0; i < progresses.length; i++) {
-            sum += progresses[i] * progressesWeights[i];
-            weights += progressesWeights[i];
+        if (lastPublished + 16 < System.currentTimeMillis()) {
+            lastPublished = System.currentTimeMillis();
+            progresses[index] = progress;
+            float sum = 0;
+            int weights = 0;
+            for (int i = 0; i < progresses.length; i++) {
+                sum += progresses[i] * progressesWeights[i];
+                weights += progressesWeights[i];
+            }
+            publishProgress(new Progress(sum / weights, context, res));
         }
-        publishProgress(new Progress(sum / weights, context, res));
     }
 
     @Nullable

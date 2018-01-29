@@ -25,7 +25,7 @@ public final class Category {
             add(new Category(7, "Università"));
             add(new Category(8, "Terreni"));
             add(new Category(9, "Manutenzione"));
-            add(new Category(11, "Sanità"));
+            add(new Category(11, "Sanità"));//Merged with 28
             add(new Category(12, "Lotterie"));
             add(new Category(13, "Stipendi"));
             add(new Category(14, "Servizi"));
@@ -42,10 +42,9 @@ public final class Category {
             add(new Category(25, "Cultura"));
             add(new Category(26, "Mezzi"));
             add(new Category(27, "Agricoltura"));
-            add(new Category(28, "Sanità"));
-            add(new Category(29, "Estero"));
+            add(new Category(29, "Estero", true));
             add(new Category(30, "Tributi"));
-            add(new Category(31, "Noleggi"));
+            add(new Category(31, "Noleggi", true));
             add(new Category(32, "Opere"));
             add(new Category(33, "Formazione"));
             add(new Category(34, "Luce e gas"));
@@ -54,7 +53,7 @@ public final class Category {
             add(new Category(38, "Mobili"));
             add(new Category(39, "Smaltimento"));
             add(new Category(40, "Mensa"));
-            add(new Category(41, "Pulizia"));
+            add(new Category(41, "Pulizia", true));
             add(new Category(42, "Servizi pubblicitari"));
             add(new Category(43, "Cancelleria"));
             add(new Category(44, "Famiglie"));
@@ -71,16 +70,16 @@ public final class Category {
             add(new Category(58, "Ministeri"));
             add(new Category(59, "Carburanti"));
             add(new Category(60, "Portuali"));
-            add(new Category(61, "Piante"));
-            add(new Category(62, "IRAP"));
-            add(new Category(63, "I.V.A."));
+            add(new Category(61, "Piante", true));
+            add(new Category(62, "IRAP", true));
+            add(new Category(63, "I.V.A.", true));
             add(new Category(64, "Giornali e riviste"));
             add(new Category(65, "Giacimenti"));
             add(new Category(66, "Cauzioni"));
             add(new Category(67, "Equitalia"));
             add(new Category(68, "Materiali"));
             add(new Category(70, "Commissioni"));
-            add(new Category(71, "Competenze"));
+            add(new Category(71, "Competenze", true));
             add(new Category(73, "Spese"));
             add(new Category(74, "Pagamenti"));
             add(new Category(76, "Prestiti"));
@@ -95,10 +94,16 @@ public final class Category {
     private final int id;
     @NotNull
     private final String name;
+    private final boolean entiOnly;
 
     private Category(int id, @NotNull String name) {
+        this(id, name, false);
+    }
+
+    private Category(int id, @NotNull String name, boolean entiOnly) {
         this.id = id;
         this.name = name;
+        this.entiOnly = entiOnly;
     }
 
     @Contract(pure = true)
@@ -110,6 +115,13 @@ public final class Category {
     @NotNull
     public String getName() {
         return name;
+    }
+
+    /**
+     * If this category is NEVER applied to regioni/province/comuni
+     */
+    public boolean isEntiOnly() {
+        return entiOnly;
     }
 
     @NotNull

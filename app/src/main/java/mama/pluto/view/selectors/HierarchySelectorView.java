@@ -133,9 +133,16 @@ public class HierarchySelectorView extends FrameLayout {
     }
 
     public static class SummaryHeaderCreator implements AbstractSelectorAdapter.HeaderCreator<EnteSummaryView> {
+        @NotNull
+        private final AnagraficheExtended anagrafiche;
+
+        public SummaryHeaderCreator(@NotNull AnagraficheExtended anagrafiche) {
+            this.anagrafiche = anagrafiche;
+        }
+
         @Override
         public EnteSummaryView createView(@NonNull Context context, @NonNull Consumer<Ente> onEnteSelected) {
-            EnteSummaryView ret = new EnteSummaryView(context);
+            EnteSummaryView ret = new EnteSummaryView(context, anagrafiche);
             ret.addExpandButton(context.getString(R.string.view_all_ente_details), onEnteSelected);
             ret.setBackgroundColor(0x10000000);
             return ret;
